@@ -477,7 +477,7 @@ if (!(await confirm({
               <select data-testid="tx-unit" className="select" value={form.unit_usaha_id}
                       onChange={(e) => onUnitChange(e.target.value)}
                       disabled={isPengelola}>
-                {!isPengelola && <option value="">— BUMDES (umum) —</option>}
+                {!isPengelola && <option value="">BUMDES - Pusat</option>}
                 {units
                   .filter(u => !isPengelola || u.id === user?.unit_usaha_id)
                   .map(u => <option key={u.id} value={u.id}>{u.code} - {u.name}</option>)}
