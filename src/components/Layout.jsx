@@ -1,10 +1,10 @@
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth, can } from "@/lib/auth";
-import { ROLE_LABELS } from "@/lib/api";
+import api, { ROLE_LABELS } from "@/lib/api";
 import {
   House, Receipt, ChartLine, ChartBar, Storefront, UsersThree,
-  BookOpenText, SignOut, List, X, Books, Calculator, UserCircle,
+  BookOpenText, SignOut, List, X, Books, Calculator, UserCircle, Package,
 } from "@phosphor-icons/react";
 
 const READ_ONLY = ["admin", "direktur", "bendahara", "pengawas", "penasihat"];
@@ -16,6 +16,7 @@ const NAV = [
   { to: "/reports", label: "Laporan Keuangan", icon: ChartLine, roles: READ_MOST },
   { to: "/ledger", label: "Buku Besar", icon: BookOpenText, roles: READ_MOST },
   { to: "/accounts", label: "Kode Akun (COA)", icon: Books, roles: READ_ONLY },
+  { to: "/inventory", label: "Inventory", icon: Package, roles: ["admin", "direktur", "bendahara", "pengelola"], uu05Only: true },
   { to: "/users", label: "Kelola Pengguna", icon: UsersThree, roles: ["admin"] },
   { to: "/profile", label: "Profil Saya", icon: UserCircle, roles: READ_MOST },
 ];
@@ -24,9 +25,26 @@ export default function Layout({ children }) {
   const { user, logout } = useAuth();
   const location = useLocation();
   const [open, setOpen] = useState(false);
+  const [uu05Id, setUu05Id] = useState(null);
+
+  useEffect(() => {
+    let alive = true;
+    api.get("/unit-usaha").then((r) => {
+      if (!alive) return;
+      const u = (r.data || []).find((x) => x.code === "UU05");
+      setUu05Id(u?.id || null);
+    }).catch(() => {});
+    return () => { alive = false; };
+  }, []);
 
   if (!user) return null;
-  const visible = NAV.filter(n => can(user, ...n.roles));
+  const visible = NAV.filter((n) => {
+    if (!can(user, ...n.roles)) return false;
+    if (n.uu05Only && user.role === "pengelola") {
+      return Boolean(uu05Id) && user.unit_usaha_id === uu05Id;
+    }
+    return true;
+  });
 
   return (
     <div className="min-h-screen flex" style={{ background: "var(--bg)" }}>
