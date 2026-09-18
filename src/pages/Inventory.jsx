@@ -3,8 +3,24 @@ import { Navigate } from "react-router-dom";
 import api, { fmtRp, fmtDate } from "@/lib/api";
 import { useAuth, can } from "@/lib/auth";
 import {
-  Package, Plus, ArrowDown, ArrowUp, SlidersHorizontal, ChartBar, Trash,
+  Package, Plus, ArrowDown, ArrowUp, SlidersHorizontal, ChartBar, Trash, PencilSimple,
 } from "@phosphor-icons/react";
+
+function formatApiError(err, fallback = "Terjadi kesalahan") {
+  const detail = err?.response?.data?.detail;
+  if (detail == null) return err?.message || fallback;
+  if (typeof detail === "string") return detail;
+  if (Array.isArray(detail)) {
+    return detail.map((item) => {
+      if (typeof item === "string") return item;
+      const loc = Array.isArray(item?.loc) ? item.loc.filter((x) => x !== "body").join(".") : "";
+      const msg = item?.msg || item?.message || JSON.stringify(item);
+      return loc ? `${loc}: ${msg}` : msg;
+    }).join("; ");
+  }
+  if (typeof detail === "object") return detail.message || JSON.stringify(detail);
+  return String(detail);
+}
 
 const BASE = "/v1/uu05_inventory";
 const today = () => new Date().toISOString().slice(0, 10);
@@ -32,6 +48,7 @@ export default function Inventory() {
   const [q, setQ] = useState("");
   const [catFilter, setCatFilter] = useState("");
   const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState(null);
   const [productForm, setProductForm] = useState({
     sku: "", name: "", category_id: "", unit_of_measure: "pcs",
     cost_price: 0, sell_price: 0, opening_qty: 0,
@@ -47,6 +64,7 @@ export default function Inventory() {
   const [adjust, setAdjust] = useState({
     product_id: "", quantity_delta: -1, reason: "rusak",
     adjustment_date: today(), notes: "",
+    debit_account_code: "", credit_account_code: "",
   });
   const [reportRange, setReportRange] = useState({ date_from: "", date_to: "" });
 
@@ -65,7 +83,7 @@ export default function Inventory() {
       setProducts(Array.isArray(p.data) ? p.data : []);
       setCategories(Array.isArray(c.data) ? c.data : []);
     } catch (e) {
-      setError(e?.response?.data?.detail || e.message || "Gagal memuat inventory");
+      setError(formatApiError(e, "Gagal memuat inventory"));
     } finally {
       setLoading(false);
     }
@@ -80,7 +98,7 @@ export default function Inventory() {
       setMovements(Array.isArray(mov.data) ? mov.data : []);
       setAdjustments(Array.isArray(adj.data) ? adj.data : []);
     } catch (e) {
-      setError(e?.response?.data?.detail || e.message || "Gagal memuat mutasi");
+      setError(formatApiError(e, "Gagal memuat mutasi"));
     }
   }, []);
 
@@ -98,7 +116,7 @@ export default function Inventory() {
       setValuation(val.data);
       setMovementReport(mov.data);
     } catch (e) {
-      setError(e?.response?.data?.detail || e.message || "Gagal memuat laporan");
+      setError(formatApiError(e, "Gagal memuat laporan"));
     }
   }, [reportRange]);
 
@@ -124,21 +142,61 @@ export default function Inventory() {
     return <Navigate to="/dashboard" replace />;
   }
 
+  const emptyProductForm = () => ({
+    sku: "", name: "", category_id: "", unit_of_measure: "pcs",
+    cost_price: 0, sell_price: 0, opening_qty: 0,
+  });
+
+  const openCreateProduct = () => {
+    setEditingId(null);
+    setProductForm(emptyProductForm());
+    setShowForm(true);
+  };
+
+  const openEditProduct = (p) => {
+    setEditingId(p.id);
+    setProductForm({
+      sku: p.sku,
+      name: p.name,
+      category_id: p.category_id || "",
+      unit_of_measure: p.unit_of_measure || "pcs",
+      cost_price: Number(p.cost_price || 0),
+      sell_price: Number(p.sell_price || 0),
+      opening_qty: 0,
+    });
+    setShowForm(true);
+  };
+
+  const closeProductForm = () => {
+    setShowForm(false);
+    setEditingId(null);
+    setProductForm(emptyProductForm());
+  };
+
   const submitProduct = async (e) => {
     e.preventDefault();
     try {
-      await api.post(`${BASE}/products`, {
-        ...productForm,
-        cost_price: Number(productForm.cost_price || 0),
-        sell_price: Number(productForm.sell_price || 0),
-        opening_qty: Number(productForm.opening_qty || 0),
-        unit_usaha_id: meta?.unit_usaha_id,
-      });
-      setShowForm(false);
-      setProductForm({ sku: "", name: "", category_id: "", unit_of_measure: "pcs", cost_price: 0, sell_price: 0, opening_qty: 0 });
+      if (editingId) {
+        await api.put(`${BASE}/products/${editingId}`, {
+          name: productForm.name,
+          category_id: productForm.category_id,
+          unit_of_measure: productForm.unit_of_measure,
+          cost_price: Number(productForm.cost_price || 0),
+          sell_price: Number(productForm.sell_price || 0),
+        });
+      } else {
+        await api.post(`${BASE}/products`, {
+          ...productForm,
+          cost_price: Number(productForm.cost_price || 0),
+          sell_price: Number(productForm.sell_price || 0),
+          opening_qty: Number(productForm.opening_qty || 0),
+          unit_usaha_id: meta?.unit_usaha_id,
+        });
+      }
+      closeProductForm();
       loadCore();
     } catch (err) {
-      setError(err?.response?.data?.detail || err.message);
+      setError(formatApiError(err, "Gagal menyimpan produk"));
     }
   };
 
@@ -148,7 +206,7 @@ export default function Inventory() {
       await api.delete(`${BASE}/products/${id}`);
       loadCore();
     } catch (err) {
-      setError(err?.response?.data?.detail || err.message);
+      setError(formatApiError(err, "Gagal menghapus produk"));
     }
   };
 
@@ -164,7 +222,7 @@ export default function Inventory() {
       setStockIn({ product_id: "", quantity: 1, unit_cost: 0, movement_date: today(), debit_account_code: "", credit_account_code: "" });
       await Promise.all([loadCore(), loadOps()]);
     } catch (err) {
-      setError(err?.response?.data?.detail || err.message);
+      setError(formatApiError(err));
     }
   };
 
@@ -179,7 +237,7 @@ export default function Inventory() {
       setStockOut({ product_id: "", quantity: 1, movement_date: today(), debit_account_code: "", credit_account_code: "" });
       await Promise.all([loadCore(), loadOps()]);
     } catch (err) {
-      setError(err?.response?.data?.detail || err.message);
+      setError(formatApiError(err));
     }
   };
 
@@ -189,11 +247,15 @@ export default function Inventory() {
       await api.post(`${BASE}/adjustments`, {
         ...adjust,
         quantity_delta: Number(adjust.quantity_delta),
+        unit_usaha_id: meta?.unit_usaha_id,
       });
-      setAdjust({ product_id: "", quantity_delta: -1, reason: "rusak", adjustment_date: today(), notes: "" });
+      setAdjust({
+        product_id: "", quantity_delta: -1, reason: "rusak", adjustment_date: today(), notes: "",
+        debit_account_code: "", credit_account_code: "",
+      });
       await Promise.all([loadCore(), loadOps()]);
     } catch (err) {
-      setError(err?.response?.data?.detail || err.message);
+      setError(formatApiError(err));
     }
   };
 
@@ -203,7 +265,7 @@ export default function Inventory() {
       await api.post(`${BASE}/cancel-movement`, { stock_card_id: id });
       await Promise.all([loadCore(), loadOps()]);
     } catch (err) {
-      setError(err?.response?.data?.detail || err.message);
+      setError(formatApiError(err));
     }
   };
 
@@ -218,15 +280,16 @@ export default function Inventory() {
           </p>
         </div>
         {tab === "katalog" && canWrite && (
-          <button type="button" className="btn btn-primary" onClick={() => setShowForm(true)} data-testid="btn-new-product">
+          <button type="button" className="btn btn-primary" onClick={openCreateProduct} data-testid="btn-new-product">
             <Plus size={16} /> Tambah Produk
           </button>
         )}
       </div>
 
       {error && (
-        <div className="card p-3 text-sm" style={{ borderColor: "#D97878", color: "#9B3B3B" }} role="alert">
-          {typeof error === "string" ? error : JSON.stringify(error)}
+        <div className="card p-3 text-sm" style={{ borderColor: "#D97878", color: "#9B3B3B", background: "#FDF2F2" }} role="alert" data-testid="inventory-error">
+          <strong className="block mb-1">Validasi / API</strong>
+          <span>{typeof error === "string" ? error : JSON.stringify(error)}</span>
           <button type="button" className="ml-3 underline" onClick={() => setError("")}>tutup</button>
         </div>
       )}
@@ -269,8 +332,12 @@ export default function Inventory() {
 
           {showForm && canWrite && (
             <div className="card fade-in">
+              <p className="label mb-3">{editingId ? "Edit produk" : "Tambah produk"}</p>
               <form onSubmit={submitProduct} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div><label className="label">SKU</label><input required className="input" value={productForm.sku} onChange={(e) => setProductForm({ ...productForm, sku: e.target.value })} /></div>
+                <div>
+                  <label className="label">SKU</label>
+                  <input required className="input" value={productForm.sku} disabled={!!editingId} onChange={(e) => setProductForm({ ...productForm, sku: e.target.value })} />
+                </div>
                 <div><label className="label">Nama produk</label><input required className="input" value={productForm.name} onChange={(e) => setProductForm({ ...productForm, name: e.target.value })} /></div>
                 <div>
                   <label className="label">Kategori</label>
@@ -282,10 +349,12 @@ export default function Inventory() {
                 <div><label className="label">Satuan</label><input className="input" value={productForm.unit_of_measure} onChange={(e) => setProductForm({ ...productForm, unit_of_measure: e.target.value })} /></div>
                 <div><label className="label">Harga pokok (Rp)</label><input type="number" min="0" className="input" value={productForm.cost_price} onChange={(e) => setProductForm({ ...productForm, cost_price: e.target.value })} /></div>
                 <div><label className="label">Harga jual (Rp)</label><input type="number" min="0" className="input" value={productForm.sell_price} onChange={(e) => setProductForm({ ...productForm, sell_price: e.target.value })} /></div>
-                <div><label className="label">Qty awal</label><input type="number" min="0" className="input" value={productForm.opening_qty} onChange={(e) => setProductForm({ ...productForm, opening_qty: e.target.value })} /></div>
+                {!editingId && (
+                  <div><label className="label">Qty awal</label><input type="number" min="0" className="input" value={productForm.opening_qty} onChange={(e) => setProductForm({ ...productForm, opening_qty: e.target.value })} /></div>
+                )}
                 <div className="sm:col-span-2 flex justify-end gap-2">
-                  <button type="button" className="btn btn-outline" onClick={() => setShowForm(false)}>Batal</button>
-                  <button type="submit" className="btn btn-primary">Simpan produk</button>
+                  <button type="button" className="btn btn-outline" onClick={closeProductForm}>Batal</button>
+                  <button type="submit" className="btn btn-primary">{editingId ? "Simpan perubahan" : "Simpan produk"}</button>
                 </div>
               </form>
             </div>
@@ -315,7 +384,10 @@ export default function Inventory() {
                     <td className="num">{p.qty_on_hand}</td>
                     <td className="num">{fmtRp(Number(p.stock_value))}</td>
                     {canWrite && (
-                      <td>
+                      <td className="whitespace-nowrap">
+                        <button type="button" className="p-1.5" title="Edit" onClick={() => openEditProduct(p)} data-testid={`btn-edit-product-${p.id}`}>
+                          <PencilSimple size={16} />
+                        </button>
                         <button type="button" className="p-1.5" title="Hapus" onClick={() => removeProduct(p.id)}>
                           <Trash size={16} color="#D97878" />
                         </button>
@@ -333,9 +405,7 @@ export default function Inventory() {
         <div className="space-y-4">
           <div className="card">
             <p className="label mb-2">Penerimaan barang (Stock In)</p>
-            <p className="text-sm mb-4" style={{ color: "var(--text-muted)" }}>
-              Menambah qty, memperbarui HPP, dan memposting jurnal pembelian persediaan.
-            </p>
+            <p className="text-sm mb-4" style={{ color: "var(--text-muted)" }}>Stock in + jurnal persediaan.</p>
             {canWrite ? (
               <form onSubmit={submitStockIn} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -365,9 +435,7 @@ export default function Inventory() {
         <div className="space-y-4">
           <div className="card">
             <p className="label mb-2">Pengeluaran barang (Stock Out / COGS)</p>
-            <p className="text-sm mb-4" style={{ color: "var(--text-muted)" }}>
-              Mengurangi stok memakai HPP berjalan dan memposting jurnal HPP ↔ Persediaan.
-            </p>
+            <p className="text-sm mb-4" style={{ color: "var(--text-muted)" }}>Stock out + jurnal HPP.</p>
             {canWrite ? (
               <form onSubmit={submitStockOut} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -394,7 +462,7 @@ export default function Inventory() {
           <div className="card">
             <p className="label mb-2">Penyesuaian stok</p>
             <p className="text-sm mb-4" style={{ color: "var(--text-muted)" }}>
-              Untuk rusak, kadaluarsa, atau koreksi opname. Jurnal otomatis belum diposting pada penyesuaian ini.
+              Penyesuaian; jurnal jika HPP x |delta| > 0 (loss: Dr beban Cr Persediaan; gain: Dr Persediaan Cr offset).
             </p>
             {canWrite ? (
               <form onSubmit={submitAdjust} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -414,6 +482,14 @@ export default function Inventory() {
                     <option value="kadaluarsa">Kadaluarsa</option>
                     <option value="koreksi">Koreksi</option>
                   </select>
+                </div>
+                <div>
+                  <label className="label">{Number(adjust.quantity_delta) < 0 ? "Akun debit (Beban/HPP)" : "Akun debit (Persediaan)"}</label>
+                  <input required className="input" placeholder={Number(adjust.quantity_delta) < 0 ? "mis. 5.1.01" : "mis. 1.1.03"} value={adjust.debit_account_code} onChange={(e) => setAdjust({ ...adjust, debit_account_code: e.target.value })} />
+                </div>
+                <div>
+                  <label className="label">{Number(adjust.quantity_delta) < 0 ? "Akun kredit (Persediaan)" : "Akun kredit (Pendapatan/Offset)"}</label>
+                  <input required className="input" placeholder={Number(adjust.quantity_delta) < 0 ? "mis. 1.1.03" : "mis. 4.1.99"} value={adjust.credit_account_code} onChange={(e) => setAdjust({ ...adjust, credit_account_code: e.target.value })} />
                 </div>
                 <div className="sm:col-span-2"><label className="label">Catatan</label><input className="input" value={adjust.notes} onChange={(e) => setAdjust({ ...adjust, notes: e.target.value })} /></div>
                 <div className="sm:col-span-2 flex justify-end"><button type="submit" className="btn btn-primary">Simpan penyesuaian</button></div>
