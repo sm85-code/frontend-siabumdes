@@ -215,7 +215,7 @@ export default function InventorySummary({ products = [], movements = [], valuat
             </thead>
             <tbody>
               {lowStock.length === 0 ? (
-                <tr><td colSpan={4} className="text-center py-8" style={{ color: "var(--text-muted)" }}>Semua stok aman (> 5).</td></tr>
+                <tr><td colSpan={4} className="text-center py-8" style={{ color: "var(--text-muted)" }}>Semua stok aman (&gt; 5).</td></tr>
               ) : lowStock.map((p) => (
                 <tr key={p.id}>
                   <td className="font-medium">{p.sku}</td>
