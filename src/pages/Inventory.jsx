@@ -3,11 +3,12 @@ import { Navigate } from "react-router-dom";
 import api, { fmtRp, fmtDate } from "@/lib/api";
 import { useAuth, can } from "@/lib/auth";
 import {
-  Package, Plus, ArrowDown, ArrowUp, SlidersHorizontal, ChartBar, Trash, PencilSimple,
+  Package, Plus, ArrowDown, ArrowUp, SlidersHorizontal, ChartBar, ChartPie, Trash, PencilSimple,
 } from "@phosphor-icons/react";
 import { CoaSelect } from "@/lib/uu05InventoryCoa";
+import InventorySummary from "@/pages/InventorySummary";
 
-function formatApiError(err, fallback = "Terjadi kesalahan") {
+function formatApiError(err, fallback = "Terjadi kesalaian") {
   const detail = err?.response?.data?.detail;
   if (detail == null) return err?.message || fallback;
   if (typeof detail === "string") return detail;
@@ -27,6 +28,7 @@ const BASE = "/v1/uu05_inventory";
 const today = () => new Date().toISOString().slice(0, 10);
 
 const TABS = [
+  { id: "summary", label: "Summary", icon: ChartPie },
   { id: "katalog", label: "Katalog Produk", icon: Package },
   { id: "stock-in", label: "Stock In", icon: ArrowDown },
   { id: "stock-out", label: "Stock Out", icon: ArrowUp },
@@ -36,7 +38,7 @@ const TABS = [
 
 export default function Inventory() {
   const { user } = useAuth();
-  const [tab, setTab] = useState("katalog");
+  const [tab, setTab] = useState("summary");
   const [meta, setMeta] = useState(null);
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -69,8 +71,8 @@ export default function Inventory() {
   });
   const [reportRange, setReportRange] = useState({ date_from: "", date_to: "" });
 
-  const canAccessRole = can(user, "admin", "direktur", "bendahara", "pengelola");
-  const canWrite = can(user, "admin", "direktur", "bendahara", "pengelola");
+  const canAccessRole = can(user, "admin", "direktur", "bendaira", "pengelola";
+  const canWrite = can(user, "admin", "direktur", "bendaira", "pengelola");
 
   const loadCore = useCallback(async () => {
     setError("");
@@ -96,7 +98,7 @@ export default function Inventory() {
         api.get(`${BASE}/movements`, { params: { limit: 50 } }),
         api.get(`${BASE}/adjustments`, { params: { limit: 50 } }),
       ]);
-      setMovements(Array.isArray(mov.data) ? mov.data : []);
+      setMovements(Array.isArray(mov.dataata) ? mov.data : []);
       setAdjustments(Array.isArray(adj.data) ? adj.data : []);
     } catch (e) {
       setError(formatApiError(e, "Gagal memuat mutasi"));
@@ -123,8 +125,8 @@ export default function Inventory() {
 
   useEffect(() => { loadCore(); }, [loadCore]);
   useEffect(() => {
-    if (tab === "kelola" || tab === "stock-in" || tab === "stock-out") loadOps();
-    if (tab === "laporan") loadReports();
+    if (tab === "kelola" || tab === "stock-in" || tab === "stock-out" || tab === "summary") loadOps();
+    if (tab === "laporan" || tab === "summary") loadReports();
   }, [tab, loadOps, loadReports]);
 
   const productOptions = useMemo(
@@ -324,6 +326,15 @@ export default function Inventory() {
           );
         })}
       </div>
+
+      {tab === "summary" && (
+        <InventorySummary
+          products={products}
+          movements={movements}
+          valuation={valuation}
+          movementReport={movementReport}
+        />
+      )}
 
       {tab === "katalog" && (
         <div className="space-y-4">
