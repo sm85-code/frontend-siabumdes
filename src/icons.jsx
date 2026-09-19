@@ -45,7 +45,7 @@ import {
   PieChart as LuPieChart,
   Key as LuKey,
   Fish as LuFish,
-  Tree as LuTree,
+  TreePine as LuTreePine,
   Sun as LuSun,
   Ship as LuShip,
 } from "lucide-react";
@@ -108,6 +108,6 @@ export const SlidersHorizontal = wrap(LuSlidersHorizontal);
 export const ChartPie = wrap(LuPieChart);
 export const Key = wrap(LuKey);
 export const Fish = wrap(LuFish);
-export const Tree = wrap(LuTree);
+export const Tree = wrap(LuTreePine);
 export const Sun = wrap(LuSun);
 export const Boat = wrap(LuShip);
