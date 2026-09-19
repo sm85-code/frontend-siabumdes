@@ -4,6 +4,7 @@ import { useAuth } from "@/lib/auth";
 import { notify } from "@/lib/feedback";
 import { useConfirm } from "@/components/ConfirmProvider";
 import { Plus, Trash, Key, Lock } from "@phosphor-icons/react";
+import TableShell, { TableCard, TableCardField } from "@/components/TableShell";
 
 const ROLE_OPTIONS = [
   { value: "admin", label: "Admin Utama" },
@@ -250,58 +251,106 @@ export default function UsersPage() {
         );
       })()}
 
-      <div className="card p-0 h-scroll">
-        <table className="tbl" data-testid="users-table">
-          <thead>
-            <tr>
-              <th>Nama</th><th>Username</th><th>Email</th>
-              <th>Role</th><th>Unit</th>
-              <th>Periode Terkunci</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map(u => {
-              const blockedCnt = (u.blocked_periods || []).length;
-              return (
-                <tr key={u.id}>
-                  <td className="font-medium">{u.name}</td>
-                  <td>{u.username}</td>
-                  <td className="text-xs">{u.email}</td>
-                  <td>
-                    <span className={`badge ${ROLE_BADGE[u.role] || ""}`}>{ROLE_LABELS[u.role] || u.role}</span>
-                  </td>
-                  <td className="text-xs">{units.find(x => x.id === u.unit_usaha_id)?.code || "-"}</td>
-                  <td className="text-xs" data-testid={`blocked-count-${u.id}`}>
+      <div className="card p-0 overflow-hidden">
+        <TableShell
+          minWidth={720}
+          data-testid="users-table"
+          mobileCards={users.map((u) => {
+            const blockedCnt = (u.blocked_periods || []).length;
+            return (
+              <TableCard
+                key={u.id}
+                title={u.name}
+                subtitle={u.username}
+                footer={(
+                  <div className="flex gap-1">
+                    {u.role !== "admin" && (
+                      <button data-testid={`btn-lock-${u.id}`} onClick={() => openLock(u)}
+                              className="p-1.5 rounded-md hover:bg-red-50" title="Kunci Periode">
+                        <Lock size={16} color="#8A4141" />
+                      </button>
+                    )}
+                    <button data-testid={`btn-reset-${u.id}`} onClick={() => setShowResetFor(u.id)}
+                            className="p-1.5 rounded-md hover:bg-yellow-50" title="Reset Password">
+                      <Key size={16} color="#4C86C4" />
+                    </button>
+                    {u.id !== user.id && (
+                      <button data-testid={`btn-del-${u.id}`} onClick={() => del(u.id)}
+                              className="p-1.5 rounded-md hover:bg-red-50" title="Hapus">
+                        <Trash size={16} color="#D97878" />
+                      </button>
+                    )}
+                  </div>
+                )}
+              >
+                <TableCardField label="Email">{u.email || "—"}</TableCardField>
+                <TableCardField label="Role">
+                  <span className={`badge ${ROLE_BADGE[u.role] || ""}`}>{ROLE_LABELS[u.role] || u.role}</span>
+                </TableCardField>
+                <TableCardField label="Unit">{units.find(x => x.id === u.unit_usaha_id)?.code || "-"}</TableCardField>
+                <TableCardField label="Terkunci" emphasize>
+                  <span data-testid={`blocked-count-${u.id}`}>
                     {blockedCnt > 0
                       ? <span className="badge badge-warn">{blockedCnt} bulan</span>
                       : <span style={{ color: "var(--text-muted)" }}>—</span>}
-                  </td>
-                  <td>
-                    <div className="flex gap-1">
-                      {u.role !== "admin" && (
-                        <button data-testid={`btn-lock-${u.id}`} onClick={() => openLock(u)}
-                                className="p-1.5 rounded-md hover:bg-red-50" title="Kunci Periode">
-                          <Lock size={16} color="#8A4141" />
+                  </span>
+                </TableCardField>
+              </TableCard>
+            );
+          })}
+        >
+          <table className="tbl" data-testid="users-table">
+            <thead>
+              <tr>
+                <th>Nama</th><th>Username</th><th>Email</th>
+                <th>Role</th><th>Unit</th>
+                <th>Periode Terkunci</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {users.map(u => {
+                const blockedCnt = (u.blocked_periods || []).length;
+                return (
+                  <tr key={u.id}>
+                    <td className="font-medium">{u.name}</td>
+                    <td>{u.username}</td>
+                    <td className="text-xs">{u.email}</td>
+                    <td>
+                      <span className={`badge ${ROLE_BADGE[u.role] || ""}`}>{ROLE_LABELS[u.role] || u.role}</span>
+                    </td>
+                    <td className="text-xs">{units.find(x => x.id === u.unit_usaha_id)?.code || "-"}</td>
+                    <td className="text-xs" data-testid={`blocked-count-${u.id}`}>
+                      {blockedCnt > 0
+                        ? <span className="badge badge-warn">{blockedCnt} bulan</span>
+                        : <span style={{ color: "var(--text-muted)" }}>—</span>}
+                    </td>
+                    <td>
+                      <div className="flex gap-1">
+                        {u.role !== "admin" && (
+                          <button data-testid={`btn-lock-${u.id}`} onClick={() => openLock(u)}
+                                  className="p-1.5 rounded-md hover:bg-red-50" title="Kunci Periode">
+                            <Lock size={16} color="#8A4141" />
+                          </button>
+                        )}
+                        <button data-testid={`btn-reset-${u.id}`} onClick={() => setShowResetFor(u.id)}
+                                className="p-1.5 rounded-md hover:bg-yellow-50" title="Reset Password">
+                          <Key size={16} color="#4C86C4" />
                         </button>
-                      )}
-                      <button data-testid={`btn-reset-${u.id}`} onClick={() => setShowResetFor(u.id)}
-                              className="p-1.5 rounded-md hover:bg-yellow-50" title="Reset Password">
-                        <Key size={16} color="#4C86C4" />
-                      </button>
-                      {u.id !== user.id && (
-                        <button data-testid={`btn-del-${u.id}`} onClick={() => del(u.id)}
-                                className="p-1.5 rounded-md hover:bg-red-50" title="Hapus">
-                          <Trash size={16} color="#D97878" />
-                        </button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                        {u.id !== user.id && (
+                          <button data-testid={`btn-del-${u.id}`} onClick={() => del(u.id)}
+                                  className="p-1.5 rounded-md hover:bg-red-50" title="Hapus">
+                            <Trash size={16} color="#D97878" />
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </TableShell>
       </div>
     </div>
   );
