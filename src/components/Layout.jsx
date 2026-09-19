@@ -47,30 +47,30 @@ export default function Layout({ children }) {
   });
 
   return (
-    <div className="min-h-screen flex" style={{ background: "var(--bg)" }}>
-      {/* Mobile top bar */}
-      <div className="lg:hidden fixed top-0 inset-x-0 z-40 flex items-center justify-between px-4 h-14"
-           style={{ background: "white", borderBottom: "1px solid var(--border)" }}>
+    <div className="min-h-screen flex gap-0 lg:gap-0" style={{ background: "var(--bg)" }}>
+      <div className="lg:hidden fixed top-3 inset-x-3 z-40 flex items-center justify-between px-4 h-14 rounded-2xl"
+           style={{ background: "white", boxShadow: "var(--shadow-soft)" }}>
         <div className="flex items-center gap-2">
-          <img src="/logo-bumdes.webp" alt="Logo" className="w-8 h-8 rounded-full object-cover"
-               style={{ border: "1px solid var(--border)" }} />
+          <img src="/logo-bumdes.webp" alt="Logo" className="w-8 h-8 rounded-full object-cover" />
           <span className="font-heading font-bold text-sm">BUMDES Karya Raharja</span>
         </div>
-        <button data-testid="mobile-menu-btn" onClick={() => setOpen(!open)} className="p-2">
+        <button data-testid="mobile-menu-btn" onClick={() => setOpen(!open)} className="p-2 rounded-xl"
+                style={{ background: "#F3F6FB", color: "var(--primary-dark)" }}>
           {open ? <X size={22} /> : <List size={22} />}
         </button>
       </div>
 
-      {/* Sidebar */}
       <aside
         data-testid="sidebar"
-        className={`fixed lg:sticky top-0 left-0 h-[100dvh] w-72 z-50 flex flex-col overflow-hidden transform transition-transform lg:transform-none ${open ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
-        style={{ background: "white", borderRight: "1px solid var(--border)" }}
+        className={`fixed lg:sticky top-0 left-0 h-[100dvh] lg:h-[100dvh] w-72 z-50 flex flex-col overflow-hidden transform transition-transform lg:transform-none ${open ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
+        style={{ background: "transparent" }}
       >
-        <div className="p-6 flex items-center gap-3" style={{ borderBottom: "1px solid var(--border)" }}>
+        <div className="m-0 lg:m-4 lg:mb-4 flex flex-col h-full lg:h-[calc(100dvh-2rem)] rounded-none lg:rounded-3xl overflow-hidden"
+             style={{ background: "white", boxShadow: "var(--shadow-soft)" }}>
+        <div className="p-6 flex items-center gap-3">
           <img src="/logo-bumdes.webp" alt="Logo BUMDES" data-testid="sidebar-logo"
                className="w-11 h-11 rounded-full object-cover"
-               style={{ background: "white", border: "1px solid var(--border)" }} />
+               style={{ background: "white", boxShadow: "var(--shadow-soft)" }} />
           <div>
             <div className="font-heading font-bold text-base leading-tight">BUMDES</div>
             <div className="text-xs" style={{ color: "var(--text-muted)" }}>Karya Raharja</div>
@@ -89,17 +89,19 @@ export default function Layout({ children }) {
                 onClick={() => setOpen(false)}
                 className={`side-link ${active ? "active" : ""}`}
               >
-                <Icon size={20} weight={active ? "fill" : "regular"} />
+                <span className="nav-ico">
+                  <Icon size={18} weight={active ? "fill" : "duotone"} />
+                </span>
                 <span>{n.label}</span>
               </NavLink>
             );
           })}
         </nav>
 
-        <div className="shrink-0 p-4" style={{ borderTop: "1px solid var(--border)", background: "white" }}>
+        <div className="shrink-0 p-4">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-9 h-9 rounded-full flex items-center justify-center font-heading font-bold text-sm"
-                 style={{ background: "var(--secondary-blue)", color: "#3A5A7D" }}>
+                 style={{ background: "var(--grad-primary)", color: "white" }}>
               {user.name?.[0]?.toUpperCase()}
             </div>
             <div className="min-w-0">
@@ -111,12 +113,13 @@ export default function Layout({ children }) {
             <SignOut size={16} /> Keluar
           </button>
         </div>
+        </div>
       </aside>
 
-      {open && <div className="lg:hidden fixed inset-0 z-40 bg-black/30" onClick={() => setOpen(false)} />}
+      {open && <div className="lg:hidden fixed inset-0 z-40 bg-[#1E2A44]/25" onClick={() => setOpen(false)} />}
 
-      <main className="flex-1 min-w-0 pt-14 lg:pt-0">
-        <div className="p-4 sm:p-6 lg:p-10 max-w-[1400px] mx-auto fade-in">
+      <main className="flex-1 min-w-0 pt-20 lg:pt-0">
+        <div className="p-4 sm:p-6 lg:p-8 max-w-[1400px] mx-auto fade-in">
           {children}
         </div>
       </main>
