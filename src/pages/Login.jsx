@@ -37,17 +37,13 @@ export default function Login() {
               alt="Logo BUMDES Karya Raharja"
               data-testid="bumdes-logo"
               className="w-32 h-32 rounded-full object-cover"
-              style={{
-                background: "white",
-                boxShadow: "8px 8px 20px rgba(164,186,214,0.35), -6px -6px 16px rgba(255,255,255,0.9)",
-                border: "4px solid white",
-              }}
+              style={{ border: "1px solid var(--border)" }}
             />
           </div>
-          <h1 className="font-heading text-2xl sm:text-3xl font-bold mt-1" style={{ color: "#1E2A44" }}>
+          <h1 className="font-heading text-2xl sm:text-3xl font-black mt-1" style={{ color: "#FFFFFF" }}>
             BUMDes Karya Raharja
           </h1>
-          <p className="text-sm mt-1" style={{ color: "#2F5FD0" }}>
+          <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
             Sistem Informasi Akuntansi
           </p>
         </div>
@@ -87,7 +83,7 @@ export default function Login() {
             </div>
             {err && (
               <div data-testid="login-error" className="text-sm p-3 rounded-2xl"
-                   style={{ background: "#FDECEA", color: "#8A4141" }}>
+                   style={{ background: "rgba(239,68,68,0.12)", color: "#EF4444", border: "1px solid rgba(239,68,68,0.2)" }}>
                 {err}
               </div>
             )}
@@ -98,7 +94,7 @@ export default function Login() {
           </form>
         </div>
 
-        <p className="text-center text-xs mt-5" style={{ color: "#2F5FD0" }}>
+        <p className="text-center text-xs mt-5" style={{ color: "var(--text-muted)" }}>
           Aplikasi SIA BUMDes ini dikembangkan dengan berpedoman pada Kepmendesa PDTT No. 136 Tahun 2022.
         </p>
         <p className="text-center text-xs mt-4" style={{ color: "var(--text-muted)" }}>
