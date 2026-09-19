@@ -1,11 +1,49 @@
 import {
-  Home, Receipt, LineChart, BarChart3, Store, Users, BookOpen,
-  LogOut, Menu, X, Library, Calculator, UserCircle, Package,
-  Eye, EyeOff, LogIn, ArrowLeft, ArrowRight, Building2, HeartHandshake,
-  TrendingUp, TrendingDown, Coins, Calendar, Lock, Plus, Trash2, Pencil,
-  FileUp, Download, FileSpreadsheet, Paperclip, Link, Cloud,
-  FileText, Scale, Search, Upload, TriangleAlert, ArrowDown, ArrowUp,
-  SlidersHorizontal, PieChart, Key,
+  Home as LuHome,
+  Receipt as LuReceipt,
+  LineChart as LuLineChart,
+  BarChart3 as LuBarChart3,
+  Store as LuStore,
+  Users as LuUsers,
+  BookOpen as LuBookOpen,
+  LogOut as LuLogOut,
+  Menu as LuMenu,
+  X as LuX,
+  Library as LuLibrary,
+  Calculator as LuCalculator,
+  UserCircle as LuUserCircle,
+  Package as LuPackage,
+  Eye as LuEye,
+  EyeOff as LuEyeOff,
+  LogIn as LuLogIn,
+  ArrowLeft as LuArrowLeft,
+  ArrowRight as LuArrowRight,
+  Building2 as LuBuilding2,
+  HeartHandshake as LuHeartHandshake,
+  TrendingUp as LuTrendingUp,
+  TrendingDown as LuTrendingDown,
+  Coins as LuCoins,
+  Calendar as LuCalendar,
+  Lock as LuLock,
+  Plus as LuPlus,
+  Trash2 as LuTrash2,
+  Pencil as LuPencil,
+  FileUp as LuFileUp,
+  Download as LuDownload,
+  FileSpreadsheet as LuFileSpreadsheet,
+  Paperclip as LuPaperclip,
+  Link as LuLink,
+  Cloud as LuCloud,
+  FileText as LuFileText,
+  Scale as LuScale,
+  Search as LuSearch,
+  Upload as LuUpload,
+  TriangleAlert as LuTriangleAlert,
+  ArrowDown as LuArrowDown,
+  ArrowUp as LuArrowUp,
+  SlidersHorizontal as LuSlidersHorizontal,
+  PieChart as LuPieChart,
+  Key as LuKey,
 } from "lucide-react";
 
 function wrap(Icon) {
@@ -15,53 +53,53 @@ function wrap(Icon) {
   };
 }
 
-export const House = wrap(Home);
-export const Receipt = wrap(Receipt);
-export const ChartLine = wrap(LineChart);
-export const ChartBar = wrap(BarChart3);
-export const Storefront = wrap(Store);
-export const UsersThree = wrap(Users);
-export const BookOpenText = wrap(BookOpen);
-export const SignOut = wrap(LogOut);
-export const List = wrap(Menu);
-export const X = wrap(X);
-export const Books = wrap(Library);
-export const Calculator = wrap(Calculator);
-export const UserCircle = wrap(UserCircle);
-export const Package = wrap(Package);
-export const Eye = wrap(Eye);
-export const EyeSlash = wrap(EyeOff);
-export const SignIn = wrap(LogIn);
-export const ArrowLeft = wrap(ArrowLeft);
-export const ArrowRight = wrap(ArrowRight);
-export const Buildings = wrap(Building2);
-export const HandHeart = wrap(HeartHandshake);
-export const ChartLineUp = wrap(TrendingUp);
-export const TrendUp = wrap(TrendingUp);
-export const TrendDown = wrap(TrendingDown);
-export const Coin = wrap(Coins);
-export const ReceiptX = wrap(Receipt);
-export const CalendarBlank = wrap(Calendar);
-export const Lock = wrap(Lock);
-export const Plus = wrap(Plus);
-export const Trash = wrap(Trash2);
-export const Pencil = wrap(Pencil);
-export const PencilSimple = wrap(Pencil);
-export const FileArrowUp = wrap(FileUp);
-export const DownloadSimple = wrap(Download);
-export const FileXls = wrap(FileSpreadsheet);
-export const Paperclip = wrap(Paperclip);
-export const LinkSimple = wrap(Link);
-export const GoogleDriveLogo = wrap(Cloud);
-export const FilePdf = wrap(FileText);
-export const Scales = wrap(Scale);
-export const Coins = wrap(Coins);
-export const BookOpen = wrap(BookOpen);
-export const MagnifyingGlass = wrap(Search);
-export const UploadSimple = wrap(Upload);
-export const Warning = wrap(TriangleAlert);
-export const ArrowDown = wrap(ArrowDown);
-export const ArrowUp = wrap(ArrowUp);
-export const SlidersHorizontal = wrap(SlidersHorizontal);
-export const ChartPie = wrap(PieChart);
-export const Key = wrap(Key);
+export const House = wrap(LuHome);
+export const Receipt = wrap(LuReceipt);
+export const ChartLine = wrap(LuLineChart);
+export const ChartBar = wrap(LuBarChart3);
+export const Storefront = wrap(LuStore);
+export const UsersThree = wrap(LuUsers);
+export const BookOpenText = wrap(LuBookOpen);
+export const SignOut = wrap(LuLogOut);
+export const List = wrap(LuMenu);
+export const X = wrap(LuX);
+export const Books = wrap(LuLibrary);
+export const Calculator = wrap(LuCalculator);
+export const UserCircle = wrap(LuUserCircle);
+export const Package = wrap(LuPackage);
+export const Eye = wrap(LuEye);
+export const EyeSlash = wrap(LuEyeOff);
+export const SignIn = wrap(LuLogIn);
+export const ArrowLeft = wrap(LuArrowLeft);
+export const ArrowRight = wrap(LuArrowRight);
+export const Buildings = wrap(LuBuilding2);
+export const HandHeart = wrap(LuHeartHandshake);
+export const ChartLineUp = wrap(LuTrendingUp);
+export const TrendUp = wrap(LuTrendingUp);
+export const TrendDown = wrap(LuTrendingDown);
+export const Coin = wrap(LuCoins);
+export const ReceiptX = wrap(LuReceipt);
+export const CalendarBlank = wrap(LuCalendar);
+export const Lock = wrap(LuLock);
+export const Plus = wrap(LuPlus);
+export const Trash = wrap(LuTrash2);
+export const Pencil = wrap(LuPencil);
+export const PencilSimple = wrap(LuPencil);
+export const FileArrowUp = wrap(LuFileUp);
+export const DownloadSimple = wrap(LuDownload);
+export const FileXls = wrap(LuFileSpreadsheet);
+export const Paperclip = wrap(LuPaperclip);
+export const LinkSimple = wrap(LuLink);
+export const GoogleDriveLogo = wrap(LuCloud);
+export const FilePdf = wrap(LuFileText);
+export const Scales = wrap(LuScale);
+export const Coins = wrap(LuCoins);
+export const BookOpen = wrap(LuBookOpen);
+export const MagnifyingGlass = wrap(LuSearch);
+export const UploadSimple = wrap(LuUpload);
+export const Warning = wrap(LuTriangleAlert);
+export const ArrowDown = wrap(LuArrowDown);
+export const ArrowUp = wrap(LuArrowUp);
+export const SlidersHorizontal = wrap(LuSlidersHorizontal);
+export const ChartPie = wrap(LuPieChart);
+export const Key = wrap(LuKey);
