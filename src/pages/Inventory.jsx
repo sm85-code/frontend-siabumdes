@@ -201,7 +201,7 @@ export default function Inventory() {
   };
 
   const removeProduct = async (id) => {
-    if (!window.confirm("Hapus produk ini? Stok harus 0.")) return;
+    if (!window.confirm("Hapus produk ini? Stok harus 0. Riwayat mutasi/penyesuaian & jurnal terkait ikut dihapus.")) return;
     try {
       await api.delete(`${BASE}/products/${id}`);
       loadCore();
@@ -263,6 +263,16 @@ export default function Inventory() {
     if (!window.confirm("Batalkan mutasi ini? Mutasi dan jurnal terkait akan dihapus permanen.")) return;
     try {
       await api.post(`${BASE}/cancel-movement`, { stock_card_id: id });
+      await Promise.all([loadCore(), loadOps()]);
+    } catch (err) {
+      setError(formatApiError(err));
+    }
+  };
+
+  const cancelAdjustment = async (id) => {
+    if (!window.confirm("Batalkan penyesuaian ini? Qty dikembalikan dan jurnal terkait dihapus.")) return;
+    try {
+      await api.post(`${BASE}/cancel-adjustment`, { adjustment_id: id });
       await Promise.all([loadCore(), loadOps()]);
     } catch (err) {
       setError(formatApiError(err));
@@ -499,10 +509,10 @@ export default function Inventory() {
 
           <div className="card p-0 overflow-x-auto">
             <table className="tbl">
-              <thead><tr><th>Tanggal</th><th>SKU</th><th>Produk</th><th className="num">Delta</th><th>Alasan</th><th>Catatan</th></tr></thead>
+              <thead><tr><th>Tanggal</th><th>SKU</th><th>Produk</th><th className="num">Delta</th><th>Alasan</th><th>Catatan</th>{canWrite && <th />}</tr></thead>
               <tbody>
                 {adjustments.length === 0 ? (
-                  <tr><td colSpan={6} className="text-center py-8" style={{ color: "var(--text-muted)" }}>Belum ada penyesuaian.</td></tr>
+                  <tr><td colSpan={canWrite ? 7 : 6} className="text-center py-8" style={{ color: "var(--text-muted)" }}>Belum ada penyesuaian.</td></tr>
                 ) : adjustments.map((a) => (
                   <tr key={a.id}>
                     <td>{fmtDate(a.adjustment_date)}</td>
@@ -511,6 +521,13 @@ export default function Inventory() {
                     <td className="num">{a.quantity_delta > 0 ? `+${a.quantity_delta}` : a.quantity_delta}</td>
                     <td><span className="badge">{a.reason}</span></td>
                     <td>{a.notes || "-"}</td>
+                    {canWrite && (
+                      <td>
+                        <button type="button" className="btn btn-outline text-xs" onClick={() => cancelAdjustment(a.id)}>
+                          Batalkan
+                        </button>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
