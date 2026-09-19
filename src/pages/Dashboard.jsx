@@ -8,8 +8,8 @@ import {
 } from "recharts";
 import { TrendUp, TrendDown, Coin, Storefront, ReceiptX, CalendarBlank, Lock } from "@phosphor-icons/react";
 
-const COLORS = ["#3E8B86", "#5BA8A0", "#E8A07A", "#E0B36A", "#3D4F9A", "#E07A8A"];
-const TOOLTIP_STYLE = { background: "white", border: "1px solid #D7E6E2", borderRadius: 8 };
+const COLORS = ["#1F2A24", "#3F5D4E", "#8B6A3F", "#5C534A", "#8B4034", "#A07A3A"];
+const TOOLTIP_STYLE = { background: "#FBF8F3", border: "1px solid #DDD4C7", borderRadius: 8, boxShadow: "none" };
 const PIE_LEGEND_STYLE = { fontSize: 11 };
 const yTickFormatter = (v) => (v >= 1e6 ? `${(v/1e6).toFixed(1)}Jt` : v >= 1e3 ? `${(v/1e3).toFixed(0)}rb` : v);
 
@@ -142,11 +142,13 @@ export default function Dashboard() {
     }).then((r) => setData(r.data)).finally(() => setLoading(false));
   }, [state, currentOpt.granularity]);
 
+  const ink = "#1F2A24";
+  const paper = "#EDE4D6";
   const kpis = useMemo(() => data ? [
-    { key: "pendapatan", label: "Total Pendapatan", value: data.total_pendapatan, icon: TrendUp, bg: "#E4F3F0", color: "#3E8B86" },
-    { key: "beban", label: "Total Beban", value: data.total_beban, icon: TrendDown, bg: "#F8E8D4", color: "#E8A07A" },
-    { key: "laba", label: "Laba Bersih", value: data.laba_bersih, icon: Coin, bg: "#D7EAF4", color: "#3D4F9A" },
-    { key: "tx", label: "Jumlah Transaksi", value: data.total_transactions, icon: ReceiptX, bg: "#F8DCE3", color: "#E07A8A", isCount: true },
+    { key: "pendapatan", label: "Total Pendapatan", value: data.total_pendapatan, icon: TrendUp },
+    { key: "beban", label: "Total Beban", value: data.total_beban, icon: TrendDown },
+    { key: "laba", label: "Laba Bersih", value: data.laba_bersih, icon: Coin },
+    { key: "tx", label: "Jumlah Transaksi", value: data.total_transactions, icon: ReceiptX, isCount: true },
   ] : [], [data]);
 
   const chartData = useMemo(() => {
@@ -165,14 +167,14 @@ export default function Dashboard() {
     <div className="space-y-6" data-testid="dashboard-page">
       {user?.blocked_periods && user.blocked_periods.length > 0 && (
         <div className="card fade-in" data-testid="blocked-periods-banner"
-             style={{ background: "#F8DCE3", border: "1px solid #F3C4CC" }}>
+             style={{ background: "#F3E6C8", border: "1px solid #DDD4C7" }}>
           <div className="flex items-start gap-3">
-            <Lock size={22} weight="duotone" color="#B4544A" style={{ flexShrink: 0, marginTop: 2 }} />
+            <Lock size={22} weight="duotone" color={ink} style={{ flexShrink: 0, marginTop: 2 }} />
             <div>
-              <p className="font-heading font-semibold" style={{ color: "#B4544A" }}>
+              <p className="font-heading font-semibold">
                 {user.blocked_periods.length} periode terkunci oleh Admin
               </p>
-              <p className="text-sm mt-1" style={{ color: "#B4544A" }}>
+              <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
                 Anda tidak dapat menambah, mengubah, atau menghapus transaksi pada:{" "}
                 <b>{
                   user.blocked_periods
@@ -191,12 +193,12 @@ export default function Dashboard() {
       )}
 
       <div>
-        <p className="label mb-1">Selamat Datang</p>
+        <p className="label mb-1">SIA BUMDes Karya Raharja</p>
         <h1 className="font-heading text-3xl sm:text-4xl font-bold page-h1" data-testid="dashboard-greeting">
-          {jabatan}, ini ringkasan data BUMDES.
+          Selamat datang, {jabatan}.
         </h1>
         <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
-          BUMDES Karya Raharja • {new Date().toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
+          Ringkasan data BUMDes Karya Raharja • {new Date().toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
         </p>
       </div>
 
@@ -204,7 +206,7 @@ export default function Dashboard() {
         <div className="flex flex-wrap items-end gap-3">
           <div className="flex-1 min-w-[220px]">
             <label className="label flex items-center gap-1">
-              <CalendarBlank size={14} weight="duotone" color="#3E8B86" /> Periode
+              <CalendarBlank size={14} weight="duotone" color={ink} /> Periode
             </label>
             <select data-testid="period-select" className="select"
                     value={state.period}
@@ -255,7 +257,7 @@ export default function Dashboard() {
           )}
 
           <div className="text-xs px-3 py-2 rounded-lg" data-testid="period-label"
-               style={{ background: "var(--primary-light)", color: "var(--primary-dark)", fontWeight: 600 }}>
+               style={{ background: paper, color: ink, fontWeight: 600 }}>
             {pLabel}
           </div>
         </div>
@@ -267,8 +269,8 @@ export default function Dashboard() {
           return (
             <div key={k.key} className="card card-sm" data-testid={`kpi-${k.key}`}>
               <div className="flex items-start justify-between mb-3">
-                <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: k.bg }}>
-                  <Icon size={18} weight="duotone" color={k.color} />
+                <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: paper }}>
+                  <Icon size={18} weight="duotone" color={ink} />
                 </div>
               </div>
               <p className="text-xs uppercase tracking-wider font-semibold" style={{ color: "var(--text-secondary)" }}>{k.label}</p>
@@ -283,33 +285,31 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="card lg:col-span-2">
           <h3 className="font-heading text-lg font-semibold mb-4" data-testid="trend-title">
-            Pendapatan &amp; Beban ({pLabel})
+            Pendapatan & Beban ({pLabel})
           </h3>
           {chartData.length > 0 ? (
             <ResponsiveContainer width="99%" height={280}>
               {useBar ? (
                 <BarChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#D7E6E2" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#DDD4C7" vertical={false} />
                   <XAxis dataKey="month" tick={{ fontSize: 11 }} />
                   <YAxis tick={{ fontSize: 11 }} tickFormatter={yTickFormatter} />
                   <Tooltip formatter={(v) => fmtRp(v)} contentStyle={TOOLTIP_STYLE} />
                   <Legend />
-                  <Bar dataKey="pendapatan" name="Pendapatan" fill="#3E8B86" radius={[4,4,0,0]} />
-                  <Bar dataKey="beban" name="Beban" fill="#E8A07A" radius={[4,4,0,0]} />
+                  <Bar dataKey="pendapatan" name="Pendapatan" fill="#1F2A24" radius={[3,3,0,0]} />
+                  <Bar dataKey="beban" name="Beban" fill="#8B6A3F" radius={[3,3,0,0]} />
                 </BarChart>
               ) : (
                 <LineChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#D7E6E2" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#DDD4C7" vertical={false} />
                   <XAxis dataKey="month" tick={{ fontSize: 11 }} />
                   <YAxis tick={{ fontSize: 11 }} tickFormatter={yTickFormatter} />
                   <Tooltip formatter={(v) => fmtRp(v)} contentStyle={TOOLTIP_STYLE} />
                   <Legend />
                   <Line type="monotone" dataKey="pendapatan" name="Pendapatan"
-                        stroke="#3E8B86" strokeWidth={3}
-                        dot={{ fill: "#3E8B86", r: 4 }} activeDot={{ r: 6 }} />
+                        stroke="#1F2A24" strokeWidth={2} dot={false} />
                   <Line type="monotone" dataKey="beban" name="Beban"
-                        stroke="#E8A07A" strokeWidth={3}
-                        dot={{ fill: "#E8A07A", r: 4 }} activeDot={{ r: 6 }} />
+                        stroke="#8B6A3F" strokeWidth={2} dot={false} />
                 </LineChart>
               )}
             </ResponsiveContainer>
@@ -345,7 +345,7 @@ export default function Dashboard() {
       <div className="card p-0 overflow-hidden">
         <div className="p-5" style={{ borderBottom: "1px solid var(--border)" }}>
           <h3 className="font-heading text-lg font-semibold flex items-center gap-2" data-testid="unit-table-title">
-            <Storefront size={20} weight="duotone" color="#3E8B86" /> Data Unit Usaha
+            <Storefront size={20} weight="duotone" color={ink} /> Data Unit Usaha
           </h3>
           <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>Periode: {pLabel}</p>
         </div>
@@ -367,7 +367,7 @@ export default function Dashboard() {
                   <td className="font-medium">{u.name}</td>
                   <td className="num">{fmtRp(u.pendapatan)}</td>
                   <td className="num">{fmtRp(u.beban)}</td>
-                  <td className="num font-semibold" style={{ color: u.laba >= 0 ? "#2C6B73" : "#E07A8A" }}>{fmtRp(u.laba)}</td>
+                  <td className="num font-semibold">{fmtRp(u.laba)}</td>
                 </tr>
               ))}
               {data.unit_summaries.length > 0 && (() => {
@@ -375,12 +375,12 @@ export default function Dashboard() {
                 const totB = data.unit_summaries.reduce((s, u) => s + (u.beban || 0), 0);
                 const totL = data.unit_summaries.reduce((s, u) => s + (u.laba || 0), 0);
                 return (
-                  <tr data-testid="unit-total-row" style={{ background: "#E4F3F0" }}>
+                  <tr data-testid="unit-total-row" style={{ background: paper }}>
                     <td></td>
-                    <td className="font-bold" style={{ color: "#2C6B73" }}>TOTAL 6 UNIT USAHA</td>
-                    <td className="num font-bold tabular-nums" style={{ color: "#2C6B73" }}>{fmtRp(totP)}</td>
-                    <td className="num font-bold tabular-nums" style={{ color: "#2C6B73" }}>{fmtRp(totB)}</td>
-                    <td className="num font-bold tabular-nums" style={{ color: totL >= 0 ? "#2C6B73" : "#E07A8A" }}>{fmtRp(totL)}</td>
+                    <td className="font-bold">TOTAL 6 UNIT USAHA</td>
+                    <td className="num font-bold tabular-nums">{fmtRp(totP)}</td>
+                    <td className="num font-bold tabular-nums">{fmtRp(totB)}</td>
+                    <td className="num font-bold tabular-nums">{fmtRp(totL)}</td>
                   </tr>
                 );
               })()}
