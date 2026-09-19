@@ -45,10 +45,10 @@ export default function Landing() {
           Papan Kinerja · BUMDes · Tahun {year}
         </p>
         <h1 className="modern-brand-title text-3xl sm:text-5xl">
-          SIA BUMDes <span style={{ color: "var(--gold)" }}>Karya Raharja</span>
+          SIA BUMDes <span style={{ color: "#3BA8C4" }}>Karya Raharja</span>
         </h1>
         <p className="mt-4 text-sm sm:text-base" style={{ color: "var(--text-secondary)" }}>
-          Sistem Informasi Akuntansi &amp; Transparansi Keuangan Terintegrasi.<br />
+          Sistem Informasi Akuntansi & Transparansi Keuangan Terintegrasi.<br />
           Berdaya dari Desa, Berkontribusi untuk Wonoharjo.
         </p>
       </section>
@@ -69,7 +69,7 @@ export default function Landing() {
       {data && trend.length > 0 && (
         <section className="max-w-5xl mx-auto px-5 pb-8">
           <div className="card">
-            <h3 className="font-heading text-lg mb-1">Tren Pendapatan &amp; Beban {year}</h3>
+            <h3 className="font-heading text-lg mb-1">Tren Pendapatan & Beban {year}</h3>
             <p className="text-xs mb-4" style={{ color: "var(--text-muted)" }}>Diperbarui langsung dari transaksi resmi.</p>
             <ResponsiveContainer width="99%" height={220}>
               <LineChart data={trend} margin={{ top: 8, right: 12, left: -4, bottom: 0 }}>
@@ -80,7 +80,7 @@ export default function Landing() {
                 <Tooltip formatter={(v) => fmtRp(v)} contentStyle={{ background: "#E6EDF3", border: 0, borderRadius: 16, fontSize: 11, boxShadow: "8px 8px 16px #c5d0db, -8px -8px 16px #fff" }} />
                 <Legend wrapperStyle={{ fontSize: 11 }} iconType="circle" iconSize={8} />
                 <Line type="monotone" dataKey="pendapatan" name="Pendapatan" stroke="#1E4A5A" strokeWidth={2} dot={{ r: 3, fill: "#1E4A5A" }} />
-                <Line type="monotone" dataKey="beban" name="Beban" stroke="#B89A5A" strokeWidth={2} dot={{ r: 3, fill: "#B89A5A" }} />
+                <Line type="monotone" dataKey="beban" name="Beban" stroke="#3BA8C4" strokeWidth={2} dot={{ r: 3, fill: "#3BA8C4" }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
