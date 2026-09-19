@@ -5,6 +5,7 @@ import { notify } from "@/lib/feedback";
 import { useConfirm } from "@/components/ConfirmProvider";
 import { useSort } from "@/lib/useSort";
 import { Plus, Pencil, Trash, DownloadSimple, UploadSimple, Warning } from "@phosphor-icons/react";
+import TableShell from "@/components/TableShell";
 
 const CAT_LABELS = {
   aset: "Aset", kewajiban: "Kewajiban", ekuitas: "Ekuitas",
@@ -381,7 +382,8 @@ export default function COAPage() {
         ))}
       </div>
 
-      <div className="card p-0 h-scroll">
+      <div className="card p-0 overflow-hidden">
+        <TableShell minWidth={720}>
         {isAdmin && selAcc.size > 0 && (
           <div className="p-3 flex justify-between items-center" style={{ background: "#FDECEA", borderBottom: "1px solid #f5c6c1" }}>
             <span className="text-sm" style={{ color: "#8A4141" }}>{selAcc.size} akun terpilih</span>
@@ -453,6 +455,7 @@ export default function COAPage() {
             ))}
           </tbody>
         </table>
+        </TableShell>
       </div>
 
       </>}
@@ -519,7 +522,8 @@ export default function COAPage() {
         </div>
       )}
 
-      <div className="card p-0 h-scroll">
+      <div className="card p-0 overflow-hidden">
+        <TableShell minWidth={720}>
         {isAdmin && selTT.size > 0 && (
           <div className="p-3 flex justify-between items-center" style={{ background: "#FDECEA", borderBottom: "1px solid #f5c6c1" }}>
             <span className="text-sm" style={{ color: "#8A4141" }}>{selTT.size} jenis transaksi terpilih</span>
@@ -588,6 +592,7 @@ export default function COAPage() {
             ))}
           </tbody>
         </table>
+        </TableShell>
       </div>
       </>}
     </div>
