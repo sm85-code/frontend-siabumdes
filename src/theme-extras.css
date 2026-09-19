@@ -1,0 +1,50 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Nunito+Sans:wght@400;500;600;700&display=swap');
+
+body, .font-body {
+  font-family: 'Nunito Sans', 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+h1, h2, h3, h4, .heading, .font-heading, .modern-brand-title {
+  font-family: 'Manrope', 'Outfit', system-ui, sans-serif;
+}
+
+.nav-ico {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #F3F6FB;
+  color: #2F5FD0;
+  flex: 0 0 auto;
+}
+.side-link.active .nav-ico {
+  background: rgba(255,255,255,0.22);
+  color: #fff;
+}
+
+select.select,
+select {
+  border-radius: 1.15rem;
+  background-color: #fff;
+  box-shadow: var(--shadow-soft);
+  color: var(--text-primary);
+}
+select.select option,
+select option {
+  background: #fff;
+  color: #1E2A44;
+  padding: 10px 12px;
+}
+select.select option:checked,
+select.select option:hover,
+select option:checked {
+  background: #D6E4FA;
+  color: #2F5FD0;
+}
+
+[data-radix-select-content],
+[data-radix-dropdown-menu-content],
+[data-radix-popper-content-wrapper] > div {
+  border-radius: 1.15rem !important;
+}
