@@ -260,7 +260,7 @@ export default function Inventory() {
   };
 
   const cancelMovement = async (id) => {
-    if (!window.confirm("Batalkan mutasi ini? Jurnal terkait akan dibatalkan.")) return;
+    if (!window.confirm("Batalkan mutasi ini? Mutasi dan jurnal terkait akan dihapus permanen.")) return;
     try {
       await api.post(`${BASE}/cancel-movement`, { stock_card_id: id });
       await Promise.all([loadCore(), loadOps()]);
@@ -427,7 +427,7 @@ export default function Inventory() {
               </form>
             ) : <p className="text-sm">Role Anda read-only.</p>}
           </div>
-          <MovementTable rows={movements.filter((m) => m.direction === "in")} onCancel={canWrite ? cancelMovement : null} />
+          <MovementTable rows={movements.filter((m) => m.direction === "in" && m.finance_status !== "cancelled")} onCancel={canWrite ? cancelMovement : null} />
         </div>
       )}
 
@@ -453,7 +453,7 @@ export default function Inventory() {
               </form>
             ) : <p className="text-sm">Role Anda read-only.</p>}
           </div>
-          <MovementTable rows={movements.filter((m) => m.direction === "out")} onCancel={canWrite ? cancelMovement : null} />
+          <MovementTable rows={movements.filter((m) => m.direction === "out" && m.finance_status !== "cancelled")} onCancel={canWrite ? cancelMovement : null} />
         </div>
       )}
 
