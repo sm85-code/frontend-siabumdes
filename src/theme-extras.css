@@ -1,10 +1,11 @@
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Nunito+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap');
 
 body, .font-body {
-  font-family: 'Nunito Sans', 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family: Inter, Geist, system-ui, sans-serif;
 }
 h1, h2, h3, h4, .heading, .font-heading, .modern-brand-title {
-  font-family: 'Manrope', 'Outfit', system-ui, sans-serif;
+  font-family: Inter, Geist, system-ui, sans-serif;
+  letter-spacing: -0.03em;
 }
 
 .nav-ico {
@@ -14,37 +15,38 @@ h1, h2, h3, h4, .heading, .font-heading, .modern-brand-title {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: #F3F6FB;
-  color: #2F5FD0;
+  background: rgba(255,255,255,0.06);
+  color: #C5C8CC;
   flex: 0 0 auto;
 }
 .side-link.active .nav-ico {
-  background: rgba(255,255,255,0.22);
+  background: rgba(129,140,248,0.2);
   color: #fff;
 }
 
 select.select,
 select {
-  border-radius: 1.15rem;
-  background-color: #fff;
-  box-shadow: var(--shadow-soft);
-  color: var(--text-primary);
+  border-radius: 1rem;
+  background-color: #30353C;
+  color: #F7F8FA;
+  border: 1px solid #494E54;
+  box-shadow: none;
 }
 select.select option,
 select option {
-  background: #fff;
-  color: #1E2A44;
-  padding: 10px 12px;
+  background: #171D24;
+  color: #F7F8FA;
 }
 select.select option:checked,
-select.select option:hover,
 select option:checked {
-  background: #D6E4FA;
-  color: #2F5FD0;
+  background: #818CF8;
+  color: #171D24;
 }
 
 [data-radix-select-content],
-[data-radix-dropdown-menu-content],
-[data-radix-popper-content-wrapper] > div {
-  border-radius: 1.15rem !important;
+[data-radix-dropdown-menu-content] {
+  border-radius: 1rem !important;
+  background: #30353C !important;
+  color: #F7F8FA !important;
+  border: 1px solid #494E54 !important;
 }
