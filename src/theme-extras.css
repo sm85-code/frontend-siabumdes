@@ -33,11 +33,13 @@ select option { background: #E6EDF3; color: #2C3E4A; }
   background: transparent !important; color: #5B7380 !important; border-bottom-color: #d3dde4 !important;
 }
 .tbl tbody tr:hover td { background: rgba(255,255,255,0.35); }
+.tbl tbody tr[style] td { background: inherit; }
 
 [style*="#2E4F7C"], [style*="#4C86C4"], [style*="#3A5A7D"], [style*="#3E8B86"],
 [style*="#3E8B77"], [style*="#2C6B73"], [style*="#1F2A24"], [style*="#3F5D4E"],
 [style*="#5BA8A0"], [style*="#C45C2A"], [style*="#8B6A3F"], [style*="#B89A5A"],
-[style*="#C4A35A"], [style*="#E8A07A"], [style*="#B47536"], [style*="#E0B36A"] {
+[style*="#C4A35A"], [style*="#E8A07A"], [style*="#B47536"], [style*="#E0B36A"],
+[style*="#1A2E1E"], [style*="#1F4E3D"] {
   color: #1E4A5A !important;
 }
 [style*="#DCE8FE"], [style*="#DCEFF7"], [style*="#E8EEF6"], [style*="#D6E4FA"],
@@ -48,16 +50,17 @@ select option { background: #E6EDF3; color: #2C3E4A; }
 }
 [fill="#7BA7E1"], [fill="#4A9DC1"], [fill="#2E4F7C"], [fill="#4C86C4"],
 [fill="#C45C2A"], [fill="#1F2A24"], [fill="#3E8B86"], [fill="#8B6A3F"],
-[fill="#B89A5A"], [fill="#E8A07A"] { fill: #3BA8C4 !important; }
+[fill="#B89A5A"], [fill="#E8A07A"], [fill="#8E88A5"] { fill: #1E4A5A !important; }
 [stroke="#7BA7E1"], [stroke="#4A9DC1"], [stroke="#C45C2A"], [stroke="#1F2A24"],
-[stroke="#3E8B86"], [stroke="#8B6A3F"], [stroke="#B89A5A"] { stroke: #3BA8C4 !important; }
+[stroke="#3E8B86"], [stroke="#8B6A3F"], [stroke="#B89A5A"], [stroke="#2E4F7C"] { stroke: #1E4A5A !important; }
 
-svg [color="#2E4F7C"], svg [color="#4C86C4"], svg [color="#3A5A7D"],
-svg [color="#3E8B86"], svg [color="#3E8B77"], svg [color="#B47536"],
-svg [color="#C4A35A"], svg [color="#E8A07A"] { color: #1E4A5A !important; }
+[color="#2E4F7C"], [color="#4C86C4"], [color="#3A5A7D"],
+[color="#3E8B86"], [color="#3E8B77"], [color="#B47536"],
+[color="#C4A35A"], [color="#E8A07A"], [color="#8E88A5"],
+[color="#1A2E1E"], [color="#1F4E3D"] { color: #1E4A5A !important; }
 
-.hover\:bg-yellow-50:hover { background: #D7E6EE !important; }
-.hover\:bg-red-50:hover { background: #E8EEF3 !important; }
+.hover\\:bg-yellow-50:hover { background: #D7E6EE !important; }
+.hover\\:bg-red-50:hover { background: #E8EEF3 !important; }
 .text-emerald-700, .text-green-700, .text-teal-700 { color: #1E4A5A !important; }
 .bg-emerald-50, .bg-green-50, .bg-amber-50, .bg-orange-50, .bg-pink-50, .bg-blue-50 {
   background: #D7E6EE !important;
