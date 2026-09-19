@@ -8,8 +8,8 @@ import {
 } from "recharts";
 import { TrendUp, TrendDown, Coin, Storefront, ReceiptX, CalendarBlank, Lock } from "@phosphor-icons/react";
 
-const COLORS = ["#7BA7E1", "#A8DADC", "#E1C3F4", "#E8B872", "#DCE8FE", "#5C6E5E"];
-const TOOLTIP_STYLE = { background: "white", border: "1px solid #E8EAE6", borderRadius: 8 };
+const COLORS = ["#3E8B86", "#5BA8A0", "#E8A07A", "#E0B36A", "#3D4F9A", "#E07A8A"];
+const TOOLTIP_STYLE = { background: "white", border: "1px solid #D7E6E2", borderRadius: 8 };
 const PIE_LEGEND_STYLE = { fontSize: 11 };
 const yTickFormatter = (v) => (v >= 1e6 ? `${(v/1e6).toFixed(1)}Jt` : v >= 1e3 ? `${(v/1e3).toFixed(0)}rb` : v);
 
@@ -17,8 +17,6 @@ const MONTHS = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustu
 const YEAR_MIN = 2022, YEAR_MAX = 2030;
 const YEARS = Array.from({ length: YEAR_MAX - YEAR_MIN + 1 }, (_, i) => YEAR_MIN + i);
 
-// granularity → what backend returns (day/month)
-// bucket → how frontend re-aggregates for chart (day/week/month)
 const PERIOD_OPTIONS = [
   { key: "hari_ini", label: "Hari ini", granularity: "day", bucket: "day" },
   { key: "minggu_ini", label: "Minggu ini", granularity: "day", bucket: "day" },
@@ -40,7 +38,7 @@ function computeRange({ period, month, year, customStart, customEnd }) {
     case "hari_ini":
       return { start: endToday, end: endToday };
     case "minggu_ini": {
-      const day = now.getDay() || 7; // Sunday=0 → 7
+      const day = now.getDay() || 7;
       const start = new Date(now); start.setDate(now.getDate() - (day - 1));
       return { start: iso(start), end: endToday };
     }
@@ -57,10 +55,9 @@ function computeRange({ period, month, year, customStart, customEnd }) {
       return { start: iso(start), end: endToday };
     }
     case "bulanan": {
-      // month = 1..12 within current year
       const y = now.getFullYear();
       const start = new Date(y, month - 1, 1);
-      const end = new Date(y, month, 0); // last day
+      const end = new Date(y, month, 0);
       return { start: iso(start), end: iso(end) };
     }
     case "tahunan": {
@@ -73,20 +70,15 @@ function computeRange({ period, month, year, customStart, customEnd }) {
   }
 }
 
-// Re-bucket a list of {month: "YYYY-MM-DD"|"YYYY-MM", pendapatan, beban}
-// into the target granularity for the chart.
 function bucketize(list, targetBucket) {
   if (!list || list.length === 0) return [];
   if (targetBucket === "day" || targetBucket === "month") {
-    // Already in the right shape, just rename label for readability
     return list.map((r) => ({ ...r, month: labelize(r.month, targetBucket) }));
   }
-  // targetBucket === "week": input is per-day rows
   const map = new Map();
   for (const r of list) {
     const d = new Date(r.month);
     if (isNaN(d.getTime())) continue;
-    // week starting Monday
     const day = d.getDay() || 7;
     const monday = new Date(d);
     monday.setDate(d.getDate() - (day - 1));
@@ -104,13 +96,11 @@ function bucketize(list, targetBucket) {
 
 function labelize(key, bucket) {
   if (bucket === "day") {
-    // YYYY-MM-DD → DD/MM
     const parts = key.split("-");
     if (parts.length === 3) return `${parts[2]}/${parts[1]}`;
     return key;
   }
   if (bucket === "month") {
-    // YYYY-MM → Mmm YY
     const parts = key.split("-");
     if (parts.length >= 2) {
       const m = Number(parts[1]);
@@ -153,13 +143,12 @@ export default function Dashboard() {
   }, [state, currentOpt.granularity]);
 
   const kpis = useMemo(() => data ? [
-    { key: "pendapatan", label: "Total Pendapatan", value: data.total_pendapatan, icon: TrendUp, bg: "var(--primary-light)", color: "#2E4F7C" },
-    { key: "beban", label: "Total Beban", value: data.total_beban, icon: TrendDown, bg: "#FDE9D0", color: "#4C86C4" },
-    { key: "laba", label: "Laba Bersih", value: data.laba_bersih, icon: Coin, bg: "var(--secondary-blue)", color: "#3A5A7D" },
-    { key: "tx", label: "Jumlah Transaksi", value: data.total_transactions, icon: ReceiptX, bg: "var(--secondary-purple)", color: "#2E4F7C", isCount: true },
+    { key: "pendapatan", label: "Total Pendapatan", value: data.total_pendapatan, icon: TrendUp, bg: "#E4F3F0", color: "#3E8B86" },
+    { key: "beban", label: "Total Beban", value: data.total_beban, icon: TrendDown, bg: "#F8E8D4", color: "#E8A07A" },
+    { key: "laba", label: "Laba Bersih", value: data.laba_bersih, icon: Coin, bg: "#D7EAF4", color: "#3D4F9A" },
+    { key: "tx", label: "Jumlah Transaksi", value: data.total_transactions, icon: ReceiptX, bg: "#F8DCE3", color: "#E07A8A", isCount: true },
   ] : [], [data]);
 
-  // Aggregate chart data based on selected bucket, and pick chart type
   const chartData = useMemo(() => {
     if (!data?.monthly) return [];
     return bucketize(data.monthly, currentOpt.bucket);
@@ -174,17 +163,16 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6" data-testid="dashboard-page">
-      {/* Banner: Periode Terkunci */}
       {user?.blocked_periods && user.blocked_periods.length > 0 && (
         <div className="card fade-in" data-testid="blocked-periods-banner"
-             style={{ background: "#FDECEA", border: "1px solid #f5c6c1" }}>
+             style={{ background: "#F8DCE3", border: "1px solid #F3C4CC" }}>
           <div className="flex items-start gap-3">
-            <Lock size={22} weight="duotone" color="#8A4141" style={{ flexShrink: 0, marginTop: 2 }} />
+            <Lock size={22} weight="duotone" color="#B4544A" style={{ flexShrink: 0, marginTop: 2 }} />
             <div>
-              <p className="font-heading font-semibold" style={{ color: "#8A4141" }}>
+              <p className="font-heading font-semibold" style={{ color: "#B4544A" }}>
                 {user.blocked_periods.length} periode terkunci oleh Admin
               </p>
-              <p className="text-sm mt-1" style={{ color: "#8A4141" }}>
+              <p className="text-sm mt-1" style={{ color: "#B4544A" }}>
                 Anda tidak dapat menambah, mengubah, atau menghapus transaksi pada:{" "}
                 <b>{
                   user.blocked_periods
@@ -212,12 +200,11 @@ export default function Dashboard() {
         </p>
       </div>
 
-      {/* Period selector */}
       <div className="card card-sm" data-testid="period-card">
         <div className="flex flex-wrap items-end gap-3">
           <div className="flex-1 min-w-[220px]">
             <label className="label flex items-center gap-1">
-              <CalendarBlank size={14} weight="duotone" /> Periode
+              <CalendarBlank size={14} weight="duotone" color="#3E8B86" /> Periode
             </label>
             <select data-testid="period-select" className="select"
                     value={state.period}
@@ -268,13 +255,12 @@ export default function Dashboard() {
           )}
 
           <div className="text-xs px-3 py-2 rounded-lg" data-testid="period-label"
-               style={{ background: "var(--primary-light)", color: "#2E4F7C", fontWeight: 600 }}>
+               style={{ background: "var(--primary-light)", color: "var(--primary-dark)", fontWeight: 600 }}>
             {pLabel}
           </div>
         </div>
       </div>
 
-      {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {kpis.map((k) => {
           const Icon = k.icon;
@@ -294,7 +280,6 @@ export default function Dashboard() {
         })}
       </div>
 
-      {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="card lg:col-span-2">
           <h3 className="font-heading text-lg font-semibold mb-4" data-testid="trend-title">
@@ -304,27 +289,27 @@ export default function Dashboard() {
             <ResponsiveContainer width="99%" height={280}>
               {useBar ? (
                 <BarChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#E8EAE6" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#D7E6E2" vertical={false} />
                   <XAxis dataKey="month" tick={{ fontSize: 11 }} />
                   <YAxis tick={{ fontSize: 11 }} tickFormatter={yTickFormatter} />
                   <Tooltip formatter={(v) => fmtRp(v)} contentStyle={TOOLTIP_STYLE} />
                   <Legend />
-                  <Bar dataKey="pendapatan" name="Pendapatan" fill="#7BA7E1" radius={[4,4,0,0]} />
-                  <Bar dataKey="beban" name="Beban" fill="#E8B872" radius={[4,4,0,0]} />
+                  <Bar dataKey="pendapatan" name="Pendapatan" fill="#3E8B86" radius={[4,4,0,0]} />
+                  <Bar dataKey="beban" name="Beban" fill="#E8A07A" radius={[4,4,0,0]} />
                 </BarChart>
               ) : (
                 <LineChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#E8EAE6" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#D7E6E2" vertical={false} />
                   <XAxis dataKey="month" tick={{ fontSize: 11 }} />
                   <YAxis tick={{ fontSize: 11 }} tickFormatter={yTickFormatter} />
                   <Tooltip formatter={(v) => fmtRp(v)} contentStyle={TOOLTIP_STYLE} />
                   <Legend />
                   <Line type="monotone" dataKey="pendapatan" name="Pendapatan"
-                        stroke="#7BA7E1" strokeWidth={3}
-                        dot={{ fill: "#7BA7E1", r: 4 }} activeDot={{ r: 6 }} />
+                        stroke="#3E8B86" strokeWidth={3}
+                        dot={{ fill: "#3E8B86", r: 4 }} activeDot={{ r: 6 }} />
                   <Line type="monotone" dataKey="beban" name="Beban"
-                        stroke="#E8B872" strokeWidth={3}
-                        dot={{ fill: "#E8B872", r: 4 }} activeDot={{ r: 6 }} />
+                        stroke="#E8A07A" strokeWidth={3}
+                        dot={{ fill: "#E8A07A", r: 4 }} activeDot={{ r: 6 }} />
                 </LineChart>
               )}
             </ResponsiveContainer>
@@ -357,11 +342,10 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Data Unit Usaha */}
       <div className="card p-0 overflow-hidden">
         <div className="p-5" style={{ borderBottom: "1px solid var(--border)" }}>
           <h3 className="font-heading text-lg font-semibold flex items-center gap-2" data-testid="unit-table-title">
-            <Storefront size={20} weight="duotone" color="#2E4F7C" /> Data Unit Usaha
+            <Storefront size={20} weight="duotone" color="#3E8B86" /> Data Unit Usaha
           </h3>
           <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>Periode: {pLabel}</p>
         </div>
@@ -383,7 +367,7 @@ export default function Dashboard() {
                   <td className="font-medium">{u.name}</td>
                   <td className="num">{fmtRp(u.pendapatan)}</td>
                   <td className="num">{fmtRp(u.beban)}</td>
-                  <td className="num font-semibold" style={{ color: u.laba >= 0 ? "#2E4F7C" : "#D97878" }}>{fmtRp(u.laba)}</td>
+                  <td className="num font-semibold" style={{ color: u.laba >= 0 ? "#2C6B73" : "#E07A8A" }}>{fmtRp(u.laba)}</td>
                 </tr>
               ))}
               {data.unit_summaries.length > 0 && (() => {
@@ -391,12 +375,12 @@ export default function Dashboard() {
                 const totB = data.unit_summaries.reduce((s, u) => s + (u.beban || 0), 0);
                 const totL = data.unit_summaries.reduce((s, u) => s + (u.laba || 0), 0);
                 return (
-                  <tr data-testid="unit-total-row" style={{ background: "#DCE8FE" }}>
+                  <tr data-testid="unit-total-row" style={{ background: "#E4F3F0" }}>
                     <td></td>
-                    <td className="font-bold" style={{ color: "#2E4F7C" }}>TOTAL 6 UNIT USAHA</td>
-                    <td className="num font-bold tabular-nums" style={{ color: "#2E4F7C" }}>{fmtRp(totP)}</td>
-                    <td className="num font-bold tabular-nums" style={{ color: "#2E4F7C" }}>{fmtRp(totB)}</td>
-                    <td className="num font-bold tabular-nums" style={{ color: totL >= 0 ? "#2E4F7C" : "#D97878" }}>{fmtRp(totL)}</td>
+                    <td className="font-bold" style={{ color: "#2C6B73" }}>TOTAL 6 UNIT USAHA</td>
+                    <td className="num font-bold tabular-nums" style={{ color: "#2C6B73" }}>{fmtRp(totP)}</td>
+                    <td className="num font-bold tabular-nums" style={{ color: "#2C6B73" }}>{fmtRp(totB)}</td>
+                    <td className="num font-bold tabular-nums" style={{ color: totL >= 0 ? "#2C6B73" : "#E07A8A" }}>{fmtRp(totL)}</td>
                   </tr>
                 );
               })()}

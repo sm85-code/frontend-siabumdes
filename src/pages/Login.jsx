@@ -30,10 +30,10 @@ export default function Login() {
       </Link>
       <div className="w-full max-w-md fade-in">
         <div className="text-center mb-6">
-          <img src="/logo-bumdes.webp" alt="Logo BUMDES Karya Raharja" data-testid="bumdes-logo"
-               className="w-28 h-28 rounded-full object-cover mx-auto mb-3" style={{ border: "1px solid var(--border)" }} />
+          <img src="/logo-transparent.png" alt="Logo BUMDES Karya Raharja" data-testid="bumdes-logo"
+               className="w-28 h-28 object-contain mx-auto mb-3" />
           <h1 className="font-heading text-2xl sm:text-3xl mt-1">BUMDes Karya Raharja</h1>
-          <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>Sistem Informasi Akuntansi</p>
+          <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>Sistem Informasi Akuntansi · Wonoharjo</p>
         </div>
         <div className="card">
           <h2 className="font-heading text-xl mb-1">Masuk ke Akun</h2>
@@ -57,7 +57,7 @@ export default function Login() {
             </div>
             {err && (
               <div data-testid="login-error" className="text-sm p-3 rounded-xl"
-                   style={{ background: "#F8E8E6", color: "#B4544A" }}>{err}</div>
+                   style={{ background: "#F8DCE3", color: "#B4544A" }}>{err}</div>
             )}
             <button data-testid="login-submit" disabled={loading} className="btn btn-primary w-full">
               <SignIn size={18} weight="bold" />{loading ? "Memproses..." : "Masuk"}
