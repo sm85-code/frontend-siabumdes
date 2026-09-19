@@ -19,12 +19,12 @@
   --text-secondary: #5B7380;
   --text-muted: #8A9AA4;
   --status-success: #3BA8C4;
-  --status-warning: #C4A03B;
+  --status-warning: #5B7380;
   --status-error: #C45C5C;
   --shadow-soft: 8px 8px 16px #c5d0db, -8px -8px 16px #ffffff;
   --shadow-inset: inset 4px 4px 8px #c5d0db, inset -4px -4px 8px #ffffff;
   --grad-primary: #3BA8C4;
-  --gold: #B89A5A;
+  --gold: #3BA8C4;
   --sea: #3BA8C4;
   --sunset: #3BA8C4;
   --coral: #C45C5C;
@@ -100,8 +100,7 @@ input[type="date"], input[type="month"] { appearance: none; color-scheme: light;
 .tbl .num { text-align: right; font-variant-numeric: tabular-nums; }
 
 .badge { display: inline-flex; align-items: center; padding: 0.15rem 0.55rem; border-radius: 999px; font-size: 0.7rem; font-weight: 600; background: var(--bg); color: var(--primary-dark); box-shadow: var(--shadow-inset); }
-.badge-blue, .badge-purple { background: var(--bg); color: var(--primary-dark); }
-.badge-warn { background: var(--bg); color: #8A6A2A; }
+.badge-blue, .badge-purple, .badge-warn { background: var(--bg); color: var(--primary-dark); }
 
 .side-link {
   display: flex; align-items: center; gap: 0.65rem;
