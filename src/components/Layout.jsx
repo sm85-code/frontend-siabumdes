@@ -9,7 +9,7 @@ import {
 
 const READ_ONLY = ["admin", "direktur", "bendahara", "pengawas", "penasihat"];
 const READ_MOST = ["admin", "direktur", "bendahara", "pengelola", "pengawas", "penasihat"];
-const INK = "#1E4A5A";
+const INK = "#14353A";
 
 const NAV = [
   { to: "/dashboard", label: "Dashboard", icon: House, roles: READ_MOST },
@@ -50,13 +50,13 @@ export default function Layout({ children }) {
   return (
     <div className="min-h-screen flex" style={{ background: "var(--bg)" }}>
       <div className="lg:hidden fixed top-3 inset-x-3 z-40 flex items-center justify-between px-4 h-14 rounded-2xl"
-           style={{ background: "var(--surface)", boxShadow: "var(--shadow-soft)" }}>
+           style={{ background: "var(--surface)", border: "1px solid var(--border)", boxShadow: "var(--shadow-soft)" }}>
         <div className="flex items-center gap-2">
           <img src="/logo-bumdes.webp" alt="Logo" className="w-8 h-8 rounded-full object-cover" />
           <span className="font-heading font-semibold text-sm">BUMDES Karya Raharja</span>
         </div>
         <button data-testid="mobile-menu-btn" onClick={() => setOpen(!open)} className="p-2 rounded-xl"
-                style={{ color: INK, boxShadow: "var(--shadow-soft)" }}>
+                style={{ color: INK }}>
           {open ? <X size={22} /> : <List size={22} />}
         </button>
       </div>
@@ -64,7 +64,7 @@ export default function Layout({ children }) {
       <aside data-testid="sidebar"
         className={`fixed lg:sticky top-0 left-0 h-[100dvh] w-72 z-50 flex flex-col overflow-hidden transform transition-transform lg:transform-none ${open ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
         <div className="m-0 lg:m-4 flex flex-col h-full lg:h-[calc(100dvh-2rem)] rounded-none lg:rounded-2xl overflow-hidden"
-             style={{ background: "var(--surface)", boxShadow: "var(--shadow-soft)" }}>
+             style={{ background: "var(--surface)", border: "1px solid var(--border)", boxShadow: "var(--shadow-soft)" }}>
           <div className="p-6 flex items-center gap-3">
             <img src="/logo-bumdes.webp" alt="Logo BUMDES" data-testid="sidebar-logo" className="w-11 h-11 rounded-full object-cover" />
             <div>
@@ -90,7 +90,7 @@ export default function Layout({ children }) {
           <div className="shrink-0 p-4">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-9 h-9 rounded-full flex items-center justify-center font-heading font-semibold text-sm"
-                   style={{ background: "#3BA8C4", color: "#fff" }}>
+                   style={{ background: "#1C8A8A", color: "#fff" }}>
                 {user.name?.[0]?.toUpperCase()}
               </div>
               <div className="min-w-0">
@@ -105,7 +105,7 @@ export default function Layout({ children }) {
         </div>
       </aside>
 
-      {open && <div className="lg:hidden fixed inset-0 z-40 bg-[#1E4A5A]/20" onClick={() => setOpen(false)} />}
+      {open && <div className="lg:hidden fixed inset-0 z-40 bg-[#14353A]/20" onClick={() => setOpen(false)} />}
       <main className="flex-1 min-w-0 pt-20 lg:pt-0">
         <div className="p-4 sm:p-6 lg:p-8 max-w-[1400px] mx-auto fade-in">{children}</div>
       </main>
