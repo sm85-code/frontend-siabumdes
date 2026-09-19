@@ -20,8 +20,10 @@ const Inventory = lazy(() => import("@/pages/Inventory"));
 
 function PageFallback() {
   return (
-    <div className="min-h-screen flex items-center justify-center text-sm text-muted-foreground" role="status" aria-live="polite">
-      Memuat halaman...
+    <div className="page-loader" role="status" aria-live="polite">
+      <div className="font-heading text-lg" style={{ color: "var(--primary-dark)" }}>BUMDes Karya Raharja</div>
+      <div className="page-loader-bar"><i /></div>
+      <div className="text-sm">Menyiapkan dasbor keuangan...</div>
     </div>
   );
 }
@@ -39,7 +41,7 @@ const ROLES_INVENTORY = ["admin", "direktur", "bendahara", "pengelola"];
 function Protected({ children, roles }) {
   const { user, loading } = useAuth();
   const location = useLocation();
-  if (loading) return <div className="min-h-screen flex items-center justify-center text-sm">Memuat...</div>;
+  if (loading) return <PageFallback />;
   if (!user) return <Navigate to="/login" replace state={{ from: location }} />;
   if (user.must_change_password && location.pathname !== "/change-password") {
     return <Navigate to="/change-password" replace state={{ from: location }} />;

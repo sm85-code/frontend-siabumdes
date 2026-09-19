@@ -49,77 +49,62 @@ export default function Layout({ children }) {
   return (
     <div className="min-h-screen flex" style={{ background: "var(--bg)" }}>
       <div className="lg:hidden fixed top-3 inset-x-3 z-40 flex items-center justify-between px-4 h-14 rounded-2xl"
-           style={{ background: "var(--nav)", border: "1px solid var(--border)" }}>
+           style={{ background: "var(--surface)", border: "1px solid var(--border)", boxShadow: "var(--shadow-soft)" }}>
         <div className="flex items-center gap-2">
           <img src="/logo-bumdes.webp" alt="Logo" className="w-8 h-8 rounded-full object-cover" />
-          <span className="font-heading font-bold text-sm">BUMDES Karya Raharja</span>
+          <span className="font-heading font-semibold text-sm">BUMDES Karya Raharja</span>
         </div>
         <button data-testid="mobile-menu-btn" onClick={() => setOpen(!open)} className="p-2 rounded-xl"
-                style={{ background: "rgba(255,255,255,0.06)", color: "#F7F8FA" }}>
+                style={{ background: "var(--primary-light)", color: "var(--primary-dark)" }}>
           {open ? <X size={22} /> : <List size={22} />}
         </button>
       </div>
 
-      <aside
-        data-testid="sidebar"
-        className={`fixed lg:sticky top-0 left-0 h-[100dvh] w-72 z-50 flex flex-col overflow-hidden transform transition-transform lg:transform-none ${open ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
-      >
+      <aside data-testid="sidebar"
+        className={`fixed lg:sticky top-0 left-0 h-[100dvh] w-72 z-50 flex flex-col overflow-hidden transform transition-transform lg:transform-none ${open ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
         <div className="m-0 lg:m-4 flex flex-col h-full lg:h-[calc(100dvh-2rem)] rounded-none lg:rounded-2xl overflow-hidden"
-             style={{ background: "var(--nav)", border: "1px solid var(--border)" }}>
-        <div className="p-6 flex items-center gap-3" style={{ borderBottom: "1px solid var(--border)" }}>
-          <img src="/logo-bumdes.webp" alt="Logo BUMDES" data-testid="sidebar-logo"
-               className="w-11 h-11 rounded-full object-cover" />
-          <div>
-            <div className="font-heading font-bold text-base leading-tight tracking-tight">BUMDES</div>
-            <div className="text-xs" style={{ color: "var(--text-muted)" }}>Karya Raharja</div>
-          </div>
-        </div>
-
-        <nav className="flex-1 min-h-0 p-3 space-y-1 overflow-y-auto">
-          {visible.map((n) => {
-            const Icon = n.icon;
-            const active = location.pathname === n.to;
-            return (
-              <NavLink
-                key={n.to}
-                to={n.to}
-                data-testid={`nav-${n.to.replace(/\//g, "-")}`}
-                onClick={() => setOpen(false)}
-                className={`side-link ${active ? "active" : ""}`}
-              >
-                <span className="nav-ico">
-                  <Icon size={18} weight={active ? "fill" : "regular"} />
-                </span>
-                <span>{n.label}</span>
-              </NavLink>
-            );
-          })}
-        </nav>
-
-        <div className="shrink-0 p-4" style={{ borderTop: "1px solid var(--border)" }}>
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-9 h-9 rounded-full flex items-center justify-center font-heading font-bold text-sm"
-                 style={{ background: "var(--primary)", color: "#171D24" }}>
-              {user.name?.[0]?.toUpperCase()}
-            </div>
-            <div className="min-w-0">
-              <div className="text-sm font-semibold truncate">{user.name}</div>
-              <div className="text-xs" style={{ color: "var(--text-muted)" }}>{ROLE_LABELS[user.role]}</div>
+             style={{ background: "var(--surface)", border: "1px solid var(--border)", boxShadow: "var(--shadow-soft)" }}>
+          <div className="p-6 flex items-center gap-3" style={{ borderBottom: "1px solid var(--border)" }}>
+            <img src="/logo-bumdes.webp" alt="Logo BUMDES" data-testid="sidebar-logo" className="w-11 h-11 rounded-full object-cover" />
+            <div>
+              <div className="font-heading font-semibold text-base leading-tight">BUMDES</div>
+              <div className="text-xs" style={{ color: "var(--text-muted)" }}>Karya Raharja</div>
             </div>
           </div>
-          <button data-testid="logout-btn" onClick={logout} className="btn btn-outline w-full text-sm">
-            <SignOut size={16} /> Keluar
-          </button>
-        </div>
+          <nav className="flex-1 min-h-0 p-3 space-y-1 overflow-y-auto">
+            {visible.map((n) => {
+              const Icon = n.icon;
+              const active = location.pathname === n.to;
+              return (
+                <NavLink key={n.to} to={n.to} data-testid={`nav-${n.to.replace(/\//g, "-")}`}
+                  onClick={() => setOpen(false)} className={`side-link ${active ? "active" : ""}`}>
+                  <span className="nav-ico"><Icon size={18} weight={active ? "fill" : "duotone"} /></span>
+                  <span>{n.label}</span>
+                </NavLink>
+              );
+            })}
+          </nav>
+          <div className="shrink-0 p-4" style={{ borderTop: "1px solid var(--border)" }}>
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-9 h-9 rounded-full flex items-center justify-center font-heading font-semibold text-sm"
+                   style={{ background: "var(--primary-dark)", color: "#fff" }}>
+                {user.name?.[0]?.toUpperCase()}
+              </div>
+              <div className="min-w-0">
+                <div className="text-sm font-semibold truncate">{user.name}</div>
+                <div className="text-xs" style={{ color: "var(--text-muted)" }}>{ROLE_LABELS[user.role]}</div>
+              </div>
+            </div>
+            <button data-testid="logout-btn" onClick={logout} className="btn btn-outline w-full text-sm">
+              <SignOut size={16} /> Keluar
+            </button>
+          </div>
         </div>
       </aside>
 
-      {open && <div className="lg:hidden fixed inset-0 z-40 bg-black/65" onClick={() => setOpen(false)} />}
-
+      {open && <div className="lg:hidden fixed inset-0 z-40 bg-[#1F4E3D]/25" onClick={() => setOpen(false)} />}
       <main className="flex-1 min-w-0 pt-20 lg:pt-0">
-        <div className="p-4 sm:p-6 lg:p-8 max-w-[1400px] mx-auto fade-in">
-          {children}
-        </div>
+        <div className="p-4 sm:p-6 lg:p-8 max-w-[1400px] mx-auto fade-in">{children}</div>
       </main>
     </div>
   );
