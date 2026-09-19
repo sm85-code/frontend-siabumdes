@@ -7,6 +7,7 @@ import {
 } from "@phosphor-icons/react";
 import { CoaSelect } from "@/lib/uu05InventoryCoa";
 import InventorySummary from "@/pages/InventorySummary";
+import TableShell from "@/components/TableShell";
 
 function formatApiError(err, fallback = "Terjadi kesalahan") {
   const detail = err?.response?.data?.detail;
@@ -382,7 +383,8 @@ export default function Inventory() {
             </div>
           )}
 
-          <div className="card p-0 overflow-x-auto">
+          <div className="card p-0 overflow-hidden">
+            <TableShell minWidth={720}>
             <table className="tbl">
               <thead>
                 <tr>
@@ -419,6 +421,7 @@ export default function Inventory() {
                 ))}
               </tbody>
             </table>
+            </TableShell>
           </div>
         </div>
       )}
@@ -531,7 +534,8 @@ export default function Inventory() {
             ) : <p className="text-sm">Role Anda read-only.</p>}
           </div>
 
-          <div className="card p-0 overflow-x-auto">
+          <div className="card p-0 overflow-hidden">
+            <TableShell minWidth={720}>
             <table className="tbl">
               <thead><tr><th>Tanggal</th><th>SKU</th><th>Produk</th><th className="num">Delta</th><th>Alasan</th><th>Catatan</th>{canWrite && <th />}</tr></thead>
               <tbody>
@@ -556,6 +560,7 @@ export default function Inventory() {
                 ))}
               </tbody>
             </table>
+            </TableShell>
           </div>
         </div>
       )}
@@ -592,7 +597,8 @@ export default function Inventory() {
           )}
 
           {valuation?.by_category?.length > 0 && (
-            <div className="card p-0 overflow-x-auto">
+            <div className="card p-0 overflow-hidden">
+              <TableShell minWidth={720}>
               <table className="tbl">
                 <thead><tr><th>Kategori</th><th className="num">SKU</th><th className="num">Qty</th><th className="num">Nilai</th></tr></thead>
                 <tbody>
@@ -606,6 +612,7 @@ export default function Inventory() {
                   ))}
                 </tbody>
               </table>
+              </TableShell>
             </div>
           )}
         </div>
@@ -625,7 +632,8 @@ function Stat({ label, value }) {
 
 function MovementTable({ rows, onCancel }) {
   return (
-    <div className="card p-0 overflow-x-auto">
+    <div className="card p-0 overflow-hidden">
+      <TableShell minWidth={720}>
       <table className="tbl">
         <thead>
           <tr>
@@ -656,6 +664,7 @@ function MovementTable({ rows, onCancel }) {
           ))}
         </tbody>
       </table>
+      </TableShell>
     </div>
   );
 }
