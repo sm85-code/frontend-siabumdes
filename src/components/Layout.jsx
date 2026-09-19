@@ -11,14 +11,14 @@ const READ_ONLY = ["admin", "direktur", "bendahara", "pengawas", "penasihat"];
 const READ_MOST = ["admin", "direktur", "bendahara", "pengelola", "pengawas", "penasihat"];
 
 const NAV = [
-  { to: "/dashboard", label: "Dashboard", icon: House, roles: READ_MOST },
-  { to: "/transactions", label: "Transaksi", icon: Receipt, roles: READ_MOST },
-  { to: "/reports", label: "Laporan Keuangan", icon: ChartLine, roles: READ_MOST },
-  { to: "/ledger", label: "Buku Besar", icon: BookOpenText, roles: READ_MOST },
-  { to: "/accounts", label: "Kode Akun (COA)", icon: Books, roles: READ_ONLY },
-  { to: "/inventory", label: "Inventory", icon: Package, roles: ["admin", "direktur", "bendahara", "pengelola"], uu05Only: true },
-  { to: "/users", label: "Kelola Pengguna", icon: UsersThree, roles: ["admin"] },
-  { to: "/profile", label: "Profil Saya", icon: UserCircle, roles: READ_MOST },
+  { to: "/dashboard", label: "Dashboard", icon: House, roles: READ_MOST, tint: "#E4F3F0", ink: "#3E8B86" },
+  { to: "/transactions", label: "Transaksi", icon: Receipt, roles: READ_MOST, tint: "#F8E8D4", ink: "#E8A07A" },
+  { to: "/reports", label: "Laporan Keuangan", icon: ChartLine, roles: READ_MOST, tint: "#D7EAF4", ink: "#3D4F9A" },
+  { to: "/ledger", label: "Buku Besar", icon: BookOpenText, roles: READ_MOST, tint: "#E8F0FF", ink: "#4A6FD0" },
+  { to: "/accounts", label: "Kode Akun (COA)", icon: Books, roles: READ_ONLY, tint: "#F8DCE3", ink: "#E07A8A" },
+  { to: "/inventory", label: "Inventory", icon: Package, roles: ["admin", "direktur", "bendahara", "pengelola"], uu05Only: true, tint: "#E4F3F0", ink: "#5BA8A0" },
+  { to: "/users", label: "Kelola Pengguna", icon: UsersThree, roles: ["admin"], tint: "#F3E9D4", ink: "#C4A35A" },
+  { to: "/profile", label: "Profil Saya", icon: UserCircle, roles: READ_MOST, tint: "#E4F3F0", ink: "#2C6B73" },
 ];
 
 export default function Layout({ children }) {
@@ -78,7 +78,9 @@ export default function Layout({ children }) {
               return (
                 <NavLink key={n.to} to={n.to} data-testid={`nav-${n.to.replace(/\//g, "-")}`}
                   onClick={() => setOpen(false)} className={`side-link ${active ? "active" : ""}`}>
-                  <span className="nav-ico"><Icon size={18} weight={active ? "fill" : "duotone"} /></span>
+                  <span className="nav-ico" style={{ background: n.tint, color: n.ink }}>
+                    <Icon size={18} weight={active ? "fill" : "duotone"} color={active ? "#fff" : n.ink} />
+                  </span>
                   <span>{n.label}</span>
                 </NavLink>
               );
@@ -102,7 +104,7 @@ export default function Layout({ children }) {
         </div>
       </aside>
 
-      {open && <div className="lg:hidden fixed inset-0 z-40 bg-[#1F4E3D]/25" onClick={() => setOpen(false)} />}
+      {open && <div className="lg:hidden fixed inset-0 z-40 bg-[#2C6B73]/20" onClick={() => setOpen(false)} />}
       <main className="flex-1 min-w-0 pt-20 lg:pt-0">
         <div className="p-4 sm:p-6 lg:p-8 max-w-[1400px] mx-auto fade-in">{children}</div>
       </main>

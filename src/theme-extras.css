@@ -1,65 +1,64 @@
 .nav-ico {
   width: 2rem; height: 2rem; border-radius: 0.7rem;
   display: inline-flex; align-items: center; justify-content: center;
-  background: #E7EFE8; color: #1F4E3D; flex: 0 0 auto;
+  flex: 0 0 auto;
 }
-.side-link.active .nav-ico { background: rgba(255,255,255,0.18); color: #fff; }
+.side-link.active .nav-ico { background: rgba(255,255,255,0.22) !important; color: #fff !important; }
 
 select.select, select {
   border-radius: 0.85rem;
-  background: #FFFcf7;
-  color: #243028;
-  border: 1px solid #D7DFD4;
-  accent-color: #2F6A52;
+  background: #FFFFFF;
+  color: #2A3A3C;
+  border: 1px solid #D7E6E2;
+  accent-color: #3E8B86;
 }
-select option { background: #FFFcf7; color: #243028; }
-select option:checked, select option:hover { background: #E7EFE8; color: #1F4E3D; }
+select option { background: #FFFFFF; color: #2A3A3C; }
+select option:checked, select option:hover { background: #E4F3F0; color: #2C6B73; }
 
 .page-loader {
   min-height: 100vh;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 1rem; background: #F4F1EA; color: #5C6B62;
+  gap: 1rem; background: #F7FBFA; color: #5B6E70;
 }
-.page-loader-bar { width: 160px; height: 3px; border-radius: 99px; overflow: hidden; background: #D7DFD4; }
-.page-loader-bar > i { display: block; height: 100%; width: 40%; background: #1F4E3D; animation: loader-slide 1.1s ease-in-out infinite; }
+.page-loader-bar { width: 160px; height: 3px; border-radius: 99px; overflow: hidden; background: #D7E6E2; }
+.page-loader-bar > i { display: block; height: 100%; width: 40%; background: #3E8B86; animation: loader-slide 1.1s ease-in-out infinite; }
 @keyframes loader-slide { 0% { transform: translateX(-120%); } 100% { transform: translateX(350%); } }
 
 .toaster [data-sonner-toast] {
-  background: #FFFcf7 !important; border: 1px solid #D7DFD4 !important; color: #243028 !important;
-  border-radius: 0.9rem !important; box-shadow: 0 10px 30px rgba(31,78,61,0.08) !important;
+  background: #FFFFFF !important; border: 1px solid #D7E6E2 !important; color: #2A3A3C !important;
+  border-radius: 0.9rem !important; box-shadow: 0 10px 30px rgba(44,107,115,0.08) !important;
 }
 
 .tbl thead th, table thead th {
-  background: #F0EBE3 !important; color: #5C6B62 !important; border-bottom-color: #D7DFD4 !important;
+  background: #EAF4F2 !important; color: #5B6E70 !important; border-bottom-color: #D7E6E2 !important;
 }
-.tbl tbody tr:hover td { background: #F7F4EE; }
+.tbl tbody tr:hover td { background: #F4FAF8; }
 
-/* Hex + computed rgb leftovers (React inlines rgb()) */
 [style*="#2E4F7C"], [style*="#4C86C4"], [style*="#3A5A7D"],
 [style*="46, 79, 124"], [style*="76, 134, 196"], [style*="58, 90, 125"] {
-  color: #1F4E3D !important;
+  color: #2C6B73 !important;
 }
 [style*="#DCE8FE"], [style*="#DCEFF7"], [style*="#E8EEF6"], [style*="#D6E4FA"],
 [style*="#EEF3F9"], [style*="#F6FAFE"],
 [style*="220, 232, 254"], [style*="238, 243, 249"], [style*="246, 250, 254"],
 [style*="220,239,247"], [style*="232, 238, 246"] {
-  background: #E7EFE8 !important;
+  background: #E4F3F0 !important;
 }
-[fill="#7BA7E1"], [fill="#4A9DC1"], [fill="#2E4F7C"], [fill="#4C86C4"] { fill: #2F6A52 !important; }
-[stroke="#7BA7E1"], [stroke="#4A9DC1"] { stroke: #2F6A52 !important; }
+[fill="#7BA7E1"], [fill="#4A9DC1"], [fill="#2E4F7C"], [fill="#4C86C4"] { fill: #3E8B86 !important; }
+[stroke="#7BA7E1"], [stroke="#4A9DC1"] { stroke: #3E8B86 !important; }
 
 .month-scroll {
   display: flex; align-items: stretch; gap: 0.35rem;
-  border: 1px solid #D7DFD4; border-radius: 0.85rem; background: #FFFcf7; min-height: 44px;
+  border: 1px solid #D7E6E2; border-radius: 0.85rem; background: #FFFFFF; min-height: 44px;
 }
 .month-scroll-btn {
-  width: 2.2rem; border: 0; background: #E7EFE8; color: #1F4E3D; font-size: 1.2rem; cursor: pointer;
+  width: 2.2rem; border: 0; background: #E4F3F0; color: #2C6B73; font-size: 1.2rem; cursor: pointer;
 }
-.month-scroll-btn:hover { background: #d7e6da; }
+.month-scroll-btn:hover { background: #d3ebe7; }
 .month-scroll-mid { flex: 1; padding: 0.25rem 0.4rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; }
-.month-scroll-label { font-weight: 650; color: #1F4E3D; font-size: 0.9rem; }
-.month-scroll-hint { font-size: 10px; color: #8A968C; width: 100%; line-height: 1; }
+.month-scroll-label { font-weight: 650; color: #2C6B73; font-size: 0.9rem; }
+.month-scroll-hint { font-size: 10px; color: #8AA0A2; width: 100%; line-height: 1; }
 .month-scroll-day, .month-scroll-year {
-  border: 1px solid #D7DFD4; border-radius: 0.5rem; background: #F4F1EA; color: #243028;
+  border: 1px solid #D7E6E2; border-radius: 0.5rem; background: #F7FBFA; color: #2A3A3C;
   font-size: 0.8rem; padding: 0.15rem 0.3rem;
 }
