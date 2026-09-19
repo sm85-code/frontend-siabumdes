@@ -26,12 +26,10 @@ export default function Login() {
   return (
     <div className="auth-bg flex items-center justify-center p-4 relative">
       <Link to="/" data-testid="login-back"
-            className="absolute top-4 left-4 sm:top-6 sm:left-6 btn btn-outline text-xs sm:text-sm"
-            style={{ background: "rgba(255,255,255,0.75)", backdropFilter: "blur(6px)" }}>
+            className="absolute top-4 left-4 sm:top-6 sm:left-6 btn btn-outline text-xs sm:text-sm">
         <ArrowLeft size={14} /> Kembali
       </Link>
       <div className="w-full max-w-md fade-in">
-        {/* Logo BUMDES */}
         <div className="text-center mb-6">
           <div className="inline-flex items-center justify-center mb-3">
             <img
@@ -41,15 +39,15 @@ export default function Login() {
               className="w-32 h-32 rounded-full object-cover"
               style={{
                 background: "white",
-                boxShadow: "0 8px 32px rgba(46,79,50,0.20)",
-                border: "3px solid white",
+                boxShadow: "8px 8px 20px rgba(164,186,214,0.35), -6px -6px 16px rgba(255,255,255,0.9)",
+                border: "4px solid white",
               }}
             />
           </div>
-          <h1 className="font-heading text-2xl sm:text-3xl font-bold mt-1" style={{ color: "#1A2E1E" }}>
+          <h1 className="font-heading text-2xl sm:text-3xl font-bold mt-1" style={{ color: "#1E2A44" }}>
             BUMDes Karya Raharja
           </h1>
-          <p className="text-sm mt-1" style={{ color: "#2E4F7C" }}>
+          <p className="text-sm mt-1" style={{ color: "#2F5FD0" }}>
             Sistem Informasi Akuntansi
           </p>
         </div>
@@ -88,8 +86,8 @@ export default function Login() {
               </div>
             </div>
             {err && (
-              <div data-testid="login-error" className="text-sm p-3 rounded-lg"
-                   style={{ background: "#FDECEA", color: "#8A4141", border: "1px solid #f5c6c1" }}>
+              <div data-testid="login-error" className="text-sm p-3 rounded-2xl"
+                   style={{ background: "#FDECEA", color: "#8A4141" }}>
                 {err}
               </div>
             )}
@@ -100,7 +98,7 @@ export default function Login() {
           </form>
         </div>
 
-        <p className="text-center text-xs mt-5" style={{ color: "#2E4F7C" }}>
+        <p className="text-center text-xs mt-5" style={{ color: "#2F5FD0" }}>
           Aplikasi SIA BUMDes ini dikembangkan dengan berpedoman pada Kepmendesa PDTT No. 136 Tahun 2022.
         </p>
         <p className="text-center text-xs mt-4" style={{ color: "var(--text-muted)" }}>
