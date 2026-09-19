@@ -41,3 +41,28 @@ select option:checked { background: #E7EFE8; color: #1F4E3D; }
   border-radius: 0.9rem !important;
   box-shadow: 0 10px 30px rgba(31,78,61,0.08) !important;
 }
+
+/* Table chrome */
+.tbl thead th,
+table thead th {
+  background: #F0EBE3 !important;
+  color: #5C6B62 !important;
+  border-bottom-color: #D7DFD4 !important;
+}
+.tbl tbody tr:hover td { background: #F7F4EE; }
+.table-shell--sticky .tbl thead th:first-child { background: #F0EBE3 !important; }
+
+/* Remap leftover blue tokens from older pages */
+[style*="#2E4F7C"], [style*="#4C86C4"], [style*="#3A5A7D"],
+[style*="#7BA7E1"], [style*="#3F86A6"], [style*="#4A9DC1"] {
+  color: #1F4E3D !important;
+}
+[style*="#DCE8FE"], [style*="#DCEFF7"], [style*="#E8EEF6"], [style*="#D6E4FA"] {
+  background: #E7EFE8 !important;
+}
+[fill="#7BA7E1"], [fill="#4A9DC1"], [fill="#3F86A6"], [fill="#2E4F7C"], [fill="#4C86C4"] {
+  fill: #2F6A52 !important;
+}
+[stroke="#7BA7E1"], [stroke="#4A9DC1"], [stroke="#3F86A6"] {
+  stroke: #2F6A52 !important;
+}
