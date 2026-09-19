@@ -41,11 +41,11 @@ export default function Landing() {
 
       <section className="max-w-3xl mx-auto px-5 pt-10 pb-6 text-center">
         <p className="inline-block text-[10px] tracking-[0.18em] uppercase px-4 py-1.5 rounded-full mb-5"
-           style={{ background: "var(--bg)", boxShadow: "var(--shadow-inset)", color: "var(--text-secondary)" }}>
+           style={{ background: "var(--primary-light)", color: "var(--text-secondary)" }}>
           Papan Kinerja · BUMDes · Tahun {year}
         </p>
         <h1 className="modern-brand-title text-3xl sm:text-5xl">
-          SIA BUMDes <span style={{ color: "#3BA8C4" }}>Karya Raharja</span>
+          SIA BUMDes <span style={{ color: "#1C8A8A" }}>Karya Raharja</span>
         </h1>
         <p className="mt-4 text-sm sm:text-base" style={{ color: "var(--text-secondary)" }}>
           Sistem Informasi Akuntansi & Transparansi Keuangan Terintegrasi.<br />
@@ -73,14 +73,14 @@ export default function Landing() {
             <p className="text-xs mb-4" style={{ color: "var(--text-muted)" }}>Diperbarui langsung dari transaksi resmi.</p>
             <ResponsiveContainer width="99%" height={220}>
               <LineChart data={trend} margin={{ top: 8, right: 12, left: -4, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#d3dde4" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#E3E8E6" vertical={false} />
                 <XAxis dataKey="label" tick={{ fontSize: 10, fill: "var(--text-muted)" }} tickLine={false} axisLine={false} />
                 <YAxis tick={{ fontSize: 10, fill: "var(--text-muted)" }} tickLine={false} axisLine={false}
                        tickFormatter={(v) => v >= 1000000 ? `${Math.round(v/1_000_000)}jt` : v >= 1000 ? `${Math.round(v/1000)}rb` : v} width={44} />
-                <Tooltip formatter={(v) => fmtRp(v)} contentStyle={{ background: "#E6EDF3", border: 0, borderRadius: 16, fontSize: 11, boxShadow: "8px 8px 16px #c5d0db, -8px -8px 16px #fff" }} />
+                <Tooltip formatter={(v) => fmtRp(v)} contentStyle={{ background: "#fff", border: "1px solid #E3E8E6", borderRadius: 12, fontSize: 11 }} />
                 <Legend wrapperStyle={{ fontSize: 11 }} iconType="circle" iconSize={8} />
-                <Line type="monotone" dataKey="pendapatan" name="Pendapatan" stroke="#1E4A5A" strokeWidth={2} dot={{ r: 3, fill: "#1E4A5A" }} />
-                <Line type="monotone" dataKey="beban" name="Beban" stroke="#3BA8C4" strokeWidth={2} dot={{ r: 3, fill: "#3BA8C4" }} />
+                <Line type="monotone" dataKey="pendapatan" name="Pendapatan" stroke="#14353A" strokeWidth={2} dot={{ r: 3, fill: "#14353A" }} />
+                <Line type="monotone" dataKey="beban" name="Beban" stroke="#1C8A8A" strokeWidth={2} dot={{ r: 3, fill: "#1C8A8A" }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -111,8 +111,8 @@ export default function Landing() {
 function StatCard({ icon: Icon, label, value, testId }) {
   return (
     <div data-testid={testId} className="card">
-      <div className="w-9 h-9 rounded-xl flex items-center justify-center mb-3" style={{ background: "var(--bg)", boxShadow: "var(--shadow-inset)" }}>
-        <Icon size={18} color="#1E4A5A" />
+      <div className="w-9 h-9 rounded-xl flex items-center justify-center mb-3" style={{ background: "var(--primary-light)" }}>
+        <Icon size={18} color="#14353A" />
       </div>
       <div className="text-[10px] tracking-[0.14em] font-semibold uppercase" style={{ color: "var(--text-muted)" }}>{label}</div>
       <div className="font-heading tabular-nums text-xl sm:text-2xl mt-1">{value}</div>
