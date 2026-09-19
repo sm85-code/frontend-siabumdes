@@ -8,7 +8,7 @@ import {
 import { CoaSelect } from "@/lib/uu05InventoryCoa";
 import InventorySummary from "@/pages/InventorySummary";
 
-function formatApiError(err, fallback = "Terjadi kesalaian") {
+function formatApiError(err, fallback = "Terjadi kesalahan") {
   const detail = err?.response?.data?.detail;
   if (detail == null) return err?.message || fallback;
   if (typeof detail === "string") return detail;
@@ -71,8 +71,8 @@ export default function Inventory() {
   });
   const [reportRange, setReportRange] = useState({ date_from: "", date_to: "" });
 
-  const canAccessRole = can(user, "admin", "direktur", "bendaira", "pengelola";
-  const canWrite = can(user, "admin", "direktur", "bendaira", "pengelola");
+  const canAccessRole = can(user, "admin", "direktur", "bendahara", "pengelola");
+  const canWrite = can(user, "admin", "direktur", "bendahara", "pengelola");
 
   const loadCore = useCallback(async () => {
     setError("");
@@ -98,7 +98,7 @@ export default function Inventory() {
         api.get(`${BASE}/movements`, { params: { limit: 50 } }),
         api.get(`${BASE}/adjustments`, { params: { limit: 50 } }),
       ]);
-      setMovements(Array.isArray(mov.dataata) ? mov.data : []);
+      setMovements(Array.isArray(mov.data) ? mov.data : []);
       setAdjustments(Array.isArray(adj.data) ? adj.data : []);
     } catch (e) {
       setError(formatApiError(e, "Gagal memuat mutasi"));
