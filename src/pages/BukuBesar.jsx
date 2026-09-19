@@ -3,6 +3,7 @@ import api, { fmtRp, fmtDate, API } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { notify } from "@/lib/feedback";
 import { Books, MagnifyingGlass, FilePdf, FileXls } from "@phosphor-icons/react";
+import TableShell, { TableCard, TableCardField } from "@/components/TableShell";
 
 const MONTHS = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 const YEAR_MIN = 2022, YEAR_MAX = 2030;
@@ -232,7 +233,38 @@ export default function BukuBesar() {
                   </div>
                 </div>
               </div>
-              <div className="h-scroll">
+              <TableShell
+                minWidth={760}
+                data-testid="ledger-table"
+                mobileCards={(
+                  <>
+                    <TableCard title="Saldo Awal" subtitle="Awal periode">
+                      <TableCardField label="Saldo" emphasize>{fmtRp(ledger.saldo_awal)}</TableCardField>
+                    </TableCard>
+                    {ledger.entries.length === 0 ? (
+                      <p className="text-sm text-center py-6" style={{ color: "var(--text-muted)" }}>
+                        Tidak ada transaksi pada periode ini.
+                      </p>
+                    ) : ledger.entries.map((e) => (
+                      <TableCard key={e.id} title={fmtDate(e.date)} subtitle={e.description}>
+                        <TableCardField label="Akun lawan">
+                          <span className="font-mono text-xs">{e.other_account_code}</span>
+                          {e.other_account_name ? <span className="block text-xs" style={{ color: "var(--text-muted)" }}>{e.other_account_name}</span> : null}
+                        </TableCardField>
+                        <TableCardField label="Ref.">{e.reference || "-"}</TableCardField>
+                        <TableCardField label="Debit">{e.debit ? fmtRp(e.debit) : "-"}</TableCardField>
+                        <TableCardField label="Kredit">{e.credit ? fmtRp(e.credit) : "-"}</TableCardField>
+                        <TableCardField label="Saldo" emphasize>{fmtRp(e.balance)}</TableCardField>
+                      </TableCard>
+                    ))}
+                    <TableCard title="Total periode">
+                      <TableCardField label="Debit" emphasize>{fmtRp(ledger.total_debit)}</TableCardField>
+                      <TableCardField label="Kredit" emphasize>{fmtRp(ledger.total_credit)}</TableCardField>
+                      <TableCardField label="Saldo akhir" emphasize>{fmtRp(ledger.saldo_akhir)}</TableCardField>
+                    </TableCard>
+                  </>
+                )}
+              >
                 <table className="tbl" data-testid="ledger-table">
                   <thead>
                     <tr>
@@ -276,7 +308,7 @@ export default function BukuBesar() {
                     </tr>
                   </tbody>
                 </table>
-              </div>
+              </TableShell>
             </div>
           ) : null}
         </div>
