@@ -28,23 +28,27 @@ export default function Login() {
       <Link to="/" data-testid="login-back" className="absolute top-4 left-4 sm:top-6 sm:left-6 btn btn-outline text-xs sm:text-sm">
         <ArrowLeft size={14} /> Kembali
       </Link>
-      <div className="w-full max-w-sm fade-in">
-        <div className="card text-center px-6 py-8">
+      <div className="w-full max-w-md fade-in">
+        <div className="text-center mb-6">
           <img src="/logo-transparent.png" alt="Logo BUMDES Karya Raharja" data-testid="bumdes-logo"
-               className="w-20 h-20 object-contain mx-auto mb-3 rounded-full" style={{ boxShadow: "var(--shadow-soft)" }} />
-          <h1 className="font-heading text-2xl">SIA BUMDes</h1>
-          <p className="text-xs tracking-[0.14em] uppercase mt-1" style={{ color: "var(--text-muted)" }}>Karya Raharja · Wonoharjo</p>
-          <form onSubmit={submit} className="space-y-4 text-left mt-6">
+               className="w-28 h-28 object-contain mx-auto mb-3" />
+          <h1 className="font-heading text-2xl sm:text-3xl mt-1">BUMDes Karya Raharja</h1>
+          <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>Sistem Informasi Akuntansi</p>
+        </div>
+        <div className="card">
+          <h2 className="font-heading text-xl mb-1">Masuk ke Akun</h2>
+          <p className="text-sm mb-5" style={{ color: "var(--text-secondary)" }}>Silakan gunakan username & password Anda.</p>
+          <form onSubmit={submit} className="space-y-4">
             <div>
-              <label className="label">Username</label>
+              <label className="label">Username / Email</label>
               <input data-testid="login-username" className="input" value={username}
-                onChange={(e) => setUsername(e.target.value)} placeholder="username" autoFocus required />
+                onChange={(e) => setUsername(e.target.value)} placeholder="mis. admin" autoFocus required />
             </div>
             <div>
               <label className="label">Password</label>
               <div className="relative">
                 <input data-testid="login-password" className="input pr-10" type={showPw ? "text" : "password"}
-                  value={password} onChange={(e) => setPassword(e.target.value)} placeholder="password" required />
+                  value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required />
                 <button type="button" data-testid="toggle-password" onClick={() => setShowPw(!showPw)}
                         className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: "var(--text-muted)" }}>
                   {showPw ? <EyeSlash size={18} /> : <Eye size={18} />}
@@ -52,16 +56,18 @@ export default function Login() {
               </div>
             </div>
             {err && (
-              <div data-testid="login-error" className="text-sm p-3 rounded-xl"
-                   style={{ color: "#C45C5C" }}>{err}</div>
+              <div data-testid="login-error" className="text-sm p-3 rounded-xl" style={{ color: "#C45C5C" }}>{err}</div>
             )}
             <button data-testid="login-submit" disabled={loading} className="btn btn-primary w-full">
-              <SignIn size={18} />{loading ? "Memproses..." : "Login"}
+              <SignIn size={18} />{loading ? "Memproses..." : "Masuk"}
             </button>
           </form>
         </div>
-        <p className="text-center text-xs mt-5" style={{ color: "var(--text-muted)" }}>
-          Berpedoman pada Kepmendesa PDTT No. 136 Tahun 2022.
+        <p className="text-center text-xs mt-5" style={{ color: "var(--text-secondary)" }}>
+          Aplikasi SIA BUMDes ini dikembangkan dengan berpedoman pada Kepmendesa PDTT No. 136 Tahun 2022.
+        </p>
+        <p className="text-center text-xs mt-3" style={{ color: "var(--text-muted)" }}>
+          © {new Date().getFullYear()} BUMDes Karya Raharja Wonoharjo. All Rights Reserved.
         </p>
       </div>
     </div>
