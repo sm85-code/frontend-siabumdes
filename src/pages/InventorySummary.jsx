@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { fmtRp, fmtDate } from "@/lib/api";
+import TableShell from "@/components/TableShell";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend, CartesianGrid,
@@ -176,11 +177,12 @@ export default function InventorySummary({ products = [], movements = [], valuat
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="card p-0 overflow-x-auto">
+        <div className="card p-0 overflow-hidden">
           <div className="p-4 pb-2">
             <h3 className="font-heading text-lg font-semibold">Top nilai persediaan</h3>
             <p className="text-xs" style={{ color: "var(--text-muted)" }}>10 SKU dengan nilai stok tertinggi</p>
           </div>
+          <TableShell minWidth={640}>
           <table className="tbl">
             <thead>
               <tr>
@@ -200,13 +202,15 @@ export default function InventorySummary({ products = [], movements = [], valuat
               ))}
             </tbody>
           </table>
+          </TableShell>
         </div>
 
-        <div className="card p-0 overflow-x-auto">
+        <div className="card p-0 overflow-hidden">
           <div className="p-4 pb-2">
             <h3 className="font-heading text-lg font-semibold">Peringatan stok tipis</h3>
             <p className="text-xs" style={{ color: "var(--text-muted)" }}>SKU dengan qty on hand ≤ 5</p>
           </div>
+          <TableShell minWidth={640}>
           <table className="tbl">
             <thead>
               <tr>
@@ -228,14 +232,16 @@ export default function InventorySummary({ products = [], movements = [], valuat
               ))}
             </tbody>
           </table>
+          </TableShell>
         </div>
       </div>
 
-      <div className="card p-0 overflow-x-auto">
+      <div className="card p-0 overflow-hidden">
         <div className="p-4 pb-2">
           <h3 className="font-heading text-lg font-semibold">Stock out terbaru</h3>
           <p className="text-xs" style={{ color: "var(--text-muted)" }}>Mutasi keluar terakhir</p>
         </div>
+        <TableShell minWidth={640}>
         <table className="tbl">
           <thead>
             <tr>
@@ -256,6 +262,7 @@ export default function InventorySummary({ products = [], movements = [], valuat
             ))}
           </tbody>
         </table>
+        </TableShell>
       </div>
     </div>
   );
