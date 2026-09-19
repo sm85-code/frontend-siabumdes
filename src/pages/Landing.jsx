@@ -6,7 +6,7 @@ import {
   LineChart, Line, XAxis, YAxis, Tooltip,
   CartesianGrid, ResponsiveContainer, Legend,
 } from "recharts";
-import { ArrowRight, Buildings, HandHeart, ChartLineUp, Fish, Palmtree, SunHorizon, Sailboat } from "@phosphor-icons/react";
+import { ArrowRight, Buildings, HandHeart, ChartLineUp, Fish, Tree, Sun, Boat } from "@phosphor-icons/react";
 
 const MONTH_LABELS = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Ags","Sep","Okt","Nov","Des"];
 
@@ -47,7 +47,7 @@ export default function Landing() {
       <section className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 sm:pt-20 pb-8 text-center">
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[10px] sm:text-xs font-semibold tracking-[0.16em] mb-6 fade-slow"
              style={{ background: "var(--primary-light)", color: "var(--primary-dark)" }}>
-          <SunHorizon size={14} weight="fill" color="#E8A07A" />
+          <Sun size={14} weight="fill" color="#E8A07A" />
           PAPAN KINERJA · BUMDes · {data?.year || new Date().getFullYear()}
         </div>
         <h1 className="modern-brand-title text-3xl sm:text-5xl lg:text-6xl leading-[1.08] fade-slow"
@@ -60,15 +60,15 @@ export default function Landing() {
         </h1>
         <p className="mt-5 sm:mt-6 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto fade-slow"
            style={{ color: "var(--text-secondary)", animationDelay: "0.16s" }}>
-          Sistem Informasi Akuntansi &amp; Transparansi Keuangan Terintegrasi.
+          Sistem Informasi Akuntansi & Transparansi Keuangan Terintegrasi.
           <br />
           Dari pesisir Wonoharjo, untuk kemajuan desa.
         </p>
         <div className="mt-6 flex justify-center gap-5 fade-slow" style={{ animationDelay: "0.2s" }}>
-          <span className="w-11 h-11 rounded-2xl bg-white/80 border border-[#D7E6E2] flex items-center justify-center"><Sailboat size={22} weight="duotone" color="#3D4F9A" /></span>
-          <span className="w-11 h-11 rounded-2xl bg-white/80 border border-[#D7E6E2] flex items-center justify-center"><Palmtree size={22} weight="duotone" color="#3E8B86" /></span>
+          <span className="w-11 h-11 rounded-2xl bg-white/80 border border-[#D7E6E2] flex items-center justify-center"><Boat size={22} weight="duotone" color="#3D4F9A" /></span>
+          <span className="w-11 h-11 rounded-2xl bg-white/80 border border-[#D7E6E2] flex items-center justify-center"><Tree size={22} weight="duotone" color="#3E8B86" /></span>
           <span className="w-11 h-11 rounded-2xl bg-white/80 border border-[#D7E6E2] flex items-center justify-center"><Fish size={22} weight="duotone" color="#5BA8A0" /></span>
-          <span className="w-11 h-11 rounded-2xl bg-white/80 border border-[#D7E6E2] flex items-center justify-center"><SunHorizon size={22} weight="duotone" color="#E8A07A" /></span>
+          <span className="w-11 h-11 rounded-2xl bg-white/80 border border-[#D7E6E2] flex items-center justify-center"><Sun size={22} weight="duotone" color="#E8A07A" /></span>
         </div>
       </section>
 
@@ -88,7 +88,7 @@ export default function Landing() {
       {data && trend.length > 0 && (
         <section className="relative z-10 max-w-4xl mx-auto px-5 sm:px-8 pt-4 pb-10 sm:pb-14">
           <div className="card p-4 sm:p-5">
-            <h3 className="font-heading text-base sm:text-lg mb-1">Tren Pendapatan &amp; Beban {data.year}</h3>
+            <h3 className="font-heading text-base sm:text-lg mb-1">Tren Pendapatan & Beban {data.year}</h3>
             <p className="text-[11px] sm:text-xs mb-3" style={{ color: "var(--text-muted)" }}>Diperbarui langsung dari transaksi resmi.</p>
             <ResponsiveContainer width="99%" height={220}>
               <LineChart data={trend} margin={{ top: 8, right: 12, left: -4, bottom: 0 }}>
