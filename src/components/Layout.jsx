@@ -1,24 +1,25 @@
-import { NavLink, useNavigate, useLocation } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuth, can } from "@/lib/auth";
 import api, { ROLE_LABELS } from "@/lib/api";
 import {
-  House, Receipt, ChartLine, ChartBar, Storefront, UsersThree,
-  BookOpenText, SignOut, List, X, Books, Calculator, UserCircle, Package,
+  House, Receipt, ChartLine, Storefront, UsersThree,
+  BookOpenText, SignOut, List, X, Books, UserCircle, Package,
 } from "@phosphor-icons/react";
 
 const READ_ONLY = ["admin", "direktur", "bendahara", "pengawas", "penasihat"];
 const READ_MOST = ["admin", "direktur", "bendahara", "pengelola", "pengawas", "penasihat"];
+const INK = "#1E4A5A";
 
 const NAV = [
-  { to: "/dashboard", label: "Dashboard", icon: House, roles: READ_MOST, tint: "#E4F3F0", ink: "#3E8B86" },
-  { to: "/transactions", label: "Transaksi", icon: Receipt, roles: READ_MOST, tint: "#F8E8D4", ink: "#E8A07A" },
-  { to: "/reports", label: "Laporan Keuangan", icon: ChartLine, roles: READ_MOST, tint: "#D7EAF4", ink: "#3D4F9A" },
-  { to: "/ledger", label: "Buku Besar", icon: BookOpenText, roles: READ_MOST, tint: "#E8F0FF", ink: "#4A6FD0" },
-  { to: "/accounts", label: "Kode Akun (COA)", icon: Books, roles: READ_ONLY, tint: "#F8DCE3", ink: "#E07A8A" },
-  { to: "/inventory", label: "Inventory", icon: Package, roles: ["admin", "direktur", "bendahara", "pengelola"], uu05Only: true, tint: "#E4F3F0", ink: "#5BA8A0" },
-  { to: "/users", label: "Kelola Pengguna", icon: UsersThree, roles: ["admin"], tint: "#F3E9D4", ink: "#C4A35A" },
-  { to: "/profile", label: "Profil Saya", icon: UserCircle, roles: READ_MOST, tint: "#E4F3F0", ink: "#2C6B73" },
+  { to: "/dashboard", label: "Dashboard", icon: House, roles: READ_MOST },
+  { to: "/transactions", label: "Transaksi", icon: Receipt, roles: READ_MOST },
+  { to: "/reports", label: "Laporan Keuangan", icon: ChartLine, roles: READ_MOST },
+  { to: "/ledger", label: "Buku Besar", icon: BookOpenText, roles: READ_MOST },
+  { to: "/accounts", label: "Kode Akun (COA)", icon: Books, roles: READ_ONLY },
+  { to: "/inventory", label: "Inventory", icon: Package, roles: ["admin", "direktur", "bendahara", "pengelola"], uu05Only: true },
+  { to: "/users", label: "Kelola Pengguna", icon: UsersThree, roles: ["admin"] },
+  { to: "/profile", label: "Profil Saya", icon: UserCircle, roles: READ_MOST },
 ];
 
 export default function Layout({ children }) {
@@ -49,13 +50,13 @@ export default function Layout({ children }) {
   return (
     <div className="min-h-screen flex" style={{ background: "var(--bg)" }}>
       <div className="lg:hidden fixed top-3 inset-x-3 z-40 flex items-center justify-between px-4 h-14 rounded-2xl"
-           style={{ background: "var(--surface)", border: "1px solid var(--border)", boxShadow: "var(--shadow-soft)" }}>
+           style={{ background: "var(--surface)", boxShadow: "var(--shadow-soft)" }}>
         <div className="flex items-center gap-2">
           <img src="/logo-bumdes.webp" alt="Logo" className="w-8 h-8 rounded-full object-cover" />
           <span className="font-heading font-semibold text-sm">BUMDES Karya Raharja</span>
         </div>
         <button data-testid="mobile-menu-btn" onClick={() => setOpen(!open)} className="p-2 rounded-xl"
-                style={{ background: "var(--primary-light)", color: "var(--primary-dark)" }}>
+                style={{ color: INK, boxShadow: "var(--shadow-soft)" }}>
           {open ? <X size={22} /> : <List size={22} />}
         </button>
       </div>
@@ -63,8 +64,8 @@ export default function Layout({ children }) {
       <aside data-testid="sidebar"
         className={`fixed lg:sticky top-0 left-0 h-[100dvh] w-72 z-50 flex flex-col overflow-hidden transform transition-transform lg:transform-none ${open ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
         <div className="m-0 lg:m-4 flex flex-col h-full lg:h-[calc(100dvh-2rem)] rounded-none lg:rounded-2xl overflow-hidden"
-             style={{ background: "var(--surface)", border: "1px solid var(--border)", boxShadow: "var(--shadow-soft)" }}>
-          <div className="p-6 flex items-center gap-3" style={{ borderBottom: "1px solid var(--border)" }}>
+             style={{ background: "var(--surface)", boxShadow: "var(--shadow-soft)" }}>
+          <div className="p-6 flex items-center gap-3">
             <img src="/logo-bumdes.webp" alt="Logo BUMDES" data-testid="sidebar-logo" className="w-11 h-11 rounded-full object-cover" />
             <div>
               <div className="font-heading font-semibold text-base leading-tight">BUMDES</div>
@@ -78,18 +79,18 @@ export default function Layout({ children }) {
               return (
                 <NavLink key={n.to} to={n.to} data-testid={`nav-${n.to.replace(/\//g, "-")}`}
                   onClick={() => setOpen(false)} className={`side-link ${active ? "active" : ""}`}>
-                  <span className="nav-ico" style={{ background: n.tint, color: n.ink }}>
-                    <Icon size={18} weight={active ? "fill" : "duotone"} color={active ? "#fff" : n.ink} />
+                  <span className="nav-ico">
+                    <Icon size={18} weight={active ? "fill" : "regular"} color={active ? "#fff" : INK} />
                   </span>
                   <span>{n.label}</span>
                 </NavLink>
               );
             })}
           </nav>
-          <div className="shrink-0 p-4" style={{ borderTop: "1px solid var(--border)" }}>
+          <div className="shrink-0 p-4">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-9 h-9 rounded-full flex items-center justify-center font-heading font-semibold text-sm"
-                   style={{ background: "var(--primary-dark)", color: "#fff" }}>
+                   style={{ background: "#3BA8C4", color: "#fff" }}>
                 {user.name?.[0]?.toUpperCase()}
               </div>
               <div className="min-w-0">
@@ -104,7 +105,7 @@ export default function Layout({ children }) {
         </div>
       </aside>
 
-      {open && <div className="lg:hidden fixed inset-0 z-40 bg-[#2C6B73]/20" onClick={() => setOpen(false)} />}
+      {open && <div className="lg:hidden fixed inset-0 z-40 bg-[#1E4A5A]/20" onClick={() => setOpen(false)} />}
       <main className="flex-1 min-w-0 pt-20 lg:pt-0">
         <div className="p-4 sm:p-6 lg:p-8 max-w-[1400px] mx-auto fade-in">{children}</div>
       </main>
