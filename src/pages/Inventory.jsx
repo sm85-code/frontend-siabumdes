@@ -4,8 +4,12 @@ import api, { fmtRp, fmtDate } from "@/lib/api";
 import { useAuth, can } from "@/lib/auth";
 import {
   Package, Plus, ArrowDown, ArrowUp, SlidersHorizontal, ChartBar, ChartPie, Trash, PencilSimple,
+  Truck, Users, Wallet, HandCoins,
 } from "@phosphor-icons/react";
-import { CoaSelect } from "@/lib/uu05InventoryCoa";
+import {
+  CoaSelect, KAS_ACCOUNT_CODE, PERSEDIAAN_ACCOUNT_CODE, PIUTANG_ACCOUNT_CODE,
+  UTANG_ACCOUNT_CODE, PENDAPATAN_ACCOUNT_CODE, HPP_ACCOUNT_CODE,
+} from "@/lib/uu05InventoryCoa";
 import InventorySummary from "@/pages/InventorySummary";
 import TableShell from "@/components/TableShell";
 
@@ -34,8 +38,27 @@ const TABS = [
   { id: "stock-in", label: "Stock In", icon: ArrowDown },
   { id: "stock-out", label: "Stock Out", icon: ArrowUp },
   { id: "kelola", label: "Kelola Stok", icon: SlidersHorizontal },
+  { id: "vendor", label: "Vendor", icon: Truck },
+  { id: "customer", label: "Customer", icon: Users },
+  { id: "utang", label: "Utang", icon: Wallet },
+  { id: "piutang", label: "Piutang", icon: HandCoins },
   { id: "laporan", label: "Laporan", icon: ChartBar },
 ];
+
+const emptyStockIn = () => ({
+  product_id: "", quantity: 1, unit_cost: 0, movement_date: today(),
+  debit_account_code: PERSEDIAAN_ACCOUNT_CODE, credit_account_code: KAS_ACCOUNT_CODE,
+  vendor_id: "", invoice_number: "", payment_method: "cash", due_date: "",
+});
+
+const emptyStockOut = () => ({
+  product_id: "", quantity: 1, movement_date: today(),
+  debit_account_code: HPP_ACCOUNT_CODE, credit_account_code: PERSEDIAAN_ACCOUNT_CODE,
+  customer_id: "", sell_price: 0, invoice_number: "", payment_method: "cash", due_date: "",
+  revenue_debit_account_code: KAS_ACCOUNT_CODE, revenue_credit_account_code: PENDAPATAN_ACCOUNT_CODE,
+});
+
+const emptyPartnerForm = () => ({ id: null, name: "", contact: "", address: "" });
 
 export default function Inventory() {
   const { user } = useAuth();
@@ -45,6 +68,10 @@ export default function Inventory() {
   const [categories, setCategories] = useState([]);
   const [movements, setMovements] = useState([]);
   const [adjustments, setAdjustments] = useState([]);
+  const [vendors, setVendors] = useState([]);
+  const [customers, setCustomers] = useState([]);
+  const [purchases, setPurchases] = useState([]);
+  const [sales, setSales] = useState([]);
   const [valuation, setValuation] = useState(null);
   const [movementReport, setMovementReport] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -53,23 +80,20 @@ export default function Inventory() {
   const [catFilter, setCatFilter] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
   const [productForm, setProductForm] = useState({
     sku: "", name: "", category_id: "", unit_of_measure: "pcs",
     cost_price: 0, sell_price: 0, opening_qty: 0,
   });
-  const [stockIn, setStockIn] = useState({
-    product_id: "", quantity: 1, unit_cost: 0, movement_date: today(),
-    debit_account_code: "1.1.05.15", credit_account_code: "2.1.01.15",
-  });
-  const [stockOut, setStockOut] = useState({
-    product_id: "", quantity: 1, movement_date: today(),
-    debit_account_code: "5.1.01.15", credit_account_code: "1.1.05.15",
-  });
+  const [stockIn, setStockIn] = useState(emptyStockIn());
+  const [stockOut, setStockOut] = useState(emptyStockOut());
   const [adjust, setAdjust] = useState({
     product_id: "", quantity_delta: -1, reason: "rusak",
     adjustment_date: today(), notes: "",
     debit_account_code: "", credit_account_code: "",
   });
+  const [vendorForm, setVendorForm] = useState(emptyPartnerForm());
+  const [customerForm, setCustomerForm] = useState(emptyPartnerForm());
   const [reportRange, setReportRange] = useState({ date_from: "", date_to: "" });
 
   const canAccessRole = can(user, "admin", "direktur", "bendahara", "pengelola");
@@ -106,6 +130,23 @@ export default function Inventory() {
     }
   }, []);
 
+  const loadTrade = useCallback(async () => {
+    try {
+      const [v, c, pu, sa] = await Promise.all([
+        api.get(`${BASE}/vendors`),
+        api.get(`${BASE}/customers`),
+        api.get(`${BASE}/purchases`, { params: { limit: 100 } }),
+        api.get(`${BASE}/sales`, { params: { limit: 100 } }),
+      ]);
+      setVendors(Array.isArray(v.data) ? v.data : []);
+      setCustomers(Array.isArray(c.data) ? c.data : []);
+      setPurchases(Array.isArray(pu.data) ? pu.data : []);
+      setSales(Array.isArray(sa.data) ? sa.data : []);
+    } catch (e) {
+      setError(formatApiError(e, "Gagal memuat vendor/customer"));
+    }
+  }, []);
+
   const loadReports = useCallback(async () => {
     try {
       const [val, mov] = await Promise.all([
@@ -128,7 +169,8 @@ export default function Inventory() {
   useEffect(() => {
     if (tab === "kelola" || tab === "stock-in" || tab === "stock-out" || tab === "summary") loadOps();
     if (tab === "laporan" || tab === "summary") loadReports();
-  }, [tab, loadOps, loadReports]);
+    if (["stock-in", "stock-out", "vendor", "customer", "utang", "piutang"].includes(tab)) loadTrade();
+  }, [tab, loadOps, loadReports, loadTrade]);
 
   const productOptions = useMemo(
     () => products.map((p) => ({
@@ -137,6 +179,9 @@ export default function Inventory() {
     })),
     [products],
   );
+
+  const activeVendors = useMemo(() => vendors.filter((v) => v.is_active), [vendors]);
+  const activeCustomers = useMemo(() => customers.filter((c) => c.is_active), [customers]);
 
   if (!canAccessRole) return <Navigate to="/dashboard" replace />;
   if (loading) {
@@ -216,32 +261,48 @@ export default function Inventory() {
 
   const submitStockIn = async (e) => {
     e.preventDefault();
+    if (submitting) return;
+    setSubmitting(true);
     try {
       await api.post(`${BASE}/stock-in`, {
         ...stockIn,
         quantity: Number(stockIn.quantity),
         unit_cost: Number(stockIn.unit_cost),
+        due_date: stockIn.payment_method === "credit" ? stockIn.due_date : null,
         unit_usaha_id: meta?.unit_usaha_id,
       });
-      setStockIn({ product_id: "", quantity: 1, unit_cost: 0, movement_date: today(), debit_account_code: "1.1.05.15", credit_account_code: "2.1.01.15" });
-      await Promise.all([loadCore(), loadOps()]);
+      setStockIn(emptyStockIn());
+      await Promise.all([loadCore(), loadOps(), loadTrade()]);
     } catch (err) {
       setError(formatApiError(err));
+    } finally {
+      setSubmitting(false);
     }
   };
 
   const submitStockOut = async (e) => {
     e.preventDefault();
+    if (submitting) return;
+    const product = products.find((p) => p.id === stockOut.product_id);
+    if (product && Number(stockOut.quantity) > Number(product.qty_on_hand)) {
+      setError(`Qty keluar (${stockOut.quantity}) melebihi stok tersedia (${product.qty_on_hand}).`);
+      return;
+    }
+    setSubmitting(true);
     try {
       await api.post(`${BASE}/stock-out`, {
         ...stockOut,
         quantity: Number(stockOut.quantity),
+        sell_price: Number(stockOut.sell_price),
+        due_date: stockOut.payment_method === "piutang" ? stockOut.due_date : null,
         unit_usaha_id: meta?.unit_usaha_id,
       });
-      setStockOut({ product_id: "", quantity: 1, movement_date: today(), debit_account_code: "5.1.01.15", credit_account_code: "1.1.05.15" });
-      await Promise.all([loadCore(), loadOps()]);
+      setStockOut(emptyStockOut());
+      await Promise.all([loadCore(), loadOps(), loadTrade()]);
     } catch (err) {
       setError(formatApiError(err));
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -264,10 +325,10 @@ export default function Inventory() {
   };
 
   const cancelMovement = async (id) => {
-    if (!window.confirm("Batalkan mutasi ini? Mutasi dan jurnal terkait akan dihapus permanen.")) return;
+    if (!window.confirm("Batalkan mutasi ini? Mutasi, transaksi pembelian/penjualan & jurnal terkait akan dihapus permanen.")) return;
     try {
       await api.post(`${BASE}/cancel-movement`, { stock_card_id: id });
-      await Promise.all([loadCore(), loadOps()]);
+      await Promise.all([loadCore(), loadOps(), loadTrade()]);
     } catch (err) {
       setError(formatApiError(err));
     }
@@ -283,6 +344,106 @@ export default function Inventory() {
     }
   };
 
+  const submitVendor = async (e) => {
+    e.preventDefault();
+    try {
+      if (vendorForm.id) {
+        await api.put(`${BASE}/vendors/${vendorForm.id}`, {
+          name: vendorForm.name, contact: vendorForm.contact, address: vendorForm.address,
+        });
+      } else {
+        await api.post(`${BASE}/vendors`, {
+          name: vendorForm.name, contact: vendorForm.contact, address: vendorForm.address,
+          unit_usaha_id: meta?.unit_usaha_id,
+        });
+      }
+      setVendorForm(emptyPartnerForm());
+      await loadTrade();
+    } catch (err) {
+      setError(formatApiError(err, "Gagal menyimpan vendor"));
+    }
+  };
+
+  const toggleVendorActive = async (v) => {
+    try {
+      await api.put(`${BASE}/vendors/${v.id}`, { is_active: !v.is_active });
+      await loadTrade();
+    } catch (err) {
+      setError(formatApiError(err));
+    }
+  };
+
+  const submitCustomer = async (e) => {
+    e.preventDefault();
+    try {
+      if (customerForm.id) {
+        await api.put(`${BASE}/customers/${customerForm.id}`, {
+          name: customerForm.name, contact: customerForm.contact, address: customerForm.address,
+        });
+      } else {
+        await api.post(`${BASE}/customers`, {
+          name: customerForm.name, contact: customerForm.contact, address: customerForm.address,
+          unit_usaha_id: meta?.unit_usaha_id,
+        });
+      }
+      setCustomerForm(emptyPartnerForm());
+      await loadTrade();
+    } catch (err) {
+      setError(formatApiError(err, "Gagal menyimpan customer"));
+    }
+  };
+
+  const toggleCustomerActive = async (c) => {
+    try {
+      await api.put(`${BASE}/customers/${c.id}`, { is_active: !c.is_active });
+      await loadTrade();
+    } catch (err) {
+      setError(formatApiError(err));
+    }
+  };
+
+  const payPurchase = async (purchase) => {
+    const amountStr = window.prompt(
+      `Jumlah pelunasan utang (sisa ${fmtRp(Number(purchase.outstanding))}):`,
+      purchase.outstanding,
+    );
+    if (!amountStr) return;
+    try {
+      await api.post(`${BASE}/purchases/pay`, {
+        purchase_id: purchase.id,
+        amount: Number(amountStr),
+        paid_date: today(),
+        debit_account_code: UTANG_ACCOUNT_CODE,
+        credit_account_code: KAS_ACCOUNT_CODE,
+        unit_usaha_id: meta?.unit_usaha_id,
+      });
+      await loadTrade();
+    } catch (err) {
+      setError(formatApiError(err, "Gagal mencatat pelunasan"));
+    }
+  };
+
+  const paySale = async (sale) => {
+    const amountStr = window.prompt(
+      `Jumlah pelunasan piutang (sisa ${fmtRp(Number(sale.outstanding))}):`,
+      sale.outstanding,
+    );
+    if (!amountStr) return;
+    try {
+      await api.post(`${BASE}/sales/pay`, {
+        sale_id: sale.id,
+        amount: Number(amountStr),
+        paid_date: today(),
+        debit_account_code: KAS_ACCOUNT_CODE,
+        credit_account_code: PIUTANG_ACCOUNT_CODE,
+        unit_usaha_id: meta?.unit_usaha_id,
+      });
+      await loadTrade();
+    } catch (err) {
+      setError(formatApiError(err, "Gagal mencatat pelunasan"));
+    }
+  };
+
   return (
     <div className="space-y-6 fade-in" data-testid="inventory-page">
       <div className="flex justify-between items-start gap-4 flex-wrap">
@@ -290,7 +451,7 @@ export default function Inventory() {
           <p className="label mb-1">Unit Usaha UU05</p>
           <h1 className="font-heading text-3xl font-bold">Inventory</h1>
           <p className="text-sm mt-1" style={{ color: "var(--text-muted)" }}>
-            {meta?.unit_name || "Persediaan barang dagang"} · katalog, mutasi, penyesuaian & valuasi
+            {meta?.unit_name || "Persediaan barang dagang"} · katalog, mutasi, pembelian, penjualan & valuasi
           </p>
         </div>
         {tab === "katalog" && canWrite && (
@@ -429,8 +590,8 @@ export default function Inventory() {
       {tab === "stock-in" && (
         <div className="space-y-4">
           <div className="card">
-            <p className="label mb-2">Penerimaan barang (Stock In)</p>
-            <p className="text-sm mb-4" style={{ color: "var(--text-muted)" }}>Stock in + jurnal persediaan.</p>
+            <p className="label mb-2">Penerimaan barang (Stock In / Pembelian)</p>
+            <p className="text-sm mb-4" style={{ color: "var(--text-muted)" }}>Stock in menghasilkan transaksi stok masuk sekaligus transaksi Pembelian (tunai atau kredit/utang).</p>
             {canWrite ? (
               <form onSubmit={submitStockIn} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -443,18 +604,45 @@ export default function Inventory() {
                     {productOptions.map((o) => <option key={o.id} value={o.id}>{o.label}</option>)}
                   </select>
                 </div>
+                <div>
+                  <label className="label">Vendor</label>
+                  <select required className="select" value={stockIn.vendor_id} onChange={(e) => setStockIn({ ...stockIn, vendor_id: e.target.value })}>
+                    <option value="">— pilih vendor —</option>
+                    {activeVendors.map((v) => <option key={v.id} value={v.id}>{v.name}</option>)}
+                  </select>
+                  {activeVendors.length === 0 && (
+                    <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>Belum ada vendor — tambahkan di tab Vendor.</p>
+                  )}
+                </div>
                 <div><label className="label">Tanggal</label><input type="date" required className="input" value={stockIn.movement_date} onChange={(e) => setStockIn({ ...stockIn, movement_date: e.target.value })} /></div>
+                <div><label className="label">No. Invoice</label><input className="input" value={stockIn.invoice_number} onChange={(e) => setStockIn({ ...stockIn, invoice_number: e.target.value })} /></div>
                 <div><label className="label">Qty masuk</label><input type="number" min="1" required className="input" value={stockIn.quantity} onChange={(e) => setStockIn({ ...stockIn, quantity: e.target.value })} /></div>
                 <div><label className="label">HPP / unit (Rp)</label><input type="number" min="0" required className="input" value={stockIn.unit_cost} onChange={(e) => setStockIn({ ...stockIn, unit_cost: e.target.value })} /></div>
+                <div>
+                  <label className="label">Metode bayar</label>
+                  <select className="select" value={stockIn.payment_method} onChange={(e) => {
+                    const method = e.target.value;
+                    setStockIn({
+                      ...stockIn, payment_method: method,
+                      credit_account_code: method === "credit" ? UTANG_ACCOUNT_CODE : KAS_ACCOUNT_CODE,
+                    });
+                  }}>
+                    <option value="cash">Tunai</option>
+                    <option value="credit">Kredit (Utang Usaha)</option>
+                  </select>
+                </div>
+                {stockIn.payment_method === "credit" && (
+                  <div><label className="label">Jatuh tempo</label><input type="date" required className="input" value={stockIn.due_date} onChange={(e) => setStockIn({ ...stockIn, due_date: e.target.value })} /></div>
+                )}
                 <div>
                   <label className="label">Akun debit (Persediaan)</label>
                   <CoaSelect value={stockIn.debit_account_code} onChange={(e) => setStockIn({ ...stockIn, debit_account_code: e.target.value })} />
                 </div>
                 <div>
-                  <label className="label">Akun kredit (Kas/Utang)</label>
+                  <label className="label">Akun kredit ({stockIn.payment_method === "credit" ? "Utang Usaha" : "Kas/Bank"})</label>
                   <CoaSelect value={stockIn.credit_account_code} onChange={(e) => setStockIn({ ...stockIn, credit_account_code: e.target.value })} />
                 </div>
-                <div className="sm:col-span-2 flex justify-end"><button type="submit" className="btn btn-primary">Catat stock in</button></div>
+                <div className="sm:col-span-2 flex justify-end"><button type="submit" className="btn btn-primary" disabled={submitting}>{submitting ? "Menyimpan…" : "Catat stock in"}</button></div>
               </form>
             ) : <p className="text-sm">Role Anda read-only.</p>}
           </div>
@@ -465,19 +653,50 @@ export default function Inventory() {
       {tab === "stock-out" && (
         <div className="space-y-4">
           <div className="card">
-            <p className="label mb-2">Pengeluaran barang (Stock Out / COGS)</p>
-            <p className="text-sm mb-4" style={{ color: "var(--text-muted)" }}>Stock out + jurnal HPP.</p>
+            <p className="label mb-2">Pengeluaran barang (Stock Out / Penjualan)</p>
+            <p className="text-sm mb-4" style={{ color: "var(--text-muted)" }}>Stock out menghasilkan transaksi stok keluar + jurnal HPP, sekaligus transaksi Penjualan (jurnal pendapatan) tunai atau piutang.</p>
             {canWrite ? (
               <form onSubmit={submitStockOut} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="label">Produk</label>
-                  <select required className="select" value={stockOut.product_id} onChange={(e) => setStockOut({ ...stockOut, product_id: e.target.value })}>
+                  <select required className="select" value={stockOut.product_id} onChange={(e) => {
+                    const p = products.find((x) => x.id === e.target.value);
+                    setStockOut({ ...stockOut, product_id: e.target.value, sell_price: p ? Number(p.sell_price) : 0 });
+                  }}>
                     <option value="">— pilih —</option>
                     {productOptions.map((o) => <option key={o.id} value={o.id}>{o.label}</option>)}
                   </select>
                 </div>
+                <div>
+                  <label className="label">Customer</label>
+                  <select required className="select" value={stockOut.customer_id} onChange={(e) => setStockOut({ ...stockOut, customer_id: e.target.value })}>
+                    <option value="">— pilih customer —</option>
+                    {activeCustomers.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  </select>
+                  {activeCustomers.length === 0 && (
+                    <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>Belum ada customer — tambahkan di tab Customer.</p>
+                  )}
+                </div>
                 <div><label className="label">Tanggal</label><input type="date" required className="input" value={stockOut.movement_date} onChange={(e) => setStockOut({ ...stockOut, movement_date: e.target.value })} /></div>
+                <div><label className="label">No. Invoice</label><input className="input" value={stockOut.invoice_number} onChange={(e) => setStockOut({ ...stockOut, invoice_number: e.target.value })} /></div>
                 <div><label className="label">Qty keluar</label><input type="number" min="1" required className="input" value={stockOut.quantity} onChange={(e) => setStockOut({ ...stockOut, quantity: e.target.value })} /></div>
+                <div><label className="label">Harga jual / unit (Rp)</label><input type="number" min="0" required className="input" value={stockOut.sell_price} onChange={(e) => setStockOut({ ...stockOut, sell_price: e.target.value })} /></div>
+                <div>
+                  <label className="label">Metode bayar</label>
+                  <select className="select" value={stockOut.payment_method} onChange={(e) => {
+                    const method = e.target.value;
+                    setStockOut({
+                      ...stockOut, payment_method: method,
+                      revenue_debit_account_code: method === "piutang" ? PIUTANG_ACCOUNT_CODE : KAS_ACCOUNT_CODE,
+                    });
+                  }}>
+                    <option value="cash">Tunai</option>
+                    <option value="piutang">Piutang</option>
+                  </select>
+                </div>
+                {stockOut.payment_method === "piutang" && (
+                  <div><label className="label">Jatuh tempo</label><input type="date" required className="input" value={stockOut.due_date} onChange={(e) => setStockOut({ ...stockOut, due_date: e.target.value })} /></div>
+                )}
                 <div>
                   <label className="label">Akun debit (HPP)</label>
                   <CoaSelect value={stockOut.debit_account_code} onChange={(e) => setStockOut({ ...stockOut, debit_account_code: e.target.value })} />
@@ -486,7 +705,19 @@ export default function Inventory() {
                   <label className="label">Akun kredit (Persediaan)</label>
                   <CoaSelect value={stockOut.credit_account_code} onChange={(e) => setStockOut({ ...stockOut, credit_account_code: e.target.value })} />
                 </div>
-                <div className="sm:col-span-2 flex justify-end"><button type="submit" className="btn btn-primary">Catat stock out</button></div>
+                <div>
+                  <label className="label">Akun debit penjualan ({stockOut.payment_method === "piutang" ? "Piutang" : "Kas/Bank"})</label>
+                  <CoaSelect value={stockOut.revenue_debit_account_code} onChange={(e) => setStockOut({ ...stockOut, revenue_debit_account_code: e.target.value })} />
+                </div>
+                <div>
+                  <label className="label">Akun kredit (Pendapatan)</label>
+                  <CoaSelect value={stockOut.revenue_credit_account_code} onChange={(e) => setStockOut({ ...stockOut, revenue_credit_account_code: e.target.value })} />
+                </div>
+                <div className="sm:col-span-2 card p-3 text-sm" style={{ background: "var(--surface-alt, #F7F5F0)" }}>
+                  <p>Preview jurnal HPP: <strong>{fmtRp(Number(stockOut.quantity || 0) * Number(products.find((p) => p.id === stockOut.product_id)?.cost_price || 0))}</strong></p>
+                  <p>Preview jurnal Penjualan: <strong>{fmtRp(Number(stockOut.quantity || 0) * Number(stockOut.sell_price || 0))}</strong></p>
+                </div>
+                <div className="sm:col-span-2 flex justify-end"><button type="submit" className="btn btn-primary" disabled={submitting}>{submitting ? "Menyimpan…" : "Catat stock out"}</button></div>
               </form>
             ) : <p className="text-sm">Role Anda read-only.</p>}
           </div>
@@ -562,6 +793,160 @@ export default function Inventory() {
             </table>
             </TableShell>
           </div>
+        </div>
+      )}
+
+      {tab === "vendor" && (
+        <div className="space-y-4">
+          {canWrite && (
+            <div className="card">
+              <p className="label mb-3">{vendorForm.id ? "Edit vendor" : "Tambah vendor"}</p>
+              <form onSubmit={submitVendor} className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div><label className="label">Nama</label><input required className="input" value={vendorForm.name} onChange={(e) => setVendorForm({ ...vendorForm, name: e.target.value })} /></div>
+                <div><label className="label">Kontak</label><input className="input" value={vendorForm.contact} onChange={(e) => setVendorForm({ ...vendorForm, contact: e.target.value })} /></div>
+                <div><label className="label">Alamat</label><input className="input" value={vendorForm.address} onChange={(e) => setVendorForm({ ...vendorForm, address: e.target.value })} /></div>
+                <div className="sm:col-span-3 flex justify-end gap-2">
+                  {vendorForm.id && <button type="button" className="btn btn-outline" onClick={() => setVendorForm(emptyPartnerForm())}>Batal</button>}
+                  <button type="submit" className="btn btn-primary">{vendorForm.id ? "Simpan perubahan" : "Simpan vendor"}</button>
+                </div>
+              </form>
+            </div>
+          )}
+          <div className="card p-0 overflow-hidden">
+            <TableShell minWidth={640}>
+              <table className="tbl">
+                <thead><tr><th>Nama</th><th>Kontak</th><th>Alamat</th><th>Status</th>{canWrite && <th />}</tr></thead>
+                <tbody>
+                  {vendors.length === 0 ? (
+                    <tr><td colSpan={5} className="text-center py-8" style={{ color: "var(--text-muted)" }}>Belum ada vendor.</td></tr>
+                  ) : vendors.map((v) => (
+                    <tr key={v.id}>
+                      <td className="font-medium">{v.name}</td>
+                      <td>{v.contact || "-"}</td>
+                      <td>{v.address || "-"}</td>
+                      <td><span className={`badge ${v.is_active ? "" : "badge-purple"}`}>{v.is_active ? "aktif" : "nonaktif"}</span></td>
+                      {canWrite && (
+                        <td className="whitespace-nowrap">
+                          <button type="button" className="p-1.5" title="Edit" onClick={() => setVendorForm({ id: v.id, name: v.name, contact: v.contact || "", address: v.address || "" })}><PencilSimple size={16} /></button>
+                          <button type="button" className="btn btn-outline text-xs ml-2" onClick={() => toggleVendorActive(v)}>{v.is_active ? "Nonaktifkan" : "Aktifkan"}</button>
+                        </td>
+                      )}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </TableShell>
+          </div>
+        </div>
+      )}
+
+      {tab === "customer" && (
+        <div className="space-y-4">
+          {canWrite && (
+            <div className="card">
+              <p className="label mb-3">{customerForm.id ? "Edit customer" : "Tambah customer"}</p>
+              <form onSubmit={submitCustomer} className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div><label className="label">Nama</label><input required className="input" value={customerForm.name} onChange={(e) => setCustomerForm({ ...customerForm, name: e.target.value })} /></div>
+                <div><label className="label">Kontak</label><input className="input" value={customerForm.contact} onChange={(e) => setCustomerForm({ ...customerForm, contact: e.target.value })} /></div>
+                <div><label className="label">Alamat</label><input className="input" value={customerForm.address} onChange={(e) => setCustomerForm({ ...customerForm, address: e.target.value })} /></div>
+                <div className="sm:col-span-3 flex justify-end gap-2">
+                  {customerForm.id && <button type="button" className="btn btn-outline" onClick={() => setCustomerForm(emptyPartnerForm())}>Batal</button>}
+                  <button type="submit" className="btn btn-primary">{customerForm.id ? "Simpan perubahan" : "Simpan customer"}</button>
+                </div>
+              </form>
+            </div>
+          )}
+          <div className="card p-0 overflow-hidden">
+            <TableShell minWidth={640}>
+              <table className="tbl">
+                <thead><tr><th>Nama</th><th>Kontak</th><th>Alamat</th><th>Status</th>{canWrite && <th />}</tr></thead>
+                <tbody>
+                  {customers.length === 0 ? (
+                    <tr><td colSpan={5} className="text-center py-8" style={{ color: "var(--text-muted)" }}>Belum ada customer.</td></tr>
+                  ) : customers.map((c) => (
+                    <tr key={c.id}>
+                      <td className="font-medium">{c.name}</td>
+                      <td>{c.contact || "-"}</td>
+                      <td>{c.address || "-"}</td>
+                      <td><span className={`badge ${c.is_active ? "" : "badge-purple"}`}>{c.is_active ? "aktif" : "nonaktif"}</span></td>
+                      {canWrite && (
+                        <td className="whitespace-nowrap">
+                          <button type="button" className="p-1.5" title="Edit" onClick={() => setCustomerForm({ id: c.id, name: c.name, contact: c.contact || "", address: c.address || "" })}><PencilSimple size={16} /></button>
+                          <button type="button" className="btn btn-outline text-xs ml-2" onClick={() => toggleCustomerActive(c)}>{c.is_active ? "Nonaktifkan" : "Aktifkan"}</button>
+                        </td>
+                      )}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </TableShell>
+          </div>
+        </div>
+      )}
+
+      {tab === "utang" && (
+        <div className="card p-0 overflow-hidden">
+          <TableShell minWidth={800}>
+            <table className="tbl">
+              <thead><tr><th>Invoice</th><th>Vendor</th><th>Metode</th><th className="num">Total</th><th className="num">Terbayar</th><th className="num">Sisa</th><th>Jatuh tempo</th><th>Status</th>{canWrite && <th />}</tr></thead>
+              <tbody>
+                {purchases.filter((p) => p.payment_method === "credit").length === 0 ? (
+                  <tr><td colSpan={9} className="text-center py-8" style={{ color: "var(--text-muted)" }}>Belum ada utang usaha.</td></tr>
+                ) : purchases.filter((p) => p.payment_method === "credit").map((p) => (
+                  <tr key={p.id}>
+                    <td>{p.invoice_number || "-"}</td>
+                    <td>{p.vendor_name}</td>
+                    <td><span className="badge">{p.payment_method}</span></td>
+                    <td className="num">{fmtRp(Number(p.total_amount))}</td>
+                    <td className="num">{fmtRp(Number(p.paid_amount))}</td>
+                    <td className="num">{fmtRp(Number(p.outstanding))}</td>
+                    <td>{p.due_date ? fmtDate(p.due_date) : "-"}</td>
+                    <td><span className={`badge ${p.status === "paid" ? "" : "badge-purple"}`}>{p.status}</span></td>
+                    {canWrite && (
+                      <td>
+                        {p.status !== "paid" && (
+                          <button type="button" className="btn btn-outline text-xs" onClick={() => payPurchase(p)}>Catat pelunasan</button>
+                        )}
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </TableShell>
+        </div>
+      )}
+
+      {tab === "piutang" && (
+        <div className="card p-0 overflow-hidden">
+          <TableShell minWidth={800}>
+            <table className="tbl">
+              <thead><tr><th>Invoice</th><th>Customer</th><th>Metode</th><th className="num">Total</th><th className="num">Terbayar</th><th className="num">Sisa</th><th>Jatuh tempo</th><th>Status</th>{canWrite && <th />}</tr></thead>
+              <tbody>
+                {sales.filter((s) => s.payment_method === "piutang").length === 0 ? (
+                  <tr><td colSpan={9} className="text-center py-8" style={{ color: "var(--text-muted)" }}>Belum ada piutang usaha.</td></tr>
+                ) : sales.filter((s) => s.payment_method === "piutang").map((s) => (
+                  <tr key={s.id}>
+                    <td>{s.invoice_number || "-"}</td>
+                    <td>{s.customer_name}</td>
+                    <td><span className="badge">{s.payment_method}</span></td>
+                    <td className="num">{fmtRp(Number(s.total_amount))}</td>
+                    <td className="num">{fmtRp(Number(s.paid_amount))}</td>
+                    <td className="num">{fmtRp(Number(s.outstanding))}</td>
+                    <td>{s.due_date ? fmtDate(s.due_date) : "-"}</td>
+                    <td><span className={`badge ${s.status === "paid" ? "" : "badge-purple"}`}>{s.status}</span></td>
+                    {canWrite && (
+                      <td>
+                        {s.status !== "paid" && (
+                          <button type="button" className="btn btn-outline text-xs" onClick={() => paySale(s)}>Catat pelunasan</button>
+                        )}
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </TableShell>
         </div>
       )}
 

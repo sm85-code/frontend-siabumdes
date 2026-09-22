@@ -48,6 +48,10 @@ import {
   TreePine as LuTreePine,
   Sun as LuSun,
   Ship as LuShip,
+  Truck as LuTruck,
+  Users as LuUsersFlat,
+  Wallet as LuWallet,
+  HandCoins as LuHandCoins,
 } from "lucide-react";
 
 function wrap(Icon) {
@@ -111,3 +115,7 @@ export const Fish = wrap(LuFish);
 export const Tree = wrap(LuTreePine);
 export const Sun = wrap(LuSun);
 export const Boat = wrap(LuShip);
+export const Truck = wrap(LuTruck);
+export const Users = wrap(LuUsersFlat);
+export const Wallet = wrap(LuWallet);
+export const HandCoins = wrap(LuHandCoins);
