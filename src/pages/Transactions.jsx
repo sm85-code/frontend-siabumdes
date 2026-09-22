@@ -6,7 +6,7 @@ import { notify } from "@/lib/feedback";
 import { useConfirm } from "@/components/ConfirmProvider";
 import { useSort } from "@/lib/useSort";
 import { Plus, Trash, Pencil, Receipt, FileArrowUp, DownloadSimple, FileXls, Paperclip, LinkSimple, GoogleDriveLogo, X } from "@phosphor-icons/react";
-import TableShell, { TableCard, TableCardField } from "@/components/TableShell";
+import TableShell from "@/components/TableShell";
 
 const MONTHS = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
 const YEAR_MIN = 2022, YEAR_MAX = 2030;
@@ -629,52 +629,8 @@ if (!(await confirm({
         <TableShell
           minWidth={720}
           data-testid="tx-table"
-          mobileCards={loading ? (
-            <p className="text-sm text-center py-6" style={{ color: "var(--text-muted)" }}>Memuat...</p>
-          ) : sortState.sorted.length === 0 ? (
-            <p className="text-sm text-center py-8" style={{ color: "var(--text-muted)" }}>
-              Belum ada transaksi <b>{activeGroup}</b> pada <b>{MONTHS[month - 1]} {year}</b>.
-            </p>
-          ) : sortState.sorted.map((tx) => {
-            const proofs = tx.proofs || (tx.proof ? [tx.proof] : []);
-            const editable = canEditRow(tx);
-            return (
-              <TableCard
-                key={tx.id}
-                title={fmtDate(tx.date)}
-                subtitle={tx.description}
-                footer={canWrite ? (
-                  <div className="flex gap-1">
-                    {canBulkDelete && (
-                      <label className="flex items-center gap-1 text-xs mr-auto" style={{ color: "var(--text-muted)" }}>
-                        <input type="checkbox" data-testid={`sel-tx-${tx.id}`}
-                               checked={selected.has(tx.id)} onChange={() => toggleSel(tx.id)} />
-                        Pilih
-                      </label>
-                    )}
-                    {editable && <button data-testid={`edit-tx-${tx.id}`} onClick={() => openEdit(tx)} className="p-1.5 rounded-md hover:bg-yellow-50"><Pencil size={16} color="var(--primary)" /></button>}
-                    {can(user, "admin", "direktur", "bendahara") && <button data-testid={`del-tx-${tx.id}`} onClick={() => del(tx.id)} className="p-1.5 rounded-md hover:bg-red-50"><Trash size={16} color="var(--status-error)" /></button>}
-                  </div>
-                ) : null}
-              >
-                {activeGroup !== "BUMDES" && (
-                  <TableCardField label="Unit"><span className="badge">{unitOf(tx.unit_usaha_id)?.code}</span></TableCardField>
-                )}
-                <TableCardField label="Debit">{accName(tx.debit_account_code)}</TableCardField>
-                <TableCardField label="Kredit">{accName(tx.credit_account_code)}</TableCardField>
-                <TableCardField label="Jumlah" emphasize>{fmtRp(tx.amount)}</TableCardField>
-                <TableCardField label="Bukti">
-                  {proofs.length === 0 ? (editable ? (
-                    <button data-testid={`upload-proof-${tx.id}`} onClick={() => uploadProof(tx)} className="text-xs underline" style={{ color: "var(--primary-dark)" }}>Upload</button>
-                  ) : "—") : (
-                    <span className="text-xs">{proofs.length} file</span>
-                  )}
-                </TableCardField>
-              </TableCard>
-            );
-          })}
         >
-          <table className="tbl" data-testid="tx-table">
+          <table className="tbl tbl-compact-mobile" data-testid="tx-table">
             <thead>
               <tr>
                 {canBulkDelete && (
