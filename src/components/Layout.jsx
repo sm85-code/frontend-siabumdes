@@ -2,7 +2,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuth, can } from "@/lib/auth";
 import api, { ROLE_LABELS } from "@/lib/api";
-import { useTheme, THEMES } from "@/lib/theme";
+import { useTheme, THEMES, FONTS } from "@/lib/theme";
 import {
   House, Receipt, ChartLine, Storefront, UsersThree,
   BookOpenText, SignOut, List, X, Books, UserCircle, Package, Buildings,
@@ -25,7 +25,7 @@ const NAV = [
 
 export default function Layout({ children }) {
   const { user, logout } = useAuth();
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, font, setFont } = useTheme();
   const location = useLocation();
   const [open, setOpen] = useState(false);
   const [uu05Id, setUu05Id] = useState(null);
@@ -100,7 +100,21 @@ export default function Layout({ children }) {
                 onChange={(e) => setTheme(e.target.value)}
               >
                 {THEMES.map((t) => (
-                  <option key={t.id} value={t.id}>{t.label} — {t.description}</option>
+                  <option key={t.id} value={t.id}>{t.label}</option>
+                ))}
+              </select>
+            </div>
+            <div className="mb-3">
+              <label className="label" htmlFor="font-switcher">Font</label>
+              <select
+                id="font-switcher"
+                data-testid="font-switcher"
+                className="select text-sm"
+                value={font}
+                onChange={(e) => setFont(e.target.value)}
+              >
+                {FONTS.map((f) => (
+                  <option key={f.id} value={f.id}>{f.label}</option>
                 ))}
               </select>
             </div>

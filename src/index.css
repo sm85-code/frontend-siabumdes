@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400..800;1,400..800&family=Inter:ital,opsz,wght@0,14..32,400..800;1,14..32,400..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400..800;1,400..800&family=Inter:ital,opsz,wght@0,14..32,400..800;1,14..32,400..800&family=Merriweather:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400..800;1,400..800&family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
 @import './theme-extras.css';
 
 @tailwind base;
@@ -45,6 +45,7 @@
   --radius-card: 1rem;
   --radius-input: 0.75rem;
   --font-heading: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
   --primary-hover: #167878;
   --focus-ring: rgba(28, 138, 138, 0.12);
   --zebra-tint: rgba(28, 138, 138, 0.025);
@@ -110,11 +111,79 @@
   --zebra-tint: rgba(124, 77, 255, 0.05);
 }
 
+/* Minimalis: grayscale, sudut tajam, ikon tipis -- serba polos */
+:root[data-theme="minimalis"] {
+  --bg: #FAFAFA;
+  --surface: #FFFFFF;
+  --border: #E4E4E4;
+  --primary-light: #F0F0F0;
+  --primary: #171717;
+  --primary-dark: #000000;
+  --primary-hover: #2E2E2E;
+  --text-primary: #171717;
+  --text-secondary: #595959;
+  --text-muted: #969696;
+  --status-success: #2E7D32;
+  --status-warning: #A17A00;
+  --status-error: #B3261E;
+  --total-row-bg: rgba(0, 0, 0, 0.06);
+  --chart-1: #171717;
+  --chart-2: #595959;
+  --chart-3: #969696;
+  --chart-4: #B3261E;
+  --chart-5: #2E7D32;
+  --chart-6: #C7C7C7;
+  --radius-btn: 0.25rem;
+  --radius-card: 0.4rem;
+  --radius-input: 0.25rem;
+  --font-heading: 'Inter', system-ui, sans-serif;
+  --focus-ring: rgba(23, 23, 23, 0.12);
+  --zebra-tint: rgba(0, 0, 0, 0.02);
+}
+
+/* Elegant: burgundy-emas di atas krem, sudut lembut, ikon tebal */
+:root[data-theme="elegant"] {
+  --bg: #FBF7F2;
+  --surface: #FFFFFF;
+  --border: #E7D9C6;
+  --primary-light: #F3E4C8;
+  --primary: #7A1F3D;
+  --primary-dark: #4A1226;
+  --primary-hover: #611831;
+  --text-primary: #2B1E22;
+  --text-secondary: #6B5A55;
+  --text-muted: #A0908A;
+  --status-success: #3F7D53;
+  --status-warning: #B8860B;
+  --status-error: #A23B3B;
+  --total-row-bg: rgba(184, 134, 11, 0.14);
+  --chart-1: #7A1F3D;
+  --chart-2: #B8860B;
+  --chart-3: #3F7D53;
+  --chart-4: #A23B3B;
+  --chart-5: #A0748A;
+  --chart-6: #A0908A;
+  --radius-btn: 0.6rem;
+  --radius-card: 1.1rem;
+  --radius-input: 0.6rem;
+  --font-heading: 'Playfair Display', Georgia, serif;
+  --focus-ring: rgba(122, 31, 61, 0.16);
+  --zebra-tint: rgba(122, 31, 61, 0.035);
+}
+
+/* Pilihan font: independen dari tema, ditumpangkan lewat data-font di <html>.
+   Diletakkan setelah blok data-theme supaya menang saat keduanya diset. */
+:root[data-font="jakarta"] { --font-heading: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif; --font-body: 'Inter', system-ui, sans-serif; }
+:root[data-font="inter"] { --font-heading: 'Inter', system-ui, sans-serif; --font-body: 'Inter', system-ui, sans-serif; }
+:root[data-font="serif"] { --font-heading: 'Merriweather', Georgia, serif; --font-body: Georgia, 'Times New Roman', serif; }
+:root[data-font="elegan"] { --font-heading: 'Playfair Display', Georgia, serif; --font-body: 'Inter', system-ui, sans-serif; }
+:root[data-font="rounded"] { --font-heading: 'Poppins', system-ui, sans-serif; --font-body: 'Poppins', system-ui, sans-serif; }
+
 body {
   margin: 0;
   background: var(--bg);
   color: var(--text-primary);
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: var(--font-body);
   font-feature-settings: 'cv05', 'cv11', 'ss01';
   -webkit-font-smoothing: antialiased;
 }
@@ -125,7 +194,7 @@ h1, h2, h3, h4, .heading, .font-heading, .modern-brand-title {
   letter-spacing: -0.02em;
   font-weight: 700;
 }
-.font-body { font-family: 'Inter', system-ui, sans-serif; }
+.font-body { font-family: var(--font-body); }
 .tabular-nums { font-variant-numeric: tabular-nums; }
 .page-h1 { letter-spacing: -0.02em; }
 
