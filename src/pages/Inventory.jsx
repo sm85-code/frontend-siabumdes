@@ -39,7 +39,7 @@ const TABS = [
   { id: "stock-in", label: "Stock In", icon: ArrowDown },
   { id: "stock-out", label: "Stock Out", icon: ArrowUp },
   { id: "kelola", label: "Penyesuaian Stok", icon: SlidersHorizontal },
-  { id: "vendor", label: "Vendor", icon: Truck },
+  { id: "vendor", label: "Mitra Pemasok", icon: Truck },
   { id: "customer", label: "Customer", icon: Users },
   { id: "utang", label: "Utang", icon: Wallet },
   { id: "piutang", label: "Piutang", icon: HandCoins },
@@ -146,7 +146,7 @@ export default function Inventory() {
       setPurchases(Array.isArray(pu.data) ? pu.data : []);
       setSales(Array.isArray(sa.data) ? sa.data : []);
     } catch (e) {
-      setError(formatApiError(e, "Gagal memuat vendor/customer"));
+      setError(formatApiError(e, "Gagal memuat mitra pemasok/customer"));
     }
   }, []);
 
@@ -364,7 +364,7 @@ export default function Inventory() {
       setVendorForm(emptyPartnerForm());
       await loadTrade();
     } catch (err) {
-      setError(formatApiError(err, "Gagal menyimpan vendor"));
+      setError(formatApiError(err, "Gagal menyimpan mitra pemasok"));
     }
   };
 
@@ -609,13 +609,13 @@ export default function Inventory() {
                   </select>
                 </div>
                 <div>
-                  <label className="label">Vendor</label>
+                  <label className="label">Mitra Pemasok</label>
                   <select required className="select" value={stockIn.vendor_id} onChange={(e) => setStockIn({ ...stockIn, vendor_id: e.target.value })}>
-                    <option value="">— pilih vendor —</option>
+                    <option value="">— pilih mitra pemasok —</option>
                     {activeVendors.map((v) => <option key={v.id} value={v.id}>{v.name}</option>)}
                   </select>
                   {activeVendors.length === 0 && (
-                    <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>Belum ada vendor — tambahkan di tab Vendor.</p>
+                    <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>Belum ada mitra pemasok — tambahkan di tab Mitra Pemasok.</p>
                   )}
                 </div>
                 <div><label className="label">Tanggal</label><input type="date" required className="input" value={stockIn.movement_date} onChange={(e) => setStockIn({ ...stockIn, movement_date: e.target.value })} /></div>
@@ -828,14 +828,14 @@ export default function Inventory() {
         <div className="space-y-4">
           {canWrite && (
             <div className="card">
-              <p className="label mb-3">{vendorForm.id ? "Edit vendor" : "Tambah vendor"}</p>
+              <p className="label mb-3">{vendorForm.id ? "Edit mitra pemasok" : "Tambah mitra pemasok"}</p>
               <form onSubmit={submitVendor} className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div><label className="label">Nama</label><input required className="input" value={vendorForm.name} onChange={(e) => setVendorForm({ ...vendorForm, name: e.target.value })} /></div>
                 <div><label className="label">Kontak</label><input className="input" value={vendorForm.contact} onChange={(e) => setVendorForm({ ...vendorForm, contact: e.target.value })} /></div>
                 <div><label className="label">Alamat</label><input className="input" value={vendorForm.address} onChange={(e) => setVendorForm({ ...vendorForm, address: e.target.value })} /></div>
                 <div className="sm:col-span-3 flex justify-end gap-2">
                   {vendorForm.id && <button type="button" className="btn btn-outline" onClick={() => setVendorForm(emptyPartnerForm())}>Batal</button>}
-                  <button type="submit" className="btn btn-primary">{vendorForm.id ? "Simpan perubahan" : "Simpan vendor"}</button>
+                  <button type="submit" className="btn btn-primary">{vendorForm.id ? "Simpan perubahan" : "Simpan mitra pemasok"}</button>
                 </div>
               </form>
             </div>
@@ -846,7 +846,7 @@ export default function Inventory() {
                 <thead><tr><th>Nama</th><th>Kontak</th><th>Alamat</th><th>Status</th>{canWrite && <th />}</tr></thead>
                 <tbody>
                   {vendors.length === 0 ? (
-                    <tr><td colSpan={5} className="text-center py-8" style={{ color: "var(--text-muted)" }}>Belum ada vendor.</td></tr>
+                    <tr><td colSpan={5} className="text-center py-8" style={{ color: "var(--text-muted)" }}>Belum ada mitra pemasok.</td></tr>
                   ) : vendors.map((v) => (
                     <tr key={v.id}>
                       <td className="font-medium">{v.name}</td>
@@ -916,7 +916,7 @@ export default function Inventory() {
         <div className="card p-0 overflow-hidden">
           <TableShell minWidth={800}>
             <table className="tbl">
-              <thead><tr><th>Invoice</th><th>Vendor</th><th>Metode</th><th className="num">Total</th><th className="num">Terbayar</th><th className="num">Sisa</th><th>Jatuh tempo</th><th>Status</th>{canWrite && <th />}</tr></thead>
+              <thead><tr><th>Invoice</th><th>Mitra Pemasok</th><th>Metode</th><th className="num">Total</th><th className="num">Terbayar</th><th className="num">Sisa</th><th>Jatuh tempo</th><th>Status</th>{canWrite && <th />}</tr></thead>
               <tbody>
                 {purchases.filter((p) => p.payment_method === "credit").length === 0 ? (
                   <tr><td colSpan={9} className="text-center py-8" style={{ color: "var(--text-muted)" }}>Belum ada utang usaha.</td></tr>

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400..800;1,14..32,400..800&display=swap');
 @import './theme-extras.css';
 
 @tailwind base;
@@ -36,17 +36,18 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text-primary);
-  font-family: 'Source Sans 3', system-ui, sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-feature-settings: 'cv05', 'cv11', 'ss01';
   -webkit-font-smoothing: antialiased;
 }
 
 h1, h2, h3, h4, .heading, .font-heading, .modern-brand-title {
-  font-family: Fraunces, Georgia, serif;
+  font-family: 'Inter', system-ui, sans-serif;
   color: var(--primary-dark);
   letter-spacing: -0.02em;
-  font-weight: 600;
+  font-weight: 700;
 }
-.font-body { font-family: 'Source Sans 3', system-ui, sans-serif; }
+.font-body { font-family: 'Inter', system-ui, sans-serif; }
 .tabular-nums { font-variant-numeric: tabular-nums; }
 .page-h1 { letter-spacing: -0.02em; }
 
