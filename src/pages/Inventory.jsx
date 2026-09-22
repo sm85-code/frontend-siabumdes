@@ -466,7 +466,7 @@ export default function Inventory() {
       </div>
 
       {error && (
-        <div className="card p-3 text-sm" style={{ borderColor: "#D97878", color: "#9B3B3B", background: "#FDF2F2" }} role="alert" data-testid="inventory-error">
+        <div className="card p-3 text-sm" style={{ borderColor: "var(--status-error)", color: "var(--status-error-strong)", background: "var(--status-error-bg)" }} role="alert" data-testid="inventory-error">
           <strong className="block mb-1">Validasi / API</strong>
           <span>{typeof error === "string" ? error : JSON.stringify(error)}</span>
           <button type="button" className="ml-3 underline" onClick={() => setError("")}>tutup</button>
@@ -578,7 +578,7 @@ export default function Inventory() {
                           <PencilSimple size={16} />
                         </button>
                         <button type="button" className="p-1.5" title="Hapus" onClick={() => removeProduct(p.id)}>
-                          <Trash size={16} color="#D97878" />
+                          <Trash size={16} color="var(--status-error)" />
                         </button>
                       </td>
                     )}
@@ -717,7 +717,7 @@ export default function Inventory() {
                   <label className="label">Akun kredit (Pendapatan)</label>
                   <CoaSelect value={stockOut.revenue_credit_account_code} onChange={(e) => setStockOut({ ...stockOut, revenue_credit_account_code: e.target.value })} />
                 </div>
-                <div className="sm:col-span-2 card p-3 text-sm" style={{ background: "var(--surface-alt, #F7F5F0)" }}>
+                <div className="sm:col-span-2 card p-3 text-sm" style={{ background: "var(--surface-alt)" }}>
                   <p>Preview jurnal HPP: <strong>{fmtRp(Number(stockOut.quantity || 0) * Number(products.find((p) => p.id === stockOut.product_id)?.cost_price || 0))}</strong></p>
                   <p>Preview jurnal Penjualan: <strong>{fmtRp(Number(stockOut.quantity || 0) * Number(stockOut.sell_price || 0))}</strong></p>
                 </div>
@@ -758,7 +758,7 @@ export default function Inventory() {
                 </div>
 
                 {Number(adjust.quantity_delta) < 0 ? (
-                  <div className="sm:col-span-2 card p-3 text-sm space-y-3" style={{ background: "var(--surface-alt, #F7F5F0)" }}>
+                  <div className="sm:col-span-2 card p-3 text-sm space-y-3" style={{ background: "var(--surface-alt)" }}>
                     <div>
                       <p className="font-medium mb-1">Jurnal 1 — Pengurangan fisik nilai persediaan</p>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">

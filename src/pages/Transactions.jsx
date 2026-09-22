@@ -391,8 +391,8 @@ if (!(await confirm({
     <div className="space-y-6" data-testid="transactions-page">
       {user?.blocked_periods && user.blocked_periods.length > 0 && (
         <div className="card fade-in" data-testid="tx-blocked-banner"
-             style={{ background: "#FDECEA", border: "1px solid #f5c6c1" }}>
-          <p className="text-sm" style={{ color: "#8A4141" }}>
+             style={{ background: "var(--status-error-bg)", border: "1px solid var(--status-error-border)" }}>
+          <p className="text-sm" style={{ color: "var(--status-error)" }}>
             <b>Periode terkunci:</b>{" "}
             {user.blocked_periods.slice().sort().join(", ")}. Anda tidak dapat menambah/mengubah/menghapus transaksi pada periode tersebut.
           </p>
@@ -413,27 +413,27 @@ if (!(await confirm({
                     className="btn btn-outline flex-1 sm:flex-none"
                     title={driveStatus?.email ? `Terhubung: ${driveStatus.email}` : "Belum terhubung"}>
               <GoogleDriveLogo size={16} weight="duotone"
-                               color={driveStatus?.connected ? "#3E8B77" : "#B47536"} />
+                               color={driveStatus?.connected ? "var(--status-success)" : "var(--status-warning)"} />
               {driveStatus?.connected ? "Drive Terhubung" : "Hubungkan Drive"}
             </button>
           )}
           {canImport && (
             <>
               <button data-testid="btn-download-template" onClick={downloadTemplate} className="btn btn-outline flex-1 sm:flex-none">
-                <DownloadSimple size={16} weight="duotone" color="#2E4F7C" /> Download Template
+                <DownloadSimple size={16} weight="duotone" color="var(--primary-dark)" /> Download Template
               </button>
               <input ref={fileInputRef} type="file" accept=".xlsx,.xls" className="hidden"
                      data-testid="import-file-input" onChange={onFileChange} />
               <button data-testid="btn-import-excel" onClick={onImportClick} className="btn btn-outline flex-1 sm:flex-none">
-                <FileArrowUp size={16} weight="duotone" color="#2E4F7C" /> Impor Excel
+                <FileArrowUp size={16} weight="duotone" color="var(--primary-dark)" /> Impor Excel
               </button>
             </>
           )}
           <button data-testid="btn-export-tx-excel" onClick={exportExcel} className="btn btn-outline flex-1 sm:flex-none">
-            <FileXls size={16} weight="duotone" color="#2E4F7C" /> Export Excel
+            <FileXls size={16} weight="duotone" color="var(--primary-dark)" /> Export Excel
           </button>
           <button data-testid="btn-export-tx-all" onClick={exportAll} className="btn btn-outline flex-1 sm:flex-none">
-            <FileXls size={16} weight="duotone" color="#3A5A7D" /> Export Semua Data
+            <FileXls size={16} weight="duotone" color="var(--primary-dark)" /> Export Semua Data
           </button>
           <button data-testid="btn-new-tx" onClick={openCreate}
                   disabled={!canWrite}
@@ -445,13 +445,13 @@ if (!(await confirm({
 
       {importResult && (
         <div className="card fade-in" data-testid="import-result"
-             style={{ background: "#EEF3F9", border: "1px solid #DCE8FE" }}>
+             style={{ background: "var(--primary-light)", border: "1px solid var(--border)" }}>
           <div className="flex items-start justify-between gap-2">
             <div>
               <h4 className="font-heading font-semibold mb-1">Hasil Impor</h4>
               <p className="text-sm">Berhasil: <b>{importResult.inserted}</b> dari <b>{importResult.total_rows}</b> baris.</p>
               {importResult.errors?.length > 0 && (
-                <ul className="text-xs mt-2 space-y-0.5" style={{ color: "#8A4141" }}>
+                <ul className="text-xs mt-2 space-y-0.5" style={{ color: "var(--status-error)" }}>
                   {importResult.errors.slice(0, 10).map((e, i) => (<li key={i}>Baris {e.row}: {e.error}</li>))}
                   {importResult.errors.length > 10 && <li>+ {importResult.errors.length - 10} error lainnya</li>}
                 </ul>
@@ -581,13 +581,13 @@ if (!(await confirm({
             </select>
           </div>
           <div className="text-xs px-3 py-2 rounded-lg"
-               style={{ background: "var(--primary-light)", color: "#2E4F7C", fontWeight: 600 }}>
+               style={{ background: "var(--primary-light)", color: "var(--primary-dark)", fontWeight: 600 }}>
             Tampilkan: {MONTHS[month - 1]} {year} · {activeGroup}
           </div>
           {canBulkDelete && selected.size > 0 && (
             <button data-testid="btn-bulk-delete" onClick={bulkDelete}
                     className="btn text-xs sm:col-span-4 justify-self-start"
-                    style={{ background: "#D97878", color: "white" }}>
+                    style={{ background: "var(--status-error)", color: "white" }}>
               <Trash size={14} /> Hapus {selected.size} Terpilih
             </button>
           )}
@@ -596,7 +596,7 @@ if (!(await confirm({
 
       {/* Unified Table */}
       <div className="card p-0 overflow-hidden">
-        <div className="p-4" style={{ borderBottom: "1px solid var(--border)", background: "#F6FAFE" }}>
+        <div className="p-4" style={{ borderBottom: "1px solid var(--border)", background: "var(--primary-light)" }}>
           <h3 className="font-heading font-semibold" data-testid="tx-table-title">
             Transaksi {activeGroup} — {MONTHS[month - 1]} {year}
           </h3>
@@ -630,8 +630,8 @@ if (!(await confirm({
                         Pilih
                       </label>
                     )}
-                    {editable && <button data-testid={`edit-tx-${tx.id}`} onClick={() => openEdit(tx)} className="p-1.5 rounded-md hover:bg-yellow-50"><Pencil size={16} color="#4C86C4" /></button>}
-                    {can(user, "admin", "direktur", "bendahara") && <button data-testid={`del-tx-${tx.id}`} onClick={() => del(tx.id)} className="p-1.5 rounded-md hover:bg-red-50"><Trash size={16} color="#D97878" /></button>}
+                    {editable && <button data-testid={`edit-tx-${tx.id}`} onClick={() => openEdit(tx)} className="p-1.5 rounded-md hover:bg-yellow-50"><Pencil size={16} color="var(--primary)" /></button>}
+                    {can(user, "admin", "direktur", "bendahara") && <button data-testid={`del-tx-${tx.id}`} onClick={() => del(tx.id)} className="p-1.5 rounded-md hover:bg-red-50"><Trash size={16} color="var(--status-error)" /></button>}
                   </div>
                 ) : null}
               >
@@ -643,7 +643,7 @@ if (!(await confirm({
                 <TableCardField label="Jumlah" emphasize>{fmtRp(tx.amount)}</TableCardField>
                 <TableCardField label="Bukti">
                   {proofs.length === 0 ? (editable ? (
-                    <button data-testid={`upload-proof-${tx.id}`} onClick={() => uploadProof(tx)} className="text-xs underline" style={{ color: "#2E4F7C" }}>Upload</button>
+                    <button data-testid={`upload-proof-${tx.id}`} onClick={() => uploadProof(tx)} className="text-xs underline" style={{ color: "var(--primary-dark)" }}>Upload</button>
                   ) : "—") : (
                     <span className="text-xs">{proofs.length} file</span>
                   )}
@@ -680,7 +680,7 @@ if (!(await confirm({
                 <tr><td colSpan={99} className="text-center py-6">Memuat...</td></tr>
               ) : sortState.sorted.length === 0 ? (
                 <tr><td colSpan={99} className="text-center py-10">
-                  <Receipt size={32} weight="duotone" color="#8E88A5" style={{ margin: "0 auto 8px" }} />
+                  <Receipt size={32} weight="duotone" color="var(--text-muted)" style={{ margin: "0 auto 8px" }} />
                   <div style={{ color: "var(--text-muted)" }}>
                     Belum ada transaksi <b>{activeGroup}</b> pada <b>{MONTHS[month - 1]} {year}</b>.
                   </div>
@@ -724,7 +724,7 @@ if (!(await confirm({
                               <a href={p.url} target="_blank" rel="noreferrer"
                                  data-testid={`view-proof-${t.id}-${p.file_id}`}
                                  className="text-xs flex items-center gap-1 underline truncate max-w-[180px]"
-                                 style={{ color: "#2E4F7C" }}
+                                 style={{ color: "var(--primary-dark)" }}
                                  title={p.file_name}>
                                 <LinkSimple size={13} /> {p.file_name}
                               </a>
@@ -733,7 +733,7 @@ if (!(await confirm({
                                         onClick={() => deleteProof(t, p.file_id, p.file_name)}
                                         title="Hapus bukti"
                                         className="p-1 rounded hover:bg-red-50">
-                                  <X size={12} color="#D97878" />
+                                  <X size={12} color="var(--status-error)" />
                                 </button>
                               )}
                             </div>
@@ -751,8 +751,8 @@ if (!(await confirm({
                   </td>
                   {canWrite && (
                     <td><div className="flex gap-1">
-                      {canEditRow(t) && <button data-testid={`edit-tx-${t.id}`} onClick={() => openEdit(t)} className="p-1.5 rounded-md hover:bg-yellow-50"><Pencil size={16} color="#4C86C4" /></button>}
-                      {can(user, "admin", "direktur", "bendahara") && <button data-testid={`del-tx-${t.id}`} onClick={() => del(t.id)} className="p-1.5 rounded-md hover:bg-red-50"><Trash size={16} color="#D97878" /></button>}
+                      {canEditRow(t) && <button data-testid={`edit-tx-${t.id}`} onClick={() => openEdit(t)} className="p-1.5 rounded-md hover:bg-yellow-50"><Pencil size={16} color="var(--primary)" /></button>}
+                      {can(user, "admin", "direktur", "bendahara") && <button data-testid={`del-tx-${t.id}`} onClick={() => del(t.id)} className="p-1.5 rounded-md hover:bg-red-50"><Trash size={16} color="var(--status-error)" /></button>}
                     </div></td>
                   )}
                 </tr>

@@ -84,7 +84,7 @@ export default function MitraPage() {
                   <td>{m.mitra_type || "-"}</td>
                   <td>{m.phone || "-"}</td>
                   <td className="num">{fmtRp(m.modal)}</td>
-                  {canDel && <td><button onClick={() => del(m.id)} className="p-1.5"><Trash size={16} color="#D97878" /></button></td>}
+                  {canDel && <td><button onClick={() => del(m.id)} className="p-1.5"><Trash size={16} color="var(--status-error)" /></button></td>}
                 </tr>
               ))}
           </tbody>

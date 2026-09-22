@@ -37,6 +37,10 @@
   --chart-4: #C45C6A;
   --chart-5: #5AA9A3;
   --chart-6: #8A969A;
+  --status-error-bg: #FDF2F2;
+  --status-error-border: #F5C6C1;
+  --status-error-strong: #9B3B3B;
+  --surface-alt: #F4F7F6;
 }
 
 body {
