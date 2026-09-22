@@ -3,7 +3,7 @@ import api, { fmtRp, API } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { notify } from "@/lib/feedback";
 import { useConfirm } from "@/components/ConfirmProvider";
-import { FilePdf, FileXls, ChartLine, Scales, Coins, TrendUp, BookOpen, ChartBar, Lock } from "@phosphor-icons/react";
+import { FilePdf, FileXls, ChartLine, Scales, Coins, TrendUp, BookOpen, Lock } from "@phosphor-icons/react";
 
 const MONTHS = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 const YEAR_MIN = 2022, YEAR_MAX = 2030;
@@ -42,14 +42,13 @@ export default function Reports() {
   const customRange = customPreset === "ytd" ? [`${year}-01-01`, new Date().toISOString().slice(0, 10)] : customPreset === "qtd" ? [`${year}-${String(Math.floor((month - 1) / 3) * 3 + 1).padStart(2, "0")}-01`, new Date().toISOString().slice(0, 10)] : customPreset === "mtd" ? [`${year}-${String(month).padStart(2, "0")}-01`, new Date().toISOString().slice(0, 10)] : [customStart, customEnd];
   const start = periodMode === "yearly" ? `${year}-01-01` : periodMode === "custom" ? customRange[0] : monthlyStart;
   const end = periodMode === "yearly" ? `${year}-12-31` : periodMode === "custom" ? customRange[1] : monthlyEnd;
-  // tab: laporan | kinerja
+  // tab: laporan | tutup-buku
   const [tab, setTab] = useState("laporan");
   const [active, setActive] = useState("laba-rugi");
   // Dropdown 7 kelompok
   const [groupKey, setGroupKey] = useState("BUMDES");  // BUMDES | UU01..UU06
   const [units, setUnits] = useState([]);
   const [data, setData] = useState(null);
-  const [kinerja, setKinerja] = useState(null);
   const [loading, setLoading] = useState(false);
 
   // Tutup Buku (admin only)
@@ -107,12 +106,9 @@ export default function Reports() {
   }, [groupKey, units]);
 
   const load = async () => {
-    setLoading(true); setData(null); setKinerja(null);
+    setLoading(true); setData(null);
     try {
-      if (tab === "kinerja") {
-        const r = await api.get("/reports/per-unit", { params: { start_date: start, end_date: end } });
-        setKinerja(r.data);
-      } else if (cfg) {
+      if (cfg) {
         const params = cfg.needsRange
           ? { start_date: start, end_date: end }
           : { as_of_date: end };
@@ -125,20 +121,13 @@ export default function Reports() {
   };
 
   const download = async (kind) => {
-    let urlPath, filename;
-    if (tab === "kinerja") {
-      const params = new URLSearchParams({ start_date: start, end_date: end });
-      urlPath = `${API}/reports/per-unit/${kind}?${params}`;
-      filename = `Rekap-Kinerja_${start}_sd_${end}.${kind === "pdf" ? "pdf" : "xlsx"}`;
-    } else {
-      if (!cfg) return;
-      const params = new URLSearchParams(cfg.needsRange
-        ? { start_date: start, end_date: end }
-        : { as_of_date: end });
-      if (activeUnitId) params.set("unit_usaha_id", activeUnitId);
-      urlPath = `${API}/reports/${cfg.key}/${kind}?${params}`;
-      filename = `${cfg.key}_${groupKey}.${kind === "pdf" ? "pdf" : "xlsx"}`;
-    }
+    if (!cfg) return;
+    const params = new URLSearchParams(cfg.needsRange
+      ? { start_date: start, end_date: end }
+      : { as_of_date: end });
+    if (activeUnitId) params.set("unit_usaha_id", activeUnitId);
+    const urlPath = `${API}/reports/${cfg.key}/${kind}?${params}`;
+    const filename = `${cfg.key}_${groupKey}.${kind === "pdf" ? "pdf" : "xlsx"}`;
     const res = await fetch(urlPath, { credentials: "include" });
     if (!res.ok) { notify(`Gagal export ${kind.toUpperCase()}`); return; }
     const blob = await res.blob();
@@ -156,19 +145,21 @@ export default function Reports() {
         <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
           {isPengelola
             ? "Anda hanya dapat mengakses laporan unit usaha yang Anda kelola."
-            : "Dua tab: Laporan Keuangan (pilih kelompok BUMDES atau salah satu unit usaha) dan Rekap Kinerja."}
+            : isAdmin
+              ? "Dua tab: Laporan Keuangan (pilih kelompok BUMDES atau salah satu unit usaha) dan Tutup Buku."
+              : "Laporan Keuangan — pilih kelompok BUMDES atau salah satu unit usaha."}
         </p>
       </div>
 
       <div className="tab-strip" data-testid="reports-toplevel-tabs">
-        <button data-testid="tab-laporan" onClick={() => { setTab("laporan"); setData(null); setKinerja(null); }}
+        <button data-testid="tab-laporan" onClick={() => { setTab("laporan"); setData(null); }}
                 className={`btn ${tab === "laporan" ? "btn-primary" : "btn-outline"}`}>
           <Scales size={16} weight={tab === "laporan" ? "fill" : "regular"} /> Laporan Keuangan
         </button>
-        {!isPengelola && (
-          <button data-testid="tab-kinerja" onClick={() => { setTab("kinerja"); setData(null); setKinerja(null); }}
-                  className={`btn ${tab === "kinerja" ? "btn-primary" : "btn-outline"}`}>
-            <ChartBar size={16} weight={tab === "kinerja" ? "fill" : "regular"} /> Rekap Kinerja
+        {isAdmin && (
+          <button data-testid="tab-tutup-buku" onClick={() => setTab("tutup-buku")}
+                  className={`btn ${tab === "tutup-buku" ? "btn-primary" : "btn-outline"}`}>
+            <Lock size={16} weight={tab === "tutup-buku" ? "fill" : "regular"} /> Tutup Buku
           </button>
         )}
       </div>
@@ -195,7 +186,7 @@ export default function Reports() {
               </div>
               <div>
                 <label className="label" htmlFor="report-period-mode">Periode</label>
-                <select id="report-period-mode" data-testid="report-period-mode" className="select" value={periodMode} onChange={(e) => { setPeriodMode(e.target.value); setData(null); setKinerja(null); }}>
+                <select id="report-period-mode" data-testid="report-period-mode" className="select" value={periodMode} onChange={(e) => { setPeriodMode(e.target.value); setData(null); }}>
                   <option value="monthly">Bulanan</option>
                   <option value="yearly">Tahunan</option>
                   <option value="custom">Custom</option>
@@ -207,170 +198,19 @@ export default function Reports() {
               </div>
               {periodMode === "monthly" && <div>
                 <label className="label" htmlFor="report-month">Bulan</label>
-                <select id="report-month" data-testid="report-month" className="select" value={month} onChange={(e) => { setMonth(Number(e.target.value)); setData(null); setKinerja(null); }}>
+                <select id="report-month" data-testid="report-month" className="select" value={month} onChange={(e) => { setMonth(Number(e.target.value)); setData(null); }}>
                   {MONTHS.map((m, i) => <option key={m} value={i + 1}>{m}</option>)}
                 </select>
               </div>}
               <div>
                 <label className="label" htmlFor="report-year">Tahun</label>
-                <select id="report-year" data-testid="report-year" className="select" value={year} onChange={(e) => { setYear(Number(e.target.value)); setData(null); setKinerja(null); }}>
+                <select id="report-year" data-testid="report-year" className="select" value={year} onChange={(e) => { setYear(Number(e.target.value)); setData(null); }}>
                   {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
                 </select>
               </div>
               <button data-testid="btn-load-report" onClick={load} className="btn btn-primary">
                 {loading ? "Memuat..." : "Tampilkan Laporan"}
               </button>
-            </div>
-          </div>
-        </>
-      )}
-
-      {tab === "kinerja" && (
-        <div className="card">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-start">
-            <div>
-              <label className="label" htmlFor="performance-period-mode">Periode</label>
-              <select id="performance-period-mode" data-testid="performance-period-mode" className="select" value={periodMode} onChange={(e) => { setPeriodMode(e.target.value); setKinerja(null); }}>
-                <option value="monthly">Bulanan</option>
-                <option value="yearly">Tahunan</option>
-              </select>
-            </div>
-            {periodMode === "monthly" && <div>
-              <label className="label" htmlFor="performance-month">Bulan</label>
-              <select id="performance-month" data-testid="performance-month" className="select" value={month} onChange={(e) => { setMonth(Number(e.target.value)); setKinerja(null); }}>
-                {MONTHS.map((m, i) => <option key={m} value={i + 1}>{m}</option>)}
-              </select>
-            </div>}
-            <div>
-              <label className="label" htmlFor="performance-year">Tahun</label>
-              <select id="performance-year" data-testid="performance-year" className="select" value={year} onChange={(e) => { setYear(Number(e.target.value)); setKinerja(null); }}>
-                {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
-              </select>
-            </div>
-            <button data-testid="btn-load-performance" onClick={load} className="btn btn-primary">
-              {loading ? "Memuat..." : "Tampilkan Laporan"}
-            </button>
-          </div>
-        </div>
-      )}
-
-      {tab === "kinerja" && kinerja && (
-        <>
-          {/* ==== Tabel Kinerja BUMDES ==== */}
-          <div className="card fade-in" data-testid="kinerja-bumdes-card">
-            <div className="flex justify-between items-center mb-4 flex-wrap gap-2">
-              <h3 className="font-heading text-xl font-semibold">Kinerja BUMDES</h3>
-              <div className="flex gap-2 flex-wrap">
-                <button data-testid="btn-export-kinerja-pdf" onClick={() => download("pdf")} className="btn btn-outline">
-                  <FilePdf size={16} weight="duotone" color="#D97878" /> Export PDF
-                </button>
-                <button data-testid="btn-export-kinerja-excel" onClick={() => download("excel")} className="btn btn-outline">
-                  <FileXls size={16} weight="duotone" color="#2E4F7C" /> Export Excel
-                </button>
-              </div>
-            </div>
-
-            {/* Mobile: stacked layout (< 768px) */}
-            <div className="sm:hidden space-y-3" data-testid="bumdes-kinerja-mobile">
-              <div className="flex items-center justify-between gap-3 pb-2"
-                   style={{ borderBottom: "1px solid var(--border)" }}>
-                <span className="badge">BUMDES</span>
-                <span className="text-xs" style={{ color: "var(--text-muted)" }}>periode terpilih</span>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div><div className="label">Pendapatan</div><div className="font-semibold text-sm tabular-nums">{fmtRp(kinerja.bumdes?.pendapatan || 0)}</div></div>
-                <div><div className="label">Beban</div><div className="font-semibold text-sm tabular-nums">{fmtRp(kinerja.bumdes?.beban || 0)}</div></div>
-                <div><div className="label">Laba Bersih</div>
-                  <div className="font-bold text-base tabular-nums"
-                       style={{ color: (kinerja.bumdes?.laba_bersih || 0) >= 0 ? "#2E4F7C" : "#D97878" }}>
-                    {fmtRp(kinerja.bumdes?.laba_bersih || 0)}
-                  </div>
-                </div>
-                <div><div className="label">18% Modal</div>
-                  <div className="font-semibold text-sm tabular-nums" style={{ color: "#3A5A7D" }}
-                       data-testid="bumdes-modal-18-m">{fmtRp(kinerja.bumdes?.share_modal_18 || 0)}</div>
-                </div>
-              </div>
-              <div className="pt-2" style={{ borderTop: "1px solid var(--border)" }}>
-                <div className="label mb-1">82% Unsur Lain</div>
-                <ul className="text-xs space-y-1">
-                  <li className="flex justify-between"><span>PADes (30%)</span><b className="tabular-nums">{fmtRp(kinerja.bumdes?.share_pades_30 || 0)}</b></li>
-                  <li className="flex justify-between"><span>Penasihat (7%)</span><b className="tabular-nums">{fmtRp(kinerja.bumdes?.share_penasihat_7 || 0)}</b></li>
-                  <li className="flex justify-between"><span>Pengawas (5%)</span><b className="tabular-nums">{fmtRp(kinerja.bumdes?.share_pengawas_5 || 0)}</b></li>
-                  <li className="flex justify-between"><span>Pengurus (35%)</span><b className="tabular-nums">{fmtRp(kinerja.bumdes?.share_pengurus_35 || 0)}</b></li>
-                  <li className="flex justify-between"><span>Dana Sosial (5%)</span><b className="tabular-nums">{fmtRp(kinerja.bumdes?.share_dana_sosial_5 || 0)}</b></li>
-                </ul>
-              </div>
-            </div>
-
-            {/* Desktop/tablet: full table (>= 768px) */}
-            <div className="hidden sm:block h-scroll">
-              <table className="tbl" data-testid="bumdes-kinerja-table" style={{ minWidth: 720 }}>
-                <thead>
-                  <tr>
-                    <th>Kode</th>
-                    <th className="num">Pendapatan</th>
-                    <th className="num">Beban</th>
-                    <th className="num">Laba Bersih</th>
-                    <th className="num">18% Modal</th>
-                    <th>82% Unsur Lain</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[
-                    ["PADes (30%)", "share_pades_30", "bumdes-pades-30"],
-                    ["Penasihat (7%)", "share_penasihat_7", "bumdes-penasihat-7"],
-                    ["Pengawas (5%)", "share_pengawas_5", "bumdes-pengawas-5"],
-                    ["Pengurus (35%)", "share_pengurus_35", "bumdes-pengurus-35"],
-                    ["Dana Sosial (5%)", "share_dana_sosial_5", "bumdes-dana-sosial-5"],
-                  ].map(([label, valueKey, testId], index) => (
-                    <tr key={valueKey}>
-                      {index === 0 && <>
-                        <td rowSpan={5}><span className="badge">BUMDES</span></td>
-                        <td rowSpan={5} className="num">{fmtRp(kinerja.bumdes?.pendapatan || 0)}</td>
-                        <td rowSpan={5} className="num">{fmtRp(kinerja.bumdes?.beban || 0)}</td>
-                        <td rowSpan={5} className="num font-semibold" style={{ color: (kinerja.bumdes?.laba_bersih || 0) >= 0 ? "#2E4F7C" : "#D97878" }}>
-                          {fmtRp(kinerja.bumdes?.laba_bersih || 0)}
-                        </td>
-                        <td rowSpan={5} className="num" style={{ color: "#3A5A7D" }} data-testid="bumdes-modal-18">
-                          {fmtRp(kinerja.bumdes?.share_modal_18 || 0)}
-                        </td>
-                      </>}
-                      <td data-testid={testId}>{label} = <b>{fmtRp(kinerja.bumdes?.[valueKey] || 0)}</b></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* ==== Tabel Kinerja Per Unit ==== */}
-          <div className="card fade-in">
-            <h3 className="font-heading text-xl font-semibold mb-4">Kinerja Per Unit Usaha</h3>
-            <div className="h-scroll">
-              <table className="tbl" data-testid="per-unit-table" style={{ minWidth: 720 }}>
-                <thead>
-                  <tr>
-                    <th>Kode</th><th>Unit Usaha</th>
-                    <th className="num">Pendapatan</th><th className="num">Beban</th>
-                    <th className="num">Laba Bersih</th>
-                    <th className="num">30% Pengelola</th><th className="num">70% BUMDES</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {kinerja.units.map(u => (
-                    <tr key={u.id}>
-                      <td><span className="badge">{u.code}</span></td>
-                      <td className="font-medium">{u.name}</td>
-                      <td className="num">{fmtRp(u.pendapatan)}</td>
-                      <td className="num">{fmtRp(u.beban)}</td>
-                      <td className="num font-semibold" style={{ color: u.laba_bersih >= 0 ? "#2E4F7C" : "#D97878" }}>{fmtRp(u.laba_bersih)}</td>
-                      <td className="num" style={{ color: "#2E4F7C" }}>{fmtRp(u.share_pengelola_30)}</td>
-                      <td className="num" style={{ color: "#3A5A7D" }}>{fmtRp(u.share_bumdes_70)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
             </div>
           </div>
         </>
@@ -431,8 +271,7 @@ export default function Reports() {
         </div>
       )}
 
-      {/* Tutup Buku Bulanan (admin only) */}
-      {isAdmin && (
+      {tab === "tutup-buku" && isAdmin && (
         <div className="card" data-testid="close-period-card">
           <div className="flex items-center gap-2 mb-3">
             <Lock size={20} weight="duotone" color="#8A4141" />
@@ -460,25 +299,37 @@ export default function Reports() {
               <Lock size={16} /> Tutup Buku
             </button>
           </div>
-          {closedList.length > 0 && (
-            <div className="mt-4">
-              <p className="label mb-2">Periode Sudah Ditutup ({closedList.length})</p>
-              <div className="flex flex-wrap gap-2">
-                {closedList.map(c => (
-                  <div key={c.period + c.group} className="px-3 py-1.5 rounded-lg text-xs flex items-center gap-2"
-                       style={{ background: "#EEF3F9", border: "1px solid var(--border)" }}>
-                    <Lock size={12} color="#8A4141" />
-                    <span><b>{c.period}</b> · {c.group} · Laba {fmtRp(c.laba_bersih || 0)}</span>
-                    <button data-testid={`reopen-${c.period}-${c.group}`}
-                            onClick={() => doReopen(c.period, c.group)}
-                            className="text-xs" style={{ color: "#8A4141", textDecoration: "underline" }}>
-                      Batalkan
-                    </button>
-                  </div>
-                ))}
-              </div>
+
+          <div className="mt-6">
+            <p className="label mb-2">Periode Sudah Ditutup ({closedList.length})</p>
+            <div className="h-scroll">
+              <table className="tbl" data-testid="closed-periods-table" style={{ minWidth: 520 }}>
+                <thead>
+                  <tr>
+                    <th>Periode</th><th>Kelompok</th><th className="num">Laba Bersih</th><th />
+                  </tr>
+                </thead>
+                <tbody>
+                  {closedList.length === 0 ? (
+                    <tr><td colSpan={4} className="text-center py-8" style={{ color: "var(--text-muted)" }}>Belum ada periode yang ditutup.</td></tr>
+                  ) : closedList.map(c => (
+                    <tr key={c.period + c.group}>
+                      <td className="font-medium">{c.period}</td>
+                      <td><span className="badge">{c.group}</span></td>
+                      <td className="num">{fmtRp(c.laba_bersih || 0)}</td>
+                      <td className="whitespace-nowrap">
+                        <button data-testid={`reopen-${c.period}-${c.group}`}
+                                onClick={() => doReopen(c.period, c.group)}
+                                className="btn btn-outline text-xs">
+                          Batalkan
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          )}
+          </div>
         </div>
       )}
     </div>
