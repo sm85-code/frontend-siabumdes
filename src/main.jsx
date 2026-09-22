@@ -5,6 +5,7 @@ import "@/index.css";
 import App from "@/App";
 import { Toaster } from "@/components/ui/sonner";
 import { ConfirmProvider } from "@/components/ConfirmProvider";
+import { ThemeProvider } from "@/lib/theme";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -19,10 +20,12 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <ConfirmProvider>
-        <App />
-        <Toaster position="top-right" richColors closeButton />
-      </ConfirmProvider>
+      <ThemeProvider>
+        <ConfirmProvider>
+          <App />
+          <Toaster position="top-right" richColors closeButton />
+        </ConfirmProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   </React.StrictMode>,
 );

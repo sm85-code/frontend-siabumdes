@@ -55,69 +55,141 @@ import {
   FileType2 as LuFileType2,
 } from "lucide-react";
 
-function wrap(Icon) {
+import {
+  House as PhHouse,
+  Receipt as PhReceipt,
+  ChartLine as PhChartLine,
+  ChartBar as PhChartBar,
+  Storefront as PhStorefront,
+  UsersThree as PhUsersThree,
+  BookOpenText as PhBookOpenText,
+  SignOut as PhSignOut,
+  List as PhList,
+  X as PhX,
+  Books as PhBooks,
+  UserCircle as PhUserCircle,
+  Package as PhPackage,
+  Eye as PhEye,
+  EyeSlash as PhEyeSlash,
+  SignIn as PhSignIn,
+  ArrowLeft as PhArrowLeft,
+  ArrowRight as PhArrowRight,
+  Buildings as PhBuildings,
+  HandHeart as PhHandHeart,
+  TrendUp as PhTrendUp,
+  TrendDown as PhTrendDown,
+  Coin as PhCoin,
+  ReceiptX as PhReceiptX,
+  CalendarBlank as PhCalendarBlank,
+  Lock as PhLock,
+  Plus as PhPlus,
+  Trash as PhTrash,
+  Pencil as PhPencil,
+  PencilSimple as PhPencilSimple,
+  FileArrowUp as PhFileArrowUp,
+  DownloadSimple as PhDownloadSimple,
+  FileXls as PhFileXls,
+  Paperclip as PhPaperclip,
+  LinkSimple as PhLinkSimple,
+  GoogleDriveLogo as PhGoogleDriveLogo,
+  FilePdf as PhFilePdf,
+  FileDoc as PhFileDoc,
+  Scales as PhScales,
+  Coins as PhCoins,
+  BookOpen as PhBookOpen,
+  MagnifyingGlass as PhMagnifyingGlass,
+  UploadSimple as PhUploadSimple,
+  Warning as PhWarning,
+  ArrowDown as PhArrowDown,
+  ArrowUp as PhArrowUp,
+  SlidersHorizontal as PhSlidersHorizontal,
+  Key as PhKey,
+  Truck as PhTruck,
+  Users as PhUsers,
+  Wallet as PhWallet,
+  HandCoins as PhHandCoins,
+} from "phosphor-native";
+
+import { useTheme } from "@/lib/theme";
+
+/**
+ * Themed icon: "modern" renders the current thin-outline Lucide icon
+ * unchanged (zero regression). "classic"/"playful" render the real Phosphor
+ * icon of the same glyph at weight="fill"/"duotone" -- these names already
+ * match Phosphor's own icon set 1:1 (this app used real Phosphor before an
+ * earlier rebrand swapped the renderer to Lucide), so no icon needed
+ * "translating" between libraries.
+ */
+function wrap(LucideIcon, PhosphorIcon) {
   return function MappedIcon({ size = 18, weight, color, className, ...rest }) {
+    const { theme } = useTheme();
+    if (PhosphorIcon && theme !== "modern") {
+      const phosphorWeight = theme === "classic" ? "fill" : "duotone";
+      return (
+        <PhosphorIcon size={size} weight={phosphorWeight} color={color} className={className} {...rest} />
+      );
+    }
     const strokeWidth = weight === "fill" || weight === "bold" ? 2.35 : 1.7;
-    return <Icon size={size} color={color} strokeWidth={strokeWidth} className={className} {...rest} />;
+    return <LucideIcon size={size} color={color} strokeWidth={strokeWidth} className={className} {...rest} />;
   };
 }
 
-export const House = wrap(LuHome);
-export const Receipt = wrap(LuReceipt);
-export const ChartLine = wrap(LuLineChart);
-export const ChartBar = wrap(LuBarChart3);
-export const Storefront = wrap(LuStore);
-export const UsersThree = wrap(LuUsers);
-export const BookOpenText = wrap(LuBookOpen);
-export const SignOut = wrap(LuLogOut);
-export const List = wrap(LuMenu);
-export const X = wrap(LuX);
-export const Books = wrap(LuLibrary);
+export const House = wrap(LuHome, PhHouse);
+export const Receipt = wrap(LuReceipt, PhReceipt);
+export const ChartLine = wrap(LuLineChart, PhChartLine);
+export const ChartBar = wrap(LuBarChart3, PhChartBar);
+export const Storefront = wrap(LuStore, PhStorefront);
+export const UsersThree = wrap(LuUsers, PhUsersThree);
+export const BookOpenText = wrap(LuBookOpen, PhBookOpenText);
+export const SignOut = wrap(LuLogOut, PhSignOut);
+export const List = wrap(LuMenu, PhList);
+export const X = wrap(LuX, PhX);
+export const Books = wrap(LuLibrary, PhBooks);
 export const Calculator = wrap(LuCalculator);
-export const UserCircle = wrap(LuUserCircle);
-export const Package = wrap(LuPackage);
-export const Eye = wrap(LuEye);
-export const EyeSlash = wrap(LuEyeOff);
-export const SignIn = wrap(LuLogIn);
-export const ArrowLeft = wrap(LuArrowLeft);
-export const ArrowRight = wrap(LuArrowRight);
-export const Buildings = wrap(LuBuilding2);
-export const HandHeart = wrap(LuHeartHandshake);
-export const ChartLineUp = wrap(LuTrendingUp);
-export const TrendUp = wrap(LuTrendingUp);
-export const TrendDown = wrap(LuTrendingDown);
-export const Coin = wrap(LuCoins);
-export const ReceiptX = wrap(LuReceipt);
-export const CalendarBlank = wrap(LuCalendar);
-export const Lock = wrap(LuLock);
-export const Plus = wrap(LuPlus);
-export const Trash = wrap(LuTrash2);
-export const Pencil = wrap(LuPencil);
-export const PencilSimple = wrap(LuPencil);
-export const FileArrowUp = wrap(LuFileUp);
-export const DownloadSimple = wrap(LuDownload);
-export const FileXls = wrap(LuFileSpreadsheet);
-export const Paperclip = wrap(LuPaperclip);
-export const LinkSimple = wrap(LuLink);
-export const GoogleDriveLogo = wrap(LuCloud);
-export const FilePdf = wrap(LuFileText);
-export const FileDoc = wrap(LuFileType2);
-export const Scales = wrap(LuScale);
-export const Coins = wrap(LuCoins);
-export const BookOpen = wrap(LuBookOpen);
-export const MagnifyingGlass = wrap(LuSearch);
-export const UploadSimple = wrap(LuUpload);
-export const Warning = wrap(LuTriangleAlert);
-export const ArrowDown = wrap(LuArrowDown);
-export const ArrowUp = wrap(LuArrowUp);
-export const SlidersHorizontal = wrap(LuSlidersHorizontal);
+export const UserCircle = wrap(LuUserCircle, PhUserCircle);
+export const Package = wrap(LuPackage, PhPackage);
+export const Eye = wrap(LuEye, PhEye);
+export const EyeSlash = wrap(LuEyeOff, PhEyeSlash);
+export const SignIn = wrap(LuLogIn, PhSignIn);
+export const ArrowLeft = wrap(LuArrowLeft, PhArrowLeft);
+export const ArrowRight = wrap(LuArrowRight, PhArrowRight);
+export const Buildings = wrap(LuBuilding2, PhBuildings);
+export const HandHeart = wrap(LuHeartHandshake, PhHandHeart);
+export const ChartLineUp = wrap(LuTrendingUp, PhTrendUp);
+export const TrendUp = wrap(LuTrendingUp, PhTrendUp);
+export const TrendDown = wrap(LuTrendingDown, PhTrendDown);
+export const Coin = wrap(LuCoins, PhCoin);
+export const ReceiptX = wrap(LuReceipt, PhReceiptX);
+export const CalendarBlank = wrap(LuCalendar, PhCalendarBlank);
+export const Lock = wrap(LuLock, PhLock);
+export const Plus = wrap(LuPlus, PhPlus);
+export const Trash = wrap(LuTrash2, PhTrash);
+export const Pencil = wrap(LuPencil, PhPencil);
+export const PencilSimple = wrap(LuPencil, PhPencilSimple);
+export const FileArrowUp = wrap(LuFileUp, PhFileArrowUp);
+export const DownloadSimple = wrap(LuDownload, PhDownloadSimple);
+export const FileXls = wrap(LuFileSpreadsheet, PhFileXls);
+export const Paperclip = wrap(LuPaperclip, PhPaperclip);
+export const LinkSimple = wrap(LuLink, PhLinkSimple);
+export const GoogleDriveLogo = wrap(LuCloud, PhGoogleDriveLogo);
+export const FilePdf = wrap(LuFileText, PhFilePdf);
+export const FileDoc = wrap(LuFileType2, PhFileDoc);
+export const Scales = wrap(LuScale, PhScales);
+export const Coins = wrap(LuCoins, PhCoins);
+export const BookOpen = wrap(LuBookOpen, PhBookOpen);
+export const MagnifyingGlass = wrap(LuSearch, PhMagnifyingGlass);
+export const UploadSimple = wrap(LuUpload, PhUploadSimple);
+export const Warning = wrap(LuTriangleAlert, PhWarning);
+export const ArrowDown = wrap(LuArrowDown, PhArrowDown);
+export const ArrowUp = wrap(LuArrowUp, PhArrowUp);
+export const SlidersHorizontal = wrap(LuSlidersHorizontal, PhSlidersHorizontal);
 export const ChartPie = wrap(LuPieChart);
-export const Key = wrap(LuKey);
+export const Key = wrap(LuKey, PhKey);
 export const Fish = wrap(LuFish);
 export const Tree = wrap(LuTreePine);
 export const Sun = wrap(LuSun);
 export const Boat = wrap(LuShip);
-export const Truck = wrap(LuTruck);
-export const Users = wrap(LuUsersFlat);
-export const Wallet = wrap(LuWallet);
-export const HandCoins = wrap(LuHandCoins);
+export const Truck = wrap(LuTruck, PhTruck);
+export const Users = wrap(LuUsersFlat, PhUsers);
+export const Wallet = wrap(LuWallet, PhWallet);
+export const HandCoins = wrap(LuHandCoins, PhHandCoins);

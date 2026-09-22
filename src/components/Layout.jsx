@@ -2,13 +2,14 @@ import { NavLink, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuth, can } from "@/lib/auth";
 import api, { ROLE_LABELS } from "@/lib/api";
+import { useTheme, THEMES } from "@/lib/theme";
 import {
   House, Receipt, ChartLine, Storefront, UsersThree,
   BookOpenText, SignOut, List, X, Books, UserCircle, Package,
 } from "@phosphor-icons/react";
 
 const READ_MOST = ["admin", "direktur", "bendahara", "pengelola", "pengawas", "penasihat"];
-const INK = "#14353A";
+const INK = "var(--primary-dark)";
 
 const NAV = [
   { to: "/dashboard", label: "Dashboard", icon: House, roles: READ_MOST },
@@ -23,6 +24,7 @@ const NAV = [
 
 export default function Layout({ children }) {
   const { user, logout } = useAuth();
+  const { theme, setTheme } = useTheme();
   const location = useLocation();
   const [open, setOpen] = useState(false);
   const [uu05Id, setUu05Id] = useState(null);
@@ -87,9 +89,23 @@ export default function Layout({ children }) {
             })}
           </nav>
           <div className="shrink-0 p-4">
+            <div className="mb-3">
+              <label className="label" htmlFor="theme-switcher">Tema</label>
+              <select
+                id="theme-switcher"
+                data-testid="theme-switcher"
+                className="select text-sm"
+                value={theme}
+                onChange={(e) => setTheme(e.target.value)}
+              >
+                {THEMES.map((t) => (
+                  <option key={t.id} value={t.id}>{t.label} — {t.description}</option>
+                ))}
+              </select>
+            </div>
             <div className="flex items-center gap-3 mb-3">
               <div className="w-9 h-9 rounded-full flex items-center justify-center font-heading font-semibold text-sm"
-                   style={{ background: "#1C8A8A", color: "#fff" }}>
+                   style={{ background: "var(--primary)", color: "#fff" }}>
                 {user.name?.[0]?.toUpperCase()}
               </div>
               <div className="min-w-0">
