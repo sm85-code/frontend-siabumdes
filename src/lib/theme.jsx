@@ -1,38 +1,67 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
 export const THEMES = [
-  { id: "modern", label: "Modern", description: "Teal, ikon garis tipis" },
-  { id: "classic", label: "Classic", description: "Navy-emas, ikon solid" },
-  { id: "playful", label: "Playful", description: "Warna cerah, ikon duotone" },
+  { id: "modern", label: "Modern" },
+  { id: "classic", label: "Classic" },
+  { id: "playful", label: "Playful" },
+  { id: "minimalis", label: "Minimalis" },
+  { id: "elegant", label: "Elegant" },
 ];
 
-const STORAGE_KEY = "bumdes-theme";
-const VALID_IDS = THEMES.map((t) => t.id);
+export const FONTS = [
+  { id: "jakarta", label: "Jakarta" },
+  { id: "inter", label: "Inter" },
+  { id: "serif", label: "Serif Klasik" },
+  { id: "elegan", label: "Elegan" },
+  { id: "rounded", label: "Rounded" },
+];
 
-function readStoredTheme() {
+const THEME_KEY = "bumdes-theme";
+const FONT_KEY = "bumdes-font";
+const VALID_THEMES = THEMES.map((t) => t.id);
+const VALID_FONTS = FONTS.map((f) => f.id);
+
+function readStored(key, validIds, fallback) {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    return VALID_IDS.includes(stored) ? stored : "modern";
+    const stored = localStorage.getItem(key);
+    return validIds.includes(stored) ? stored : fallback;
   } catch {
-    return "modern";
+    return fallback;
   }
 }
 
-const ThemeContext = createContext({ theme: "modern", setTheme: () => {} });
+const ThemeContext = createContext({
+  theme: "modern", setTheme: () => {},
+  font: "jakarta", setFont: () => {},
+});
 
 export function ThemeProvider({ children }) {
-  const [theme, setTheme] = useState(readStoredTheme);
+  const [theme, setTheme] = useState(() => readStored(THEME_KEY, VALID_THEMES, "modern"));
+  const [font, setFont] = useState(() => readStored(FONT_KEY, VALID_FONTS, "jakarta"));
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
     try {
-      localStorage.setItem(STORAGE_KEY, theme);
+      localStorage.setItem(THEME_KEY, theme);
     } catch {
       // ignore (private mode / storage blocked)
     }
   }, [theme]);
 
-  return <ThemeContext.Provider value={{ theme, setTheme }}>{children}</ThemeContext.Provider>;
+  useEffect(() => {
+    document.documentElement.setAttribute("data-font", font);
+    try {
+      localStorage.setItem(FONT_KEY, font);
+    } catch {
+      // ignore (private mode / storage blocked)
+    }
+  }, [font]);
+
+  return (
+    <ThemeContext.Provider value={{ theme, setTheme, font, setFont }}>
+      {children}
+    </ThemeContext.Provider>
+  );
 }
 
 export function useTheme() {

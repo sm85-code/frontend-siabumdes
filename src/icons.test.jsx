@@ -25,8 +25,8 @@ describe("themed icons", () => {
     expect(getByTestId("icon").getAttribute("class")).toMatch(/lucide/);
   });
 
-  it("renders the real Phosphor icon (not Lucide) for classic and playful themes", () => {
-    for (const theme of ["classic", "playful"]) {
+  it("renders the real Phosphor icon (not Lucide) for every non-modern theme", () => {
+    for (const theme of ["classic", "playful", "minimalis", "elegant"]) {
       const { container, unmount } = renderWithTheme(theme);
       const svg = container.querySelector('[data-testid="icon"]');
       expect(svg.getAttribute("class") || "").not.toMatch(/lucide/);

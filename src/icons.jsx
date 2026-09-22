@@ -114,17 +114,24 @@ import { useTheme } from "@/lib/theme";
 
 /**
  * Themed icon: "modern" renders the current thin-outline Lucide icon
- * unchanged (zero regression). "classic"/"playful" render the real Phosphor
- * icon of the same glyph at weight="fill"/"duotone" -- these names already
+ * unchanged (zero regression). Every other theme renders the real Phosphor
+ * icon of the same glyph at a theme-specific weight -- these names already
  * match Phosphor's own icon set 1:1 (this app used real Phosphor before an
  * earlier rebrand swapped the renderer to Lucide), so no icon needed
  * "translating" between libraries.
  */
+const PHOSPHOR_WEIGHT_BY_THEME = {
+  classic: "fill",
+  playful: "duotone",
+  minimalis: "thin",
+  elegant: "bold",
+};
+
 function wrap(LucideIcon, PhosphorIcon) {
   return function MappedIcon({ size = 18, weight, color, className, ...rest }) {
     const { theme } = useTheme();
-    if (PhosphorIcon && theme !== "modern") {
-      const phosphorWeight = theme === "classic" ? "fill" : "duotone";
+    const phosphorWeight = PHOSPHOR_WEIGHT_BY_THEME[theme];
+    if (PhosphorIcon && phosphorWeight) {
       return (
         <PhosphorIcon size={size} weight={phosphorWeight} color={color} className={className} {...rest} />
       );
