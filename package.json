@@ -70,7 +70,7 @@
     "start": "vite",
     "build": "vite build",
     "lint": "eslint . --max-warnings 0",
-    "test": "echo \"No automated tests configured\""
+    "test": "vitest run"
   },
   "devDependencies": {
     "@eslint/js": "9.23.0",
@@ -85,7 +85,8 @@
     "globals": "15.15.0",
     "postcss": "8.5.10",
     "tailwindcss": "3.4.17",
-    "vite": "^8.3.0"
+    "vite": "^8.3.0",
+    "vitest": "5.0.1"
   },
   "resolutions": {
     "react-router": "7.15.1",
