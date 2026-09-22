@@ -5,7 +5,7 @@ import api, { ROLE_LABELS } from "@/lib/api";
 import { useTheme, THEMES } from "@/lib/theme";
 import {
   House, Receipt, ChartLine, Storefront, UsersThree,
-  BookOpenText, SignOut, List, X, Books, UserCircle, Package,
+  BookOpenText, SignOut, List, X, Books, UserCircle, Package, Buildings,
 } from "@phosphor-icons/react";
 
 const READ_MOST = ["admin", "direktur", "bendahara", "pengelola", "pengawas", "penasihat"];
@@ -19,6 +19,7 @@ const NAV = [
   { to: "/accounts", label: "Kode Akun (COA)", icon: Books, roles: ["admin"] },
   { to: "/inventory", label: "Inventory", icon: Package, roles: ["admin", "direktur", "bendahara", "pengelola"], uu05Only: true },
   { to: "/users", label: "Kelola Pengguna", icon: UsersThree, roles: ["admin"] },
+  { to: "/profil-bumdes", label: "Profil BUMDES", icon: Buildings, roles: ["admin"] },
   { to: "/profile", label: "Profil Saya", icon: UserCircle, roles: READ_MOST },
 ];
 

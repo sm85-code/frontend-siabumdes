@@ -17,6 +17,7 @@ const Transactions = lazy(() => import("@/pages/Transactions"));
 const BukuBesar = lazy(() => import("@/pages/BukuBesar"));
 const COAPage = lazy(() => import("@/pages/COAPage"));
 const Inventory = lazy(() => import("@/pages/Inventory"));
+const OrgProfilePage = lazy(() => import("@/pages/OrgProfilePage"));
 
 function PageFallback() {
   return (
@@ -36,6 +37,7 @@ const ROLES_REPORTS = ["admin", "direktur", "bendahara", "pengelola", "pengawas"
 const ROLES_LEDGER = ["admin", "direktur", "bendahara", "pengelola", "pengawas", "penasihat"];
 const ROLES_COA = ["admin"];
 const ROLES_USERS = ["admin"];
+const ROLES_ORG_PROFILE = ["admin"];
 const ROLES_INVENTORY = ["admin", "direktur", "bendahara", "pengelola"];
 
 function Protected({ children, roles }) {
@@ -70,6 +72,7 @@ function App() {
             <Route path="/accounts" element={<Protected roles={ROLES_COA}><LazyPage><COAPage /></LazyPage></Protected>} />
             <Route path="/inventory" element={<Protected roles={ROLES_INVENTORY}><LazyPage><Inventory /></LazyPage></Protected>} />
             <Route path="/users" element={<Protected roles={ROLES_USERS}><LazyPage><UsersPage /></LazyPage></Protected>} />
+            <Route path="/profil-bumdes" element={<Protected roles={ROLES_ORG_PROFILE}><LazyPage><OrgProfilePage /></LazyPage></Protected>} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </AuthProvider>
