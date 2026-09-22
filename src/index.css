@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400..800;1,14..32,400..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400..800;1,400..800&family=Inter:ital,opsz,wght@0,14..32,400..800;1,14..32,400..800&display=swap');
 @import './theme-extras.css';
 
 @tailwind base;
@@ -30,6 +30,13 @@
   --coral: #C45C6A;
   --navy: #14353A;
   --sand: #F4F7F6;
+  --total-row-bg: rgba(28, 138, 138, 0.14);
+  --chart-1: #1C8A8A;
+  --chart-2: #14353A;
+  --chart-3: #C9A227;
+  --chart-4: #C45C6A;
+  --chart-5: #5AA9A3;
+  --chart-6: #8A969A;
 }
 
 body {
@@ -42,7 +49,7 @@ body {
 }
 
 h1, h2, h3, h4, .heading, .font-heading, .modern-brand-title {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
   color: var(--primary-dark);
   letter-spacing: -0.02em;
   font-weight: 700;
