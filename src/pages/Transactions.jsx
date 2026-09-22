@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import api, { fmtRp, fmtDate, API } from "@/lib/api";
 import { useAuth, can } from "@/lib/auth";
 import { notify } from "@/lib/feedback";
@@ -30,6 +31,10 @@ export default function Transactions() {
   const canImport = can(user, "admin", "direktur", "bendahara");
   const canBulkDelete = can(user, "admin", "direktur", "bendahara");
   const isPengelola = user?.role === "pengelola";
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const refFilter = searchParams.get("reference") || "";
+  const clearRefFilter = () => setSearchParams((prev) => { const p = new URLSearchParams(prev); p.delete("reference"); return p; });
 
   const [txs, setTxs] = useState([]);
   const [units, setUnits] = useState([]);
@@ -128,14 +133,14 @@ export default function Transactions() {
   const load = useCallback(async () => {
     setLoading(true);
     const [t, u, tt, a] = await Promise.all([
-      api.get("/transactions"),
+      api.get("/transactions", refFilter ? { params: { reference: refFilter, limit: 2000 } } : undefined),
       api.get("/unit-usaha"),
       api.get("/transaction-types"),
       api.get("/accounts"),
     ]);
     setTxs(t.data); setUnits(u.data); setTypes(tt.data); setAccounts(a.data);
     setLoading(false);
-  }, []);
+  }, [refFilter]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -322,12 +327,17 @@ export default function Transactions() {
   const customEndDate = customPreset === "ytd" || customPreset === "qtd" || customPreset === "mtd" ? new Date().toISOString().slice(0, 10) : customEnd;
   const yearPrefix = `${year}-`;
   const filteredTxs = useMemo(() => {
+  // Deep-link dari Inventory (?reference=...): backend sudah filter persis
+  // yang diminta, jangan disaring lagi oleh periode/unit yang sedang aktif
+  // di halaman ini -- transaksinya bisa saja di bulan/unit yang beda dari
+  // yang sedang ditampilkan.
+  if (refFilter) return txs;
   return txs.filter(t => {
   const inGroup = activeGroup === "BUMDES" ? !t.unit_usaha_id : t.unit_usaha_id === activeUnitId;
   const inPeriod = periodMode === "yearly" ? (t.date || "").startsWith(yearPrefix) : periodMode === "custom" ? (t.date || "") >= customStartDate && (t.date || "") <= customEndDate : (t.date || "").startsWith(monthPrefix);
   return inGroup && inPeriod;
   });
-  }, [txs, activeGroup, activeUnitId, monthPrefix, yearPrefix, periodMode, customStartDate, customEndDate]);
+  }, [txs, activeGroup, activeUnitId, monthPrefix, yearPrefix, periodMode, customStartDate, customEndDate, refFilter]);
 
   const sortState = useSort(filteredTxs, "date", "desc");
 
@@ -396,6 +406,18 @@ if (!(await confirm({
             <b>Periode terkunci:</b>{" "}
             {user.blocked_periods.slice().sort().join(", ")}. Anda tidak dapat menambah/mengubah/menghapus transaksi pada periode tersebut.
           </p>
+        </div>
+      )}
+
+      {refFilter && (
+        <div className="card flex items-center justify-between gap-3 flex-wrap" style={{ borderColor: "var(--primary-dark)" }}>
+          <p className="text-sm">
+            Menampilkan {filteredTxs.length === 0 ? "0 transaksi" : `${filteredTxs.length} transaksi`} terkait mutasi/penyesuaian stok dari Inventory.
+            {filteredTxs.length === 0 && " Kemungkinan mutasi ini tidak berdampak nilai (tidak ada jurnal yang diposting)."}
+          </p>
+          <button type="button" className="btn btn-outline text-xs" onClick={clearRefFilter}>
+            Tampilkan semua transaksi
+          </button>
         </div>
       )}
 
