@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import api, { fmtRp, fmtDate } from "@/lib/api";
 import { useAuth, can } from "@/lib/auth";
 import {
@@ -796,10 +796,10 @@ export default function Inventory() {
           <div className="card p-0 overflow-hidden">
             <TableShell minWidth={720}>
             <table className="tbl">
-              <thead><tr><th>Tanggal</th><th>SKU</th><th>Produk</th><th className="num">Delta</th><th>Alasan</th><th>Catatan</th>{canWrite && <th />}</tr></thead>
+              <thead><tr><th>Tanggal</th><th>SKU</th><th>Produk</th><th className="num">Delta</th><th>Alasan</th><th>Catatan</th><th>Ref</th>{canWrite && <th />}</tr></thead>
               <tbody>
                 {adjustments.length === 0 ? (
-                  <tr><td colSpan={canWrite ? 7 : 6} className="text-center py-8" style={{ color: "var(--text-muted)" }}>Belum ada penyesuaian.</td></tr>
+                  <tr><td colSpan={canWrite ? 8 : 7} className="text-center py-8" style={{ color: "var(--text-muted)" }}>Belum ada penyesuaian.</td></tr>
                 ) : adjustments.map((a) => (
                   <tr key={a.id}>
                     <td>{fmtDate(a.adjustment_date)}</td>
@@ -808,6 +808,15 @@ export default function Inventory() {
                     <td className="num">{a.quantity_delta > 0 ? `+${a.quantity_delta}` : a.quantity_delta}</td>
                     <td><span className="badge">{a.reason}</span></td>
                     <td>{a.notes || "-"}</td>
+                    <td className="text-xs">
+                      <Link
+                        to={`/transactions?reference=${encodeURIComponent(a.id)}`}
+                        className="underline"
+                        style={{ color: "var(--primary-dark)" }}
+                      >
+                        Lihat transaksi
+                      </Link>
+                    </td>
                     {canWrite && (
                       <td>
                         <button type="button" className="btn btn-outline text-xs" onClick={() => cancelAdjustment(a.id)}>
@@ -1065,7 +1074,19 @@ function MovementTable({ rows, onCancel }) {
               <td className="num">{m.quantity}</td>
               <td className="num">{fmtRp(Number(m.total_value))}</td>
               <td><span className="badge">{m.finance_status}</span></td>
-              <td className="text-xs">{m.reference}</td>
+              <td className="text-xs">
+                {m.reference ? (
+                  <Link
+                    to={`/transactions?reference=${encodeURIComponent(m.id)}`}
+                    className="underline"
+                    style={{ color: "var(--primary-dark)" }}
+                  >
+                    Lihat transaksi
+                  </Link>
+                ) : (
+                  "-"
+                )}
+              </td>
               {onCancel && (
                 <td>
                   {m.finance_status !== "cancelled" && (
