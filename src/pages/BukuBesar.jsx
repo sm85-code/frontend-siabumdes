@@ -2,8 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import api, { fmtRp, fmtDate, API } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { notify } from "@/lib/feedback";
-import { Books, MagnifyingGlass, FilePdf, FileXls } from "@phosphor-icons/react";
-import TableShell, { TableCard, TableCardField } from "@/components/TableShell";
+import { Books, MagnifyingGlass, FilePdf, FileXls, FileDoc } from "@phosphor-icons/react";
+import TableShell from "@/components/TableShell";
 
 const MONTHS = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 const YEAR_MIN = 2022, YEAR_MAX = 2030;
@@ -69,6 +69,7 @@ export default function BukuBesar() {
 
   const downloadPdf = async () => download("pdf");
   const downloadExcel = async () => download("excel");
+  const downloadWord = async () => download("word");
   const download = async (kind) => {
     if (!selected) return;
     const p = new URLSearchParams({ account_code: selected, start_date: startDate, end_date: endDate });
@@ -80,7 +81,7 @@ export default function BukuBesar() {
     const blob = await res.blob();
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    const ext = kind === "pdf" ? "pdf" : "xlsx";
+    const ext = kind === "pdf" ? "pdf" : kind === "word" ? "docx" : "xlsx";
     a.href = url; a.download = `Buku-Besar_${group}_${selected}_${startDate}_sd_${endDate}.${ext}`; a.click();
     URL.revokeObjectURL(url);
   };
@@ -230,42 +231,17 @@ export default function BukuBesar() {
                     <button data-testid="btn-ledger-excel" onClick={downloadExcel} className="btn btn-outline">
                       <FileXls size={16} weight="duotone" color="var(--primary-dark)" /> Export Excel
                     </button>
+                    <button data-testid="btn-ledger-word" onClick={downloadWord} className="btn btn-outline">
+                      <FileDoc size={16} weight="duotone" color="#2b579a" /> Export Word
+                    </button>
                   </div>
                 </div>
               </div>
               <TableShell
                 minWidth={760}
                 data-testid="ledger-table"
-                mobileCards={(
-                  <>
-                    <TableCard title="Saldo Awal" subtitle="Awal periode">
-                      <TableCardField label="Saldo" emphasize>{fmtRp(ledger.saldo_awal)}</TableCardField>
-                    </TableCard>
-                    {ledger.entries.length === 0 ? (
-                      <p className="text-sm text-center py-6" style={{ color: "var(--text-muted)" }}>
-                        Tidak ada transaksi pada periode ini.
-                      </p>
-                    ) : ledger.entries.map((e) => (
-                      <TableCard key={e.id} title={fmtDate(e.date)} subtitle={e.description}>
-                        <TableCardField label="Akun lawan">
-                          <span className="font-mono text-xs">{e.other_account_code}</span>
-                          {e.other_account_name ? <span className="block text-xs" style={{ color: "var(--text-muted)" }}>{e.other_account_name}</span> : null}
-                        </TableCardField>
-                        <TableCardField label="Ref.">{e.reference || "-"}</TableCardField>
-                        <TableCardField label="Debit">{e.debit ? fmtRp(e.debit) : "-"}</TableCardField>
-                        <TableCardField label="Kredit">{e.credit ? fmtRp(e.credit) : "-"}</TableCardField>
-                        <TableCardField label="Saldo" emphasize>{fmtRp(e.balance)}</TableCardField>
-                      </TableCard>
-                    ))}
-                    <TableCard title="Total periode">
-                      <TableCardField label="Debit" emphasize>{fmtRp(ledger.total_debit)}</TableCardField>
-                      <TableCardField label="Kredit" emphasize>{fmtRp(ledger.total_credit)}</TableCardField>
-                      <TableCardField label="Saldo akhir" emphasize>{fmtRp(ledger.saldo_akhir)}</TableCardField>
-                    </TableCard>
-                  </>
-                )}
               >
-                <table className="tbl" data-testid="ledger-table">
+                <table className="tbl tbl-compact-mobile" data-testid="ledger-table">
                   <thead>
                     <tr>
                       <th>Tanggal</th>

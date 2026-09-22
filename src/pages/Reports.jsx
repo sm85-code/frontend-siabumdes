@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import api, { fmtRp, API } from "@/lib/api";
+import api, { fmtRp, fmtDate, API } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { notify } from "@/lib/feedback";
 import { useConfirm } from "@/components/ConfirmProvider";
-import { FilePdf, FileXls, ChartLine, Scales, Coins, TrendUp, BookOpen, Lock } from "@phosphor-icons/react";
+import { FilePdf, FileXls, FileDoc, ChartLine, Scales, Coins, TrendUp, BookOpen, Lock } from "@phosphor-icons/react";
 
 const MONTHS = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 const YEAR_MIN = 2022, YEAR_MAX = 2030;
@@ -127,7 +127,8 @@ export default function Reports() {
       : { as_of_date: end });
     if (activeUnitId) params.set("unit_usaha_id", activeUnitId);
     const urlPath = `${API}/reports/${cfg.key}/${kind}?${params}`;
-    const filename = `${cfg.key}_${groupKey}.${kind === "pdf" ? "pdf" : "xlsx"}`;
+    const ext = kind === "pdf" ? "pdf" : kind === "word" ? "docx" : "xlsx";
+    const filename = `${cfg.key}_${groupKey}.${ext}`;
     const res = await fetch(urlPath, { credentials: "include" });
     if (!res.ok) { notify(`Gagal export ${kind.toUpperCase()}`); return; }
     const blob = await res.blob();
@@ -228,6 +229,9 @@ export default function Reports() {
               </button>
               <button data-testid="btn-export-excel" onClick={() => download("excel")} className="btn btn-outline">
                 <FileXls size={16} weight="duotone" color="var(--primary-dark)" /> Export Excel
+              </button>
+              <button data-testid="btn-export-word" onClick={() => download("word")} className="btn btn-outline">
+                <FileDoc size={16} weight="duotone" color="#2b579a" /> Export Word
               </button>
             </div>
           </div>
@@ -396,40 +400,56 @@ function ReportBody({ active, data }) {
   }
   if (active === "perubahan-ekuitas") {
     const row = (item) => item.kind === "section" ? (
-      <tr key={item.no} style={{ background: "var(--total-row-bg)", fontWeight: 700 }}><td>{item.no}</td><td>{item.label}</td><td></td></tr>
+      <tr key={item.no} style={{ background: "var(--total-row-bg)", fontWeight: 700 }}>
+        <td>{item.no}</td><td colSpan={2} className="uppercase tracking-wide" style={{ paddingLeft: 12 + (item.indent || 0) * 20 }}>{item.label}</td>
+      </tr>
     ) : (
       <tr key={item.no} style={item.bold ? { background: "var(--primary-light)", fontWeight: 700 } : undefined}>
-        <td>{item.no}</td><td style={{ paddingLeft: 12 + (item.indent || 0) * 20 }}>{item.label}</td><td className="num">{fmtRp(item.amount)}</td>
+        <td>{item.no}</td>
+        <td className="max-w-xs" style={{ paddingLeft: 12 + (item.indent || 0) * 20 }}>{item.label}</td>
+        <td className="num">{fmtRp(item.amount)}</td>
       </tr>
     );
-    return <table className="tbl" style={{ minWidth: 620 }}><thead><tr><th>No.</th><th>Uraian</th><th className="num">Jumlah (Rp)</th></tr></thead><tbody>{data.rows.map(row)}</tbody></table>;
+    return <table className="tbl tbl-compact-mobile" style={{ minWidth: 620 }}><thead><tr><th>No.</th><th>Uraian</th><th className="num">Jumlah (Rp)</th></tr></thead><tbody>{data.rows.map(row)}</tbody></table>;
   }
   if (active === "calk") {
+    const INFO_LABELS = { nama: "Nama Entitas", periode_awal: "Periode Awal", periode_akhir: "Periode Akhir" };
+    const RINGKASAN_LABELS = {
+      total_pendapatan: "Total Pendapatan", total_beban: "Total Beban", laba_bersih: "Laba Bersih",
+      total_aset: "Total Aset", total_kewajiban: "Total Kewajiban", total_ekuitas: "Total Ekuitas",
+      arus_kas_bersih: "Arus Kas Bersih",
+    };
+    const titleCase = (s) => s.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+    const fmtInfoValue = (k, v) => (k === "periode_awal" || k === "periode_akhir") ? fmtDate(v) : v;
     return (
-      <div className="space-y-5 text-sm">
+      <div className="space-y-6 text-sm leading-relaxed">
         <section>
           <h4 className="font-heading font-semibold mb-2">1. Informasi Umum</h4>
-          <ul className="space-y-1">
-            {Object.entries(data.informasi_umum).map(([k, v]) => (
-              <li key={k}>• <b>{k.replace(/_/g, " ")}</b>: {v}</li>
-            ))}
-          </ul>
+          <table className="tbl" style={{ minWidth: 320 }}>
+            <tbody>
+              {Object.entries(data.informasi_umum).map(([k, v]) => (
+                <tr key={k}><td style={{ width: "45%" }}>{INFO_LABELS[k] || titleCase(k)}</td><td>{fmtInfoValue(k, v)}</td></tr>
+              ))}
+            </tbody>
+          </table>
         </section>
         <section>
           <h4 className="font-heading font-semibold mb-2">2. Ringkasan Kinerja</h4>
-          <table className="tbl">
+          <table className="tbl" style={{ minWidth: 320 }}>
             <tbody>
               {Object.entries(data.ringkasan_kinerja).map(([k, v]) => (
-                <tr key={k}><td>{k.replace(/_/g, " ")}</td><td className="num">{fmtRp(v)}</td></tr>
+                <tr key={k}><td>{RINGKASAN_LABELS[k] || titleCase(k)}</td><td className="num">{fmtRp(v)}</td></tr>
               ))}
             </tbody>
           </table>
         </section>
         <section>
           <h4 className="font-heading font-semibold mb-2">3. Kebijakan Akuntansi</h4>
-          <ul className="space-y-1">
-            {data.kebijakan_akuntansi.map((k) => <li key={k}>• {k}</li>)}
-          </ul>
+          <div className="space-y-3">
+            {data.kebijakan_akuntansi.map((k, i) => (
+              <p key={i} className="text-justify" style={{ color: "var(--text-primary)" }}>{k}</p>
+            ))}
+          </div>
         </section>
       </div>
     );

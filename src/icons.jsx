@@ -52,6 +52,7 @@ import {
   Users as LuUsersFlat,
   Wallet as LuWallet,
   HandCoins as LuHandCoins,
+  FileType2 as LuFileType2,
 } from "lucide-react";
 
 function wrap(Icon) {
@@ -100,6 +101,7 @@ export const Paperclip = wrap(LuPaperclip);
 export const LinkSimple = wrap(LuLink);
 export const GoogleDriveLogo = wrap(LuCloud);
 export const FilePdf = wrap(LuFileText);
+export const FileDoc = wrap(LuFileType2);
 export const Scales = wrap(LuScale);
 export const Coins = wrap(LuCoins);
 export const BookOpen = wrap(LuBookOpen);
