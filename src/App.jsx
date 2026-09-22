@@ -34,7 +34,7 @@ function LazyPage({ children }) {
 
 const ROLES_REPORTS = ["admin", "direktur", "bendahara", "pengelola", "pengawas", "penasihat"];
 const ROLES_LEDGER = ["admin", "direktur", "bendahara", "pengelola", "pengawas", "penasihat"];
-const ROLES_COA = ["admin", "direktur", "bendahara", "pengawas", "penasihat"];
+const ROLES_COA = ["admin"];
 const ROLES_USERS = ["admin"];
 const ROLES_INVENTORY = ["admin", "direktur", "bendahara", "pengelola"];
 

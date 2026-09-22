@@ -7,7 +7,6 @@ import {
   BookOpenText, SignOut, List, X, Books, UserCircle, Package,
 } from "@phosphor-icons/react";
 
-const READ_ONLY = ["admin", "direktur", "bendahara", "pengawas", "penasihat"];
 const READ_MOST = ["admin", "direktur", "bendahara", "pengelola", "pengawas", "penasihat"];
 const INK = "#14353A";
 
@@ -16,7 +15,7 @@ const NAV = [
   { to: "/transactions", label: "Transaksi", icon: Receipt, roles: READ_MOST },
   { to: "/reports", label: "Laporan Keuangan", icon: ChartLine, roles: READ_MOST },
   { to: "/ledger", label: "Buku Besar", icon: BookOpenText, roles: READ_MOST },
-  { to: "/accounts", label: "Kode Akun (COA)", icon: Books, roles: READ_ONLY },
+  { to: "/accounts", label: "Kode Akun (COA)", icon: Books, roles: ["admin"] },
   { to: "/inventory", label: "Inventory", icon: Package, roles: ["admin", "direktur", "bendahara", "pengelola"], uu05Only: true },
   { to: "/users", label: "Kelola Pengguna", icon: UsersThree, roles: ["admin"] },
   { to: "/profile", label: "Profil Saya", icon: UserCircle, roles: READ_MOST },
