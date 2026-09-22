@@ -161,7 +161,7 @@ export default function UsersPage() {
       {showResetFor && (
         <div className="card fade-in" data-testid="reset-pw-form">
           <h3 className="font-heading text-lg font-semibold mb-4 flex items-center gap-2">
-            <Key size={20} weight="duotone" color="#2E4F7C" /> Reset Password
+            <Key size={20} weight="duotone" color="var(--primary-dark)" /> Reset Password
           </h3>
           <form onSubmit={resetPw} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="sm:col-span-2">
@@ -190,7 +190,7 @@ export default function UsersPage() {
             <div className="flex items-start justify-between gap-2 mb-4">
               <div>
                 <h3 className="font-heading text-lg font-semibold flex items-center gap-2">
-                  <Lock size={20} weight="duotone" color="#8A4141" /> Kunci Periode Transaksi
+                  <Lock size={20} weight="duotone" color="var(--status-error)" /> Kunci Periode Transaksi
                 </h3>
                 <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
                   Untuk <b>{targetUser?.name}</b>. Bulan yang dicentang akan diblokir dari input/edit/hapus transaksi.
@@ -233,9 +233,9 @@ export default function UsersPage() {
                                   onClick={() => togglePeriod(ym)}
                                   className="text-xs py-1.5 rounded-md transition-colors"
                                   style={{
-                                    background: blocked ? "#8A4141" : "white",
+                                    background: blocked ? "var(--status-error)" : "white",
                                     color: blocked ? "white" : "var(--text-primary)",
-                                    border: `1px solid ${blocked ? "#8A4141" : "var(--border)"}`,
+                                    border: `1px solid ${blocked ? "var(--status-error)" : "var(--border)"}`,
                                     fontWeight: blocked ? 600 : 400,
                                   }}>
                             {mn}
@@ -267,17 +267,17 @@ export default function UsersPage() {
                     {u.role !== "admin" && (
                       <button data-testid={`btn-lock-${u.id}`} onClick={() => openLock(u)}
                               className="p-1.5 rounded-md hover:bg-red-50" title="Kunci Periode">
-                        <Lock size={16} color="#8A4141" />
+                        <Lock size={16} color="var(--status-error)" />
                       </button>
                     )}
                     <button data-testid={`btn-reset-${u.id}`} onClick={() => setShowResetFor(u.id)}
                             className="p-1.5 rounded-md hover:bg-yellow-50" title="Reset Password">
-                      <Key size={16} color="#4C86C4" />
+                      <Key size={16} color="var(--primary)" />
                     </button>
                     {u.id !== user.id && (
                       <button data-testid={`btn-del-${u.id}`} onClick={() => del(u.id)}
                               className="p-1.5 rounded-md hover:bg-red-50" title="Hapus">
-                        <Trash size={16} color="#D97878" />
+                        <Trash size={16} color="var(--status-error)" />
                       </button>
                     )}
                   </div>
@@ -330,17 +330,17 @@ export default function UsersPage() {
                         {u.role !== "admin" && (
                           <button data-testid={`btn-lock-${u.id}`} onClick={() => openLock(u)}
                                   className="p-1.5 rounded-md hover:bg-red-50" title="Kunci Periode">
-                            <Lock size={16} color="#8A4141" />
+                            <Lock size={16} color="var(--status-error)" />
                           </button>
                         )}
                         <button data-testid={`btn-reset-${u.id}`} onClick={() => setShowResetFor(u.id)}
                                 className="p-1.5 rounded-md hover:bg-yellow-50" title="Reset Password">
-                          <Key size={16} color="#4C86C4" />
+                          <Key size={16} color="var(--primary)" />
                         </button>
                         {u.id !== user.id && (
                           <button data-testid={`btn-del-${u.id}`} onClick={() => del(u.id)}
                                   className="p-1.5 rounded-md hover:bg-red-50" title="Hapus">
-                            <Trash size={16} color="#D97878" />
+                            <Trash size={16} color="var(--status-error)" />
                           </button>
                         )}
                       </div>

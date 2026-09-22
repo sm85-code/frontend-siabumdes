@@ -365,7 +365,7 @@ export default function COAPage() {
               Akun ini akan disimpan pada kelompok <b>{group}</b>.
             </p>
             {accErr && <div className="sm:col-span-2 text-sm p-3 rounded-lg"
-                            style={{ background: "#FDECEA", color: "#8A4141", border: "1px solid #f5c6c1" }}>{accErr}</div>}
+                            style={{ background: "var(--status-error-bg)", color: "var(--status-error)", border: "1px solid var(--status-error-border)" }}>{accErr}</div>}
             <div className="sm:col-span-2 flex justify-end gap-2 pt-2">
               <button type="button" onClick={() => setShowAcc(false)} className="btn btn-outline">Batal</button>
               <button data-testid="acc-save" className="btn btn-primary">Simpan</button>
@@ -385,10 +385,10 @@ export default function COAPage() {
       <div className="card p-0 overflow-hidden">
         <TableShell minWidth={720}>
         {isAdmin && selAcc.size > 0 && (
-          <div className="p-3 flex justify-between items-center" style={{ background: "#FDECEA", borderBottom: "1px solid #f5c6c1" }}>
-            <span className="text-sm" style={{ color: "#8A4141" }}>{selAcc.size} akun terpilih</span>
+          <div className="p-3 flex justify-between items-center" style={{ background: "var(--status-error-bg)", borderBottom: "1px solid var(--status-error-border)" }}>
+            <span className="text-sm" style={{ color: "var(--status-error)" }}>{selAcc.size} akun terpilih</span>
             <button data-testid="bulk-del-acc" onClick={bulkDelAcc} className="btn text-xs"
-                    style={{ background: "#D97878", color: "white" }}>
+                    style={{ background: "var(--status-error)", color: "white" }}>
               <Trash size={14} /> Hapus Terpilih
             </button>
           </div>
@@ -442,11 +442,11 @@ export default function COAPage() {
                     <div className="flex gap-1">
                       <button data-testid={`edit-acc-${a.code}`} onClick={() => openEditAcc(a)}
                               className="p-1.5 rounded-md hover:bg-yellow-50" title="Edit">
-                        <Pencil size={16} color="#4C86C4" />
+                        <Pencil size={16} color="var(--primary)" />
                       </button>
                       <button data-testid={`del-acc-${a.code}`} onClick={() => delAcc(a.code)}
                               className="p-1.5 rounded-md hover:bg-red-50" title="Hapus">
-                        <Trash size={16} color="#D97878" />
+                        <Trash size={16} color="var(--status-error)" />
                       </button>
                     </div>
                   </td>
@@ -513,7 +513,7 @@ export default function COAPage() {
               Jenis transaksi ini akan disimpan pada kelompok <b>{group}</b>.
             </p>
             {ttErr && <div className="sm:col-span-2 text-sm p-3 rounded-lg"
-                           style={{ background: "#FDECEA", color: "#8A4141" }}>{ttErr}</div>}
+                           style={{ background: "var(--status-error-bg)", color: "var(--status-error)" }}>{ttErr}</div>}
             <div className="sm:col-span-2 flex justify-end gap-2 pt-2">
               <button type="button" onClick={() => setShowTT(false)} className="btn btn-outline">Batal</button>
               <button data-testid="tt-save" className="btn btn-primary">Simpan</button>
@@ -525,10 +525,10 @@ export default function COAPage() {
       <div className="card p-0 overflow-hidden">
         <TableShell minWidth={720}>
         {isAdmin && selTT.size > 0 && (
-          <div className="p-3 flex justify-between items-center" style={{ background: "#FDECEA", borderBottom: "1px solid #f5c6c1" }}>
-            <span className="text-sm" style={{ color: "#8A4141" }}>{selTT.size} jenis transaksi terpilih</span>
+          <div className="p-3 flex justify-between items-center" style={{ background: "var(--status-error-bg)", borderBottom: "1px solid var(--status-error-border)" }}>
+            <span className="text-sm" style={{ color: "var(--status-error)" }}>{selTT.size} jenis transaksi terpilih</span>
             <button data-testid="bulk-del-tt" onClick={bulkDelTT} className="btn text-xs"
-                    style={{ background: "#D97878", color: "white" }}>
+                    style={{ background: "var(--status-error)", color: "white" }}>
               <Trash size={14} /> Hapus Terpilih
             </button>
           </div>
@@ -579,11 +579,11 @@ export default function COAPage() {
                     <div className="flex gap-1">
                       <button data-testid={`edit-tt-${t.code}`} onClick={() => openEditTT(t)}
                               className="p-1.5 rounded-md hover:bg-yellow-50" title="Edit">
-                        <Pencil size={16} color="#4C86C4" />
+                        <Pencil size={16} color="var(--primary)" />
                       </button>
                       <button data-testid={`del-tt-${t.code}`} onClick={() => delTT(t.code)}
                               className="p-1.5 rounded-md hover:bg-red-50" title="Hapus">
-                        <Trash size={16} color="#D97878" />
+                        <Trash size={16} color="var(--status-error)" />
                       </button>
                     </div>
                   </td>

@@ -8,10 +8,11 @@ import {
 } from "recharts";
 import { TrendUp, TrendDown, Coin, Storefront, ReceiptX, CalendarBlank, Lock } from "@phosphor-icons/react";
 
-const INK = "#1E4A5A";
-const TEAL = "#3BA8C4";
-const COLORS = ["#1E4A5A", "#3BA8C4", "#6BB8CC", "#8A9AA4", "#5B7380", "#2C3E4A"];
-const TOOLTIP_STYLE = { background: "#E6EDF3", border: 0, borderRadius: 16, boxShadow: "8px 8px 16px #c5d0db, -8px -8px 16px #fff" };
+const INK = "#14353A"; // --primary-dark
+const TEAL = "#1C8A8A"; // --primary
+const GRID_STROKE = "#E3E8E6"; // --border
+const COLORS = ["#1C8A8A", "#14353A", "#C9A227", "#C45C6A", "#5AA9A3", "#8A969A"];
+const TOOLTIP_STYLE = { background: "#FFFFFF", border: "1px solid #E3E8E6", borderRadius: 12, boxShadow: "0 1px 2px rgba(20, 53, 58, 0.05), 0 8px 24px rgba(20, 53, 58, 0.04)" };
 const PIE_LEGEND_STYLE = { fontSize: 11 };
 const yTickFormatter = (v) => (v >= 1e6 ? `${(v/1e6).toFixed(1)}Jt` : v >= 1e3 ? `${(v/1e3).toFixed(0)}rb` : v);
 
@@ -275,7 +276,7 @@ export default function Dashboard() {
             <ResponsiveContainer width="99%" height={280}>
               {useBar ? (
                 <BarChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#d3dde4" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE} vertical={false} />
                   <XAxis dataKey="month" tick={{ fontSize: 11 }} />
                   <YAxis tick={{ fontSize: 11 }} tickFormatter={yTickFormatter} />
                   <Tooltip formatter={(v) => fmtRp(v)} contentStyle={TOOLTIP_STYLE} />
@@ -285,7 +286,7 @@ export default function Dashboard() {
                 </BarChart>
               ) : (
                 <LineChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#d3dde4" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE} vertical={false} />
                   <XAxis dataKey="month" tick={{ fontSize: 11 }} />
                   <YAxis tick={{ fontSize: 11 }} tickFormatter={yTickFormatter} />
                   <Tooltip formatter={(v) => fmtRp(v)} contentStyle={TOOLTIP_STYLE} />

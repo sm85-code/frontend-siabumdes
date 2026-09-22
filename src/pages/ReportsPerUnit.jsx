@@ -40,8 +40,8 @@ export default function ReportsPerUnit() {
         <div><label className="label">Sampai</label><input type="date" className="input" value={end} onChange={(e) => setEnd(e.target.value)} /></div>
         <div className="flex gap-2">
           <button onClick={load} className="btn btn-primary flex-1">Terapkan</button>
-          <button data-testid="btn-per-unit-pdf" onClick={() => download("pdf")} className="btn btn-outline"><FilePdf size={16} color="#D97878" /> PDF</button>
-          <button data-testid="btn-per-unit-excel" onClick={() => download("excel")} className="btn btn-outline"><FileXls size={16} color="#2E4F7C" /> Excel</button>
+          <button data-testid="btn-per-unit-pdf" onClick={() => download("pdf")} className="btn btn-outline"><FilePdf size={16} color="var(--status-error)" /> PDF</button>
+          <button data-testid="btn-per-unit-excel" onClick={() => download("excel")} className="btn btn-outline"><FileXls size={16} color="var(--primary-dark)" /> Excel</button>
         </div>
       </div>
       {data && (
@@ -62,9 +62,9 @@ export default function ReportsPerUnit() {
                   <td className="font-medium">{u.name}</td>
                   <td className="num">{fmtRp(u.pendapatan)}</td>
                   <td className="num">{fmtRp(u.beban)}</td>
-                  <td className="num font-semibold" style={{ color: u.laba_bersih >= 0 ? "#2E4F7C" : "#D97878" }}>{fmtRp(u.laba_bersih)}</td>
-                  <td className="num" style={{ color: "#2E4F7C" }}>{fmtRp(u.share_pengelola_30)}</td>
-                  <td className="num" style={{ color: "#3A5A7D" }}>{fmtRp(u.share_bumdes_70)}</td>
+                  <td className="num font-semibold" style={{ color: u.laba_bersih >= 0 ? "var(--primary-dark)" : "var(--status-error)" }}>{fmtRp(u.laba_bersih)}</td>
+                  <td className="num" style={{ color: "var(--primary-dark)" }}>{fmtRp(u.share_pengelola_30)}</td>
+                  <td className="num" style={{ color: "var(--primary-dark)" }}>{fmtRp(u.share_bumdes_70)}</td>
                 </tr>
               ))}
             </tbody>

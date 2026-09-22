@@ -112,7 +112,7 @@ export default function BukuBesar() {
       <div>
         <p className="label mb-1">GENERAL LEDGER</p>
         <h1 className="font-heading text-3xl font-bold flex items-center gap-2 page-h1">
-          <Books size={26} weight="duotone" color="#2E4F7C" /> Buku Besar per Akun
+          <Books size={26} weight="duotone" color="var(--primary-dark)" /> Buku Besar per Akun
         </h1>
         <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
           Tiap kelompok punya buku besar sendiri. Pilih tab kelompok terlebih dahulu, lalu klik akun untuk melihat riwayat transaksinya.
@@ -156,7 +156,7 @@ export default function BukuBesar() {
         <div className="sm:col-span-3">
           <label className="label" htmlFor="ledger-search">Cari Akun</label>
           <div className="relative">
-            <MagnifyingGlass size={16} aria-hidden="true" className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" color="#8E88A5" />
+            <MagnifyingGlass size={16} aria-hidden="true" className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" color="var(--text-muted)" />
             <input id="ledger-search" data-testid="ledger-search" className="input pl-10"
                    placeholder="Cari berdasarkan kode atau nama akun"
                    value={search} onChange={(e) => setSearch(e.target.value)} />
@@ -167,7 +167,7 @@ export default function BukuBesar() {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Left: list akun */}
         <div className="card p-0 overflow-hidden lg:col-span-1" style={{ maxHeight: 600, overflowY: "auto" }}>
-          <div className="p-4" style={{ borderBottom: "1px solid var(--border)", background: "#F6FAFE" }}>
+          <div className="p-4" style={{ borderBottom: "1px solid var(--border)", background: "var(--primary-light)" }}>
             <p className="label mb-0">Akun {group} ({filteredAccounts.length})</p>
           </div>
           <ul data-testid="ledger-account-list">
@@ -186,8 +186,8 @@ export default function BukuBesar() {
                             background: active ? "var(--primary-light)" : "transparent",
                             borderColor: "var(--border)",
                           }}>
-                    <div className="font-mono text-xs font-semibold" style={{ color: active ? "#2E4F7C" : "var(--text-secondary)" }}>{a.code}</div>
-                    <div className="text-sm" style={{ color: active ? "#1A2E1E" : "var(--text-primary)" }}>{a.name}</div>
+                    <div className="font-mono text-xs font-semibold" style={{ color: active ? "var(--primary-dark)" : "var(--text-secondary)" }}>{a.code}</div>
+                    <div className="text-sm" style={{ color: active ? "var(--primary-dark)" : "var(--text-primary)" }}>{a.name}</div>
                   </button>
                 </li>
               );
@@ -199,7 +199,7 @@ export default function BukuBesar() {
         <div className="lg:col-span-3">
           {!selected ? (
             <div className="card text-center py-16">
-              <Books size={40} weight="duotone" color="#8E88A5" style={{ margin: "0 auto 12px" }} />
+              <Books size={40} weight="duotone" color="var(--text-muted)" style={{ margin: "0 auto 12px" }} />
               <p style={{ color: "var(--text-muted)" }}>Pilih akun di sebelah kiri untuk melihat buku besar <b>{group}</b>.</p>
             </div>
           ) : loading ? (
@@ -220,15 +220,15 @@ export default function BukuBesar() {
                   <div className="flex items-start gap-3 flex-wrap">
                     <div className="text-right">
                       <div className="label">Saldo Akhir</div>
-                      <div className="font-heading text-xl font-bold" style={{ color: "#2E4F7C" }} data-testid="ledger-final-balance">
+                      <div className="font-heading text-xl font-bold" style={{ color: "var(--primary-dark)" }} data-testid="ledger-final-balance">
                         {fmtRp(ledger.saldo_akhir)}
                       </div>
                     </div>
                     <button data-testid="btn-ledger-pdf" onClick={downloadPdf} className="btn btn-outline">
-                      <FilePdf size={16} weight="duotone" color="#D97878" /> Export PDF
+                      <FilePdf size={16} weight="duotone" color="var(--status-error)" /> Export PDF
                     </button>
                     <button data-testid="btn-ledger-excel" onClick={downloadExcel} className="btn btn-outline">
-                      <FileXls size={16} weight="duotone" color="#2E4F7C" /> Export Excel
+                      <FileXls size={16} weight="duotone" color="var(--primary-dark)" /> Export Excel
                     </button>
                   </div>
                 </div>
@@ -278,7 +278,7 @@ export default function BukuBesar() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr style={{ background: "#EEF3F9" }}>
+                    <tr style={{ background: "var(--primary-light)" }}>
                       <td colSpan={6} className="font-semibold">Saldo Awal</td>
                       <td className="num font-semibold">{fmtRp(ledger.saldo_awal)}</td>
                     </tr>
@@ -300,8 +300,8 @@ export default function BukuBesar() {
                         <td className="num font-semibold tabular-nums">{fmtRp(e.balance)}</td>
                       </tr>
                     ))}
-                    <tr style={{ background: "#DCE8FE" }}>
-                      <td colSpan={4} className="font-bold" style={{ color: "#2E4F7C" }}>TOTAL PERIODE</td>
+                    <tr style={{ background: "var(--total-row-bg)" }}>
+                      <td colSpan={4} className="font-bold" style={{ color: "var(--primary-dark)" }}>TOTAL PERIODE</td>
                       <td className="num font-bold">{fmtRp(ledger.total_debit)}</td>
                       <td className="num font-bold">{fmtRp(ledger.total_credit)}</td>
                       <td className="num font-bold">{fmtRp(ledger.saldo_akhir)}</td>

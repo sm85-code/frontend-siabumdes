@@ -224,10 +224,10 @@ export default function Reports() {
             </h3>
             <div className="flex gap-2">
               <button data-testid="btn-export-pdf" onClick={() => download("pdf")} className="btn btn-outline">
-                <FilePdf size={16} weight="duotone" color="#D97878" /> Export PDF
+                <FilePdf size={16} weight="duotone" color="var(--status-error)" /> Export PDF
               </button>
               <button data-testid="btn-export-excel" onClick={() => download("excel")} className="btn btn-outline">
-                <FileXls size={16} weight="duotone" color="#2E4F7C" /> Export Excel
+                <FileXls size={16} weight="duotone" color="var(--primary-dark)" /> Export Excel
               </button>
             </div>
           </div>
@@ -237,31 +237,31 @@ export default function Reports() {
           {/* Alokasi Bagi Hasil Unit (30/70) */}
           {active === "laba-rugi" && activeUnitId && (
             <div className="mt-6 p-4 rounded-lg" data-testid="bagi-hasil-info"
-                 style={{ background: "#EEF3F9", border: "1px solid var(--border)" }}>
-              <h4 className="font-heading font-semibold mb-2" style={{ color: "#2E4F7C" }}>
+                 style={{ background: "var(--primary-light)", border: "1px solid var(--border)" }}>
+              <h4 className="font-heading font-semibold mb-2" style={{ color: "var(--primary-dark)" }}>
                 Alokasi Bagi Hasil Unit Usaha {groupKey}:
               </h4>
               <ol className="text-sm space-y-1 ml-5" style={{ listStyleType: "decimal" }}>
-                <li>Pengelola Unit (30%) = <b style={{ color: "#2E4F7C" }} data-testid="share-pengelola">{fmtRp(Math.round((data.laba_bersih || 0) * 0.30))}</b></li>
-                <li>BUMDES (70%) = <b style={{ color: "#3A5A7D" }} data-testid="share-bumdes">{fmtRp(Math.round((data.laba_bersih || 0) * 0.70))}</b></li>
+                <li>Pengelola Unit (30%) = <b style={{ color: "var(--primary)" }} data-testid="share-pengelola">{fmtRp(Math.round((data.laba_bersih || 0) * 0.30))}</b></li>
+                <li>BUMDES (70%) = <b style={{ color: "var(--primary-dark)" }} data-testid="share-bumdes">{fmtRp(Math.round((data.laba_bersih || 0) * 0.70))}</b></li>
               </ol>
             </div>
           )}
           {/* Alokasi Bagi Hasil BUMDES 6-way (untuk Laba Rugi BUMDES) */}
           {active === "laba-rugi" && !activeUnitId && !isPengelola && (
             <div className="mt-6 p-4 rounded-lg" data-testid="alokasi-bumdes-info"
-                 style={{ background: "#EEF3F9", border: "1px solid var(--border)" }}>
-              <h4 className="font-heading font-semibold mb-2" style={{ color: "#2E4F7C" }}>
+                 style={{ background: "var(--primary-light)", border: "1px solid var(--border)" }}>
+              <h4 className="font-heading font-semibold mb-2" style={{ color: "var(--primary-dark)" }}>
                 Alokasi Bagi Hasil Usaha BUMDES:
               </h4>
               <ol className="text-sm space-y-1 ml-5" style={{ listStyleType: "decimal" }}>
                 {[
-                  ["PADes", 30, "#4C86C4"],
-                  ["Modal BUMDES", 18, "#3A5A7D"],
-                  ["Penasihat", 7, "#2E4F7C"],
-                  ["Pengawas", 5, "#2E4F7C"],
-                  ["Pengurus", 35, "#8A4141"],
-                  ["Dana Sosial", 5, "#6B5F8A"],
+                  ["PADes", 30, "var(--chart-1)"],
+                  ["Modal BUMDES", 18, "var(--chart-2)"],
+                  ["Penasihat", 7, "var(--chart-3)"],
+                  ["Pengawas", 5, "var(--chart-4)"],
+                  ["Pengurus", 35, "var(--text-primary)"],
+                  ["Dana Sosial", 5, "var(--text-muted)"],
                 ].map(([label, pct, color]) => (
                   <li key={label}>{label} ({pct}%) = <b style={{ color }} data-testid={`share-${label.toLowerCase().replace(/ /g, "-")}`}>{fmtRp(Math.round((data.laba_bersih || 0) * pct / 100))}</b></li>
                 ))}
@@ -274,7 +274,7 @@ export default function Reports() {
       {tab === "tutup-buku" && isAdmin && (
         <div className="card" data-testid="close-period-card">
           <div className="flex items-center gap-2 mb-3">
-            <Lock size={20} weight="duotone" color="#8A4141" />
+            <Lock size={20} weight="duotone" color="var(--status-warning)" />
             <h3 className="font-heading font-semibold">Tutup Buku Bulanan</h3>
           </div>
           <p className="text-xs mb-3" style={{ color: "var(--text-muted)" }}>
@@ -342,13 +342,13 @@ function ReportBody({ active, data }) {
       <table className="tbl" style={{ minWidth: 480 }}>
         <thead><tr><th>Kode</th><th>Nama Akun</th><th className="num">Jumlah</th></tr></thead>
         <tbody>
-          <tr><td colSpan={3} className="font-semibold" style={{ background: "#EEF3F9" }}>PENDAPATAN</td></tr>
+          <tr><td colSpan={3} className="font-semibold" style={{ background: "var(--primary-light)" }}>PENDAPATAN</td></tr>
           {data.pendapatan.map((it) => (<tr key={it.code}><td>{it.code}</td><td>{it.name}</td><td className="num">{fmtRp(it.amount)}</td></tr>))}
           <tr><td></td><td className="font-semibold">Total Pendapatan</td><td className="num font-semibold">{fmtRp(data.total_pendapatan)}</td></tr>
-          <tr><td colSpan={3} className="font-semibold" style={{ background: "#EEF3F9" }}>BEBAN</td></tr>
+          <tr><td colSpan={3} className="font-semibold" style={{ background: "var(--primary-light)" }}>BEBAN</td></tr>
           {data.beban.map((it) => (<tr key={it.code}><td>{it.code}</td><td>{it.name}</td><td className="num">{fmtRp(it.amount)}</td></tr>))}
           <tr><td></td><td className="font-semibold">Total Beban</td><td className="num font-semibold">{fmtRp(data.total_beban)}</td></tr>
-          <tr style={{ background: "#DCE8FE" }}><td></td><td className="font-bold" style={{ color: "#2E4F7C" }}>LABA / (RUGI) BERSIH</td><td className="num font-bold" style={{ color: "#2E4F7C" }}>{fmtRp(data.laba_bersih)}</td></tr>
+          <tr style={{ background: "var(--total-row-bg)" }}><td></td><td className="font-bold" style={{ color: "var(--primary-dark)" }}>LABA / (RUGI) BERSIH</td><td className="num font-bold" style={{ color: "var(--primary-dark)" }}>{fmtRp(data.laba_bersih)}</td></tr>
         </tbody>
       </table>
     );
@@ -360,19 +360,19 @@ function ReportBody({ active, data }) {
         <table className="tbl" style={{ minWidth: 480 }}>
           <thead><tr><th>Kode</th><th>Akun</th><th className="num">Jumlah</th></tr></thead>
           <tbody>
-            <tr><td colSpan={3} className="font-semibold" style={{ background: "#EEF3F9" }}>ASET</td></tr>
+            <tr><td colSpan={3} className="font-semibold" style={{ background: "var(--primary-light)" }}>ASET</td></tr>
             {data.aset.map((it) => (<tr key={`a-${it.code}`}><td>{it.code}</td><td>{it.name}</td><td className="num">{fmtRp(it.amount)}</td></tr>))}
             <tr><td></td><td className="font-semibold">Total Aset</td><td className="num font-semibold">{fmtRp(data.total_aset)}</td></tr>
-            <tr><td colSpan={3} className="font-semibold" style={{ background: "#EEF3F9" }}>KEWAJIBAN</td></tr>
+            <tr><td colSpan={3} className="font-semibold" style={{ background: "var(--primary-light)" }}>KEWAJIBAN</td></tr>
             {data.kewajiban.map((it) => (<tr key={`k-${it.code}`}><td>{it.code}</td><td>{it.name}</td><td className="num">{fmtRp(it.amount)}</td></tr>))}
             <tr><td></td><td className="font-semibold">Total Kewajiban</td><td className="num font-semibold">{fmtRp(data.total_kewajiban)}</td></tr>
-            <tr><td colSpan={3} className="font-semibold" style={{ background: "#EEF3F9" }}>EKUITAS</td></tr>
+            <tr><td colSpan={3} className="font-semibold" style={{ background: "var(--primary-light)" }}>EKUITAS</td></tr>
             {data.ekuitas.map((it, i) => (<tr key={`e-${it.code}-${i}`}><td>{it.code}</td><td>{it.name}</td><td className="num">{fmtRp(it.amount)}</td></tr>))}
             <tr><td></td><td className="font-semibold">Total Ekuitas</td><td className="num font-semibold">{fmtRp(data.total_ekuitas)}</td></tr>
-            <tr style={{ background: "#DCE8FE" }}><td></td><td className="font-bold">TOTAL PASIVA</td><td className="num font-bold">{fmtRp(data.total_pasiva)}</td></tr>
+            <tr style={{ background: "var(--total-row-bg)" }}><td></td><td className="font-bold">TOTAL PASIVA</td><td className="num font-bold">{fmtRp(data.total_pasiva)}</td></tr>
           </tbody>
         </table>
-        <p className="text-xs mt-3" style={{ color: data.balanced ? "#2E4F7C" : "#D97878" }}>
+        <p className="text-xs mt-3" style={{ color: data.balanced ? "var(--status-success)" : "var(--status-error)" }}>
           {data.balanced ? "✓ Neraca seimbang" : "⚠ Neraca belum seimbang — periksa transaksi."}
         </p>
       </>
@@ -383,22 +383,22 @@ function ReportBody({ active, data }) {
       <table className="tbl" style={{ minWidth: 480 }}>
         <thead><tr><th>Tanggal</th><th>Keterangan</th><th className="num">Jumlah</th></tr></thead>
         <tbody>
-          <tr><td colSpan={3} className="font-semibold" style={{ background: "#EEF3F9" }}>KAS MASUK</td></tr>
+          <tr><td colSpan={3} className="font-semibold" style={{ background: "var(--primary-light)" }}>KAS MASUK</td></tr>
           {data.kas_masuk.map((it, i) => (<tr key={`m-${it.date}-${i}`}><td>{it.date}</td><td>{it.description}</td><td className="num">{fmtRp(it.amount)}</td></tr>))}
           <tr><td></td><td className="font-semibold">Total Kas Masuk</td><td className="num font-semibold">{fmtRp(data.total_masuk)}</td></tr>
-          <tr><td colSpan={3} className="font-semibold" style={{ background: "#EEF3F9" }}>KAS KELUAR</td></tr>
+          <tr><td colSpan={3} className="font-semibold" style={{ background: "var(--primary-light)" }}>KAS KELUAR</td></tr>
           {data.kas_keluar.map((it, i) => (<tr key={`k-${it.date}-${i}`}><td>{it.date}</td><td>{it.description}</td><td className="num">{fmtRp(it.amount)}</td></tr>))}
           <tr><td></td><td className="font-semibold">Total Kas Keluar</td><td className="num font-semibold">{fmtRp(data.total_keluar)}</td></tr>
-          <tr style={{ background: "#DCE8FE" }}><td></td><td className="font-bold">ARUS KAS BERSIH</td><td className="num font-bold">{fmtRp(data.arus_kas_bersih)}</td></tr>
+          <tr style={{ background: "var(--total-row-bg)" }}><td></td><td className="font-bold">ARUS KAS BERSIH</td><td className="num font-bold">{fmtRp(data.arus_kas_bersih)}</td></tr>
         </tbody>
       </table>
     );
   }
   if (active === "perubahan-ekuitas") {
     const row = (item) => item.kind === "section" ? (
-      <tr key={item.no} style={{ background: "#DCE8FE", fontWeight: 700 }}><td>{item.no}</td><td>{item.label}</td><td></td></tr>
+      <tr key={item.no} style={{ background: "var(--total-row-bg)", fontWeight: 700 }}><td>{item.no}</td><td>{item.label}</td><td></td></tr>
     ) : (
-      <tr key={item.no} style={item.bold ? { background: "#EEF3F9", fontWeight: 700 } : undefined}>
+      <tr key={item.no} style={item.bold ? { background: "var(--primary-light)", fontWeight: 700 } : undefined}>
         <td>{item.no}</td><td style={{ paddingLeft: 12 + (item.indent || 0) * 20 }}>{item.label}</td><td className="num">{fmtRp(item.amount)}</td>
       </tr>
     );

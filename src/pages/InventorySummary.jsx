@@ -6,8 +6,8 @@ import {
   PieChart, Pie, Cell, Legend, CartesianGrid,
 } from "recharts";
 
-const COLORS = ["#7BA7E1", "#A8DADC", "#E1C3F4", "#E8B872", "#DCE8FE", "#5C6E5E", "#D97878", "#9BBF8A"];
-const TOOLTIP_STYLE = { background: "white", border: "1px solid #E8EAE6", borderRadius: 8 };
+const COLORS = ["var(--chart-1)", "var(--chart-5)", "var(--chart-3)", "var(--chart-4)", "var(--chart-2)", "var(--chart-6)"];
+const TOOLTIP_STYLE = { background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8 };
 function Stat({ label, value, hint }) {
   return (
     <div className="card p-4">
@@ -126,14 +126,14 @@ export default function InventorySummary({ products = [], movements = [], valuat
           {topOut.length > 0 ? (
             <ResponsiveContainer width="99%" height={280}>
               <BarChart data={topOut} layout="vertical" margin={{ top: 4, right: 16, left: 8, bottom: 4 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#E8EAE6" horizontal={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" horizontal={false} />
                 <XAxis type="number" tick={{ fontSize: 11 }} />
                 <YAxis type="category" dataKey="name" width={110} tick={{ fontSize: 11 }} />
                 <Tooltip
                   formatter={(v, name) => (name === "qty" ? [`${v} unit`, "Qty keluar"] : [fmtRp(v), "Nilai"])}
                   contentStyle={TOOLTIP_STYLE}
                 />
-                <Bar dataKey="qty" name="qty" fill="#7BA7E1" radius={[0, 4, 4, 0]} />
+                <Bar dataKey="qty" name="qty" fill="var(--chart-1)" radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
           ) : (
@@ -225,7 +225,7 @@ export default function InventorySummary({ products = [], movements = [], valuat
                   <td className="font-medium">{p.sku}</td>
                   <td>{p.name}</td>
                   <td><span className="badge">{p.category_name || "-"}</span></td>
-                  <td className="num" style={{ color: Number(p.qty_on_hand) === 0 ? "#9B3B3B" : undefined }}>
+                  <td className="num" style={{ color: Number(p.qty_on_hand) === 0 ? "var(--status-error-strong)" : undefined }}>
                     {p.qty_on_hand}
                   </td>
                 </tr>

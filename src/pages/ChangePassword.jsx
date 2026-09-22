@@ -61,7 +61,7 @@ export default function ChangePassword() {
             <input id="confirm-password" className="input" type="password" minLength={8} required
               value={confirmation} onChange={(event) => setConfirmation(event.target.value)} />
           </div>
-          {error && <div className="text-sm p-3 rounded-lg" style={{ background: "#FDECEA", color: "#8A4141" }}>{error}</div>}
+          {error && <div className="text-sm p-3 rounded-lg" style={{ background: "var(--status-error-bg)", color: "var(--status-error)" }}>{error}</div>}
           <button className="btn btn-primary w-full" disabled={saving}>
             {saving ? "Menyimpan..." : "Simpan Password Baru"}
           </button>
