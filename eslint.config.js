@@ -10,7 +10,7 @@ export default [
   },
   js.configs.recommended,
   {
-    files: ["vite.config.mjs"],
+    files: ["vite.config.mjs", "vitest.config.mjs"],
     languageOptions: { globals: globals.node },
   },
   {

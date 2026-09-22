@@ -107,7 +107,7 @@ const DropdownMenuRadioItem = React.forwardRef(({ className, children, ...props 
     {children}
   </DropdownMenuPrimitive.RadioItem>
 ))
-DropdownMenuRadioItem.displayName = DropdownMenuRadioItem.displayName
+DropdownMenuRadioItem.displayName = DropdownMenuPrimitive.RadioItem.displayName
 
 const DropdownMenuLabel = React.forwardRef(({ className, inset, ...props }, ref) => (
   <DropdownMenuPrimitive.Label
@@ -123,7 +123,7 @@ const DropdownMenuSeparator = React.forwardRef(({ className, ...props }, ref) =>
     className={cn("-mx-1 my-1 h-px bg-[#D7E3F2]", className)}
     {...props} />
 ))
-DropdownMenuSeparator.displayName = DropdownMenuSeparator.displayName
+DropdownMenuSeparator.displayName = DropdownMenuPrimitive.Separator.displayName
 
 const DropdownMenuShortcut = ({
   className,
