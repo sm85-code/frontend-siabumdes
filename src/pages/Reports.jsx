@@ -151,18 +151,18 @@ export default function Reports() {
         </p>
       </div>
 
-      <div className="tab-strip" data-testid="reports-toplevel-tabs">
-        <button data-testid="tab-laporan" onClick={() => { setTab("laporan"); setData(null); }}
-                className={`btn ${tab === "laporan" ? "btn-primary" : "btn-outline"}`}>
-          <Scales size={16} weight={tab === "laporan" ? "fill" : "regular"} /> Laporan Keuangan
-        </button>
-        {isAdmin && (
+      {isAdmin && (
+        <div className="tab-strip" data-testid="reports-toplevel-tabs">
+          <button data-testid="tab-laporan" onClick={() => { setTab("laporan"); setData(null); }}
+                  className={`btn ${tab === "laporan" ? "btn-primary" : "btn-outline"}`}>
+            <Scales size={16} weight={tab === "laporan" ? "fill" : "regular"} /> Laporan Keuangan
+          </button>
           <button data-testid="tab-tutup-buku" onClick={() => setTab("tutup-buku")}
                   className={`btn ${tab === "tutup-buku" ? "btn-primary" : "btn-outline"}`}>
             <Lock size={16} weight={tab === "tutup-buku" ? "fill" : "regular"} /> Tutup Buku
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
       {tab === "laporan" && (
         <>
