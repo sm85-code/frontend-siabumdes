@@ -9,6 +9,7 @@ import {
 import {
   CoaSelect, KAS_ACCOUNT_CODE, PERSEDIAAN_ACCOUNT_CODE, PIUTANG_ACCOUNT_CODE,
   UTANG_ACCOUNT_CODE, PENDAPATAN_ACCOUNT_CODE, HPP_ACCOUNT_CODE,
+  PENYESUAIAN_NILAI_PERSEDIAAN_ACCOUNT_CODE, BEBAN_KERUGIAN_BARANG_ACCOUNT_CODE,
 } from "@/lib/uu05InventoryCoa";
 import InventorySummary from "@/pages/InventorySummary";
 import TableShell from "@/components/TableShell";
@@ -37,7 +38,7 @@ const TABS = [
   { id: "katalog", label: "Katalog Produk", icon: Package },
   { id: "stock-in", label: "Stock In", icon: ArrowDown },
   { id: "stock-out", label: "Stock Out", icon: ArrowUp },
-  { id: "kelola", label: "Kelola Stok", icon: SlidersHorizontal },
+  { id: "kelola", label: "Penyesuaian Stok", icon: SlidersHorizontal },
   { id: "vendor", label: "Vendor", icon: Truck },
   { id: "customer", label: "Customer", icon: Users },
   { id: "utang", label: "Utang", icon: Wallet },
@@ -59,6 +60,12 @@ const emptyStockOut = () => ({
 });
 
 const emptyPartnerForm = () => ({ id: null, name: "", contact: "", address: "" });
+
+const emptyAdjustForm = () => ({
+  product_id: "", quantity_delta: -1, reason: "rusak",
+  adjustment_date: today(), notes: "",
+  debit_account_code: PERSEDIAAN_ACCOUNT_CODE, credit_account_code: PENDAPATAN_ACCOUNT_CODE,
+});
 
 export default function Inventory() {
   const { user } = useAuth();
@@ -87,11 +94,7 @@ export default function Inventory() {
   });
   const [stockIn, setStockIn] = useState(emptyStockIn());
   const [stockOut, setStockOut] = useState(emptyStockOut());
-  const [adjust, setAdjust] = useState({
-    product_id: "", quantity_delta: -1, reason: "rusak",
-    adjustment_date: today(), notes: "",
-    debit_account_code: "", credit_account_code: "",
-  });
+  const [adjust, setAdjust] = useState(emptyAdjustForm());
   const [vendorForm, setVendorForm] = useState(emptyPartnerForm());
   const [customerForm, setCustomerForm] = useState(emptyPartnerForm());
   const [reportRange, setReportRange] = useState({ date_from: "", date_to: "" });
@@ -308,19 +311,20 @@ export default function Inventory() {
 
   const submitAdjust = async (e) => {
     e.preventDefault();
+    if (submitting) return;
+    setSubmitting(true);
     try {
       await api.post(`${BASE}/adjustments`, {
         ...adjust,
         quantity_delta: Number(adjust.quantity_delta),
         unit_usaha_id: meta?.unit_usaha_id,
       });
-      setAdjust({
-        product_id: "", quantity_delta: -1, reason: "rusak", adjustment_date: today(), notes: "",
-        debit_account_code: "", credit_account_code: "",
-      });
+      setAdjust(emptyAdjustForm());
       await Promise.all([loadCore(), loadOps()]);
     } catch (err) {
       setError(formatApiError(err));
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -728,9 +732,10 @@ export default function Inventory() {
       {tab === "kelola" && (
         <div className="space-y-4">
           <div className="card">
-            <p className="label mb-2">Penyesuaian stok</p>
+            <p className="label mb-2">Penyesuaian Stok</p>
             <p className="text-sm mb-4" style={{ color: "var(--text-muted)" }}>
-              Penyesuaian; jurnal jika HPP × |delta| lebih dari 0 (loss: Dr beban Cr Persediaan; gain: Dr Persediaan Cr offset).
+              Pengurangan stok (delta negatif) menghasilkan 2 transaksi: pengurangan fisik nilai persediaan, lalu pengakuan beban kerugian.
+              Penambahan stok (delta positif) tetap 1 jurnal dengan akun kredit/offset pilihan Anda.
             </p>
             {canWrite ? (
               <form onSubmit={submitAdjust} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -751,16 +756,39 @@ export default function Inventory() {
                     <option value="koreksi">Koreksi</option>
                   </select>
                 </div>
-                <div>
-                  <label className="label">{Number(adjust.quantity_delta) < 0 ? "Akun debit (Beban/HPP)" : "Akun debit (Persediaan)"}</label>
-                  <input required className="input" placeholder={Number(adjust.quantity_delta) < 0 ? "mis. 5.1.01" : "mis. 1.1.03"} value={adjust.debit_account_code} onChange={(e) => setAdjust({ ...adjust, debit_account_code: e.target.value })} />
-                </div>
-                <div>
-                  <label className="label">{Number(adjust.quantity_delta) < 0 ? "Akun kredit (Persediaan)" : "Akun kredit (Pendapatan/Offset)"}</label>
-                  <input required className="input" placeholder={Number(adjust.quantity_delta) < 0 ? "mis. 1.1.03" : "mis. 4.1.99"} value={adjust.credit_account_code} onChange={(e) => setAdjust({ ...adjust, credit_account_code: e.target.value })} />
-                </div>
+
+                {Number(adjust.quantity_delta) < 0 ? (
+                  <div className="sm:col-span-2 card p-3 text-sm space-y-3" style={{ background: "var(--surface-alt, #F7F5F0)" }}>
+                    <div>
+                      <p className="font-medium mb-1">Jurnal 1 — Pengurangan fisik nilai persediaan</p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <CoaSelect value={PENYESUAIAN_NILAI_PERSEDIAAN_ACCOUNT_CODE} onChange={() => {}} disabled id="adj-loss-debit-1" />
+                        <CoaSelect value={PERSEDIAAN_ACCOUNT_CODE} onChange={() => {}} disabled id="adj-loss-credit-1" />
+                      </div>
+                    </div>
+                    <div>
+                      <p className="font-medium mb-1">Jurnal 2 — Pengakuan beban kerugian</p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <CoaSelect value={BEBAN_KERUGIAN_BARANG_ACCOUNT_CODE} onChange={() => {}} disabled id="adj-loss-debit-2" />
+                        <CoaSelect value={PENYESUAIAN_NILAI_PERSEDIAAN_ACCOUNT_CODE} onChange={() => {}} disabled id="adj-loss-credit-2" />
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div>
+                      <label className="label">Akun debit (Persediaan)</label>
+                      <CoaSelect value={adjust.debit_account_code} onChange={(e) => setAdjust({ ...adjust, debit_account_code: e.target.value })} />
+                    </div>
+                    <div>
+                      <label className="label">Akun kredit (Pendapatan/Offset)</label>
+                      <CoaSelect value={adjust.credit_account_code} onChange={(e) => setAdjust({ ...adjust, credit_account_code: e.target.value })} />
+                    </div>
+                  </>
+                )}
+
                 <div className="sm:col-span-2"><label className="label">Catatan</label><input className="input" value={adjust.notes} onChange={(e) => setAdjust({ ...adjust, notes: e.target.value })} /></div>
-                <div className="sm:col-span-2 flex justify-end"><button type="submit" className="btn btn-primary">Simpan penyesuaian</button></div>
+                <div className="sm:col-span-2 flex justify-end"><button type="submit" className="btn btn-primary" disabled={submitting}>{submitting ? "Menyimpan…" : "Simpan penyesuaian"}</button></div>
               </form>
             ) : <p className="text-sm">Role Anda read-only.</p>}
           </div>
