@@ -3,6 +3,7 @@ import api, { fmtRp, fmtDate, API } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { notify } from "@/lib/feedback";
 import { useConfirm } from "@/components/ConfirmProvider";
+import Spinner from "@/components/Spinner";
 import { FilePdf, FileXls, FileDoc, ChartLine, Scales, Coins, TrendUp, BookOpen, Lock } from "@phosphor-icons/react";
 
 const MONTHS = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
@@ -217,7 +218,7 @@ export default function Reports() {
                 </select>
               </div>
               <button data-testid="btn-load-report" onClick={load} className="btn btn-primary">
-                {loading ? "Memuat..." : "Tampilkan Laporan"}
+                {loading ? <Spinner size={18} label="Memuat..." /> : "Tampilkan Laporan"}
               </button>
             </div>
           </div>

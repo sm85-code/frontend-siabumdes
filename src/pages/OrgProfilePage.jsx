@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import { notify } from "@/lib/feedback";
+import Spinner from "@/components/Spinner";
 
 const EMPTY = {
   org_name: "", org_legal_name: "", address: "", village: "", district: "",
@@ -61,7 +62,7 @@ export default function OrgProfilePage() {
       .finally(() => setUploading(false));
   };
 
-  if (loading) return <p className="text-sm" style={{ color: "var(--text-muted)" }}>Memuat...</p>;
+  if (loading) return <Spinner />;
 
   return (
     <div className="max-w-3xl space-y-6" data-testid="org-profile-page">

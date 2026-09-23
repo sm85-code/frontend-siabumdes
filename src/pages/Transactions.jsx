@@ -7,6 +7,7 @@ import { useConfirm } from "@/components/ConfirmProvider";
 import { useSort } from "@/lib/useSort";
 import { Plus, Trash, Pencil, Receipt, FileArrowUp, DownloadSimple, FileXls, Paperclip, LinkSimple, GoogleDriveLogo, X } from "@phosphor-icons/react";
 import TableShell from "@/components/TableShell";
+import Spinner from "@/components/Spinner";
 
 const MONTHS = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
 const YEAR_MIN = 2022, YEAR_MAX = 2030;
@@ -655,7 +656,7 @@ if (!(await confirm({
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={99} className="text-center py-6">Memuat...</td></tr>
+                <tr><td colSpan={99} className="text-center py-6"><Spinner className="justify-center" /></td></tr>
               ) : sortState.sorted.length === 0 ? (
                 <tr><td colSpan={99} className="text-center py-10">
                   <Receipt size={32} weight="duotone" color="var(--text-muted)" style={{ margin: "0 auto 8px" }} />

@@ -4,6 +4,7 @@ import { useAuth } from "@/lib/auth";
 import { notify } from "@/lib/feedback";
 import { Books, MagnifyingGlass, FilePdf, FileXls, FileDoc } from "@phosphor-icons/react";
 import TableShell from "@/components/TableShell";
+import Spinner from "@/components/Spinner";
 
 const MONTHS = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 const YEAR_MIN = 2022, YEAR_MAX = 2030;
@@ -204,7 +205,7 @@ export default function BukuBesar() {
               <p style={{ color: "var(--text-muted)" }}>Pilih akun di sebelah kiri untuk melihat buku besar <b>{group}</b>.</p>
             </div>
           ) : loading ? (
-            <div className="card text-center py-10">Memuat...</div>
+            <div className="card text-center py-10"><Spinner className="justify-center" /></div>
           ) : ledger ? (
             <div className="card p-0 overflow-hidden">
               <div className="p-5" style={{ borderBottom: "1px solid var(--legacy-border)" }}>
