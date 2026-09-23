@@ -2,7 +2,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuth, can } from "@/lib/auth";
 import api, { ROLE_LABELS } from "@/lib/api";
-import { useTheme, THEMES, FONTS } from "@/lib/theme";
+import { useTheme, FONTS } from "@/lib/theme";
 import {
   House, Receipt, ChartLine, Storefront, UsersThree,
   BookOpenText, SignOut, List, X, Books, UserCircle, Package, Buildings,
@@ -26,7 +26,7 @@ const NAV = [
 
 export default function Layout({ children }) {
   const { user, logout } = useAuth();
-  const { theme, setTheme, font, setFont } = useTheme();
+  const { font, setFont } = useTheme();
   const location = useLocation();
   const [open, setOpen] = useState(false);
   const [uu05Id, setUu05Id] = useState(null);
@@ -91,20 +91,6 @@ export default function Layout({ children }) {
             })}
           </nav>
           <div className="shrink-0 p-4">
-            <div className="mb-3">
-              <label className="label" htmlFor="theme-switcher">Tema</label>
-              <select
-                id="theme-switcher"
-                data-testid="theme-switcher"
-                className="select text-sm"
-                value={theme}
-                onChange={(e) => setTheme(e.target.value)}
-              >
-                {THEMES.map((t) => (
-                  <option key={t.id} value={t.id}>{t.label}</option>
-                ))}
-              </select>
-            </div>
             <div className="mb-3">
               <label className="label" htmlFor="font-switcher">Font</label>
               <select
