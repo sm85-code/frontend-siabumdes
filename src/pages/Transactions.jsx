@@ -2,11 +2,24 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import api, { fmtRp, fmtDate, API } from "@/lib/api";
 import { useAuth, can } from "@/lib/auth";
-import { notify } from "@/lib/feedback";
+import { notify, notifySuccess, notifyError } from "@/lib/feedback";
 import { useConfirm } from "@/components/ConfirmProvider";
 import { useSort } from "@/lib/useSort";
 import { Plus, Trash, Pencil, Receipt, FileArrowUp, DownloadSimple, FileXls, Paperclip, LinkSimple, GoogleDriveLogo, X } from "@phosphor-icons/react";
 import TableShell from "@/components/TableShell";
+import Spinner from "@/components/Spinner";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
+import {
+  Table, TableHeader, TableBody, TableRow, TableHead, TableCell,
+} from "@/components/ui/table";
 
 const MONTHS = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
 const YEAR_MIN = 2022, YEAR_MAX = 2030;
@@ -241,13 +254,17 @@ export default function Transactions() {
       else await api.post("/transactions", body);
       setShowForm(false); setEditingId(null);
       load();
-    } catch (er) { notify(er.response?.data?.detail || "Gagal menyimpan"); }
+      notifySuccess(editingId ? "Transaksi berhasil diperbarui." : "Transaksi berhasil disimpan.");
+    } catch (er) { notifyError(er.response?.data?.detail || "Gagal menyimpan"); }
   };
 
   const del = async (id) => {
     if (!(await confirm({ title: "Hapus transaksi", description: "Transaksi akan dihapus dan tidak dapat dipulihkan.", confirmLabel: "Hapus", destructive: true }))) return;
-    await api.delete(`/transactions/${id}`);
-    load();
+    try {
+      await api.delete(`/transactions/${id}`);
+      load();
+      notifySuccess("Transaksi berhasil dihapus.");
+    } catch (er) { notifyError(er.response?.data?.detail || "Gagal menghapus transaksi"); }
   };
 
   const bulkDelete = async () => {
@@ -256,8 +273,9 @@ export default function Transactions() {
     if (!(await confirm({ title: "Hapus transaksi terpilih", description: `Hapus ${ids.length} transaksi terpilih? Aksi ini tidak dapat dibatalkan.`, confirmLabel: "Hapus semua", destructive: true }))) return;
     try {
       await Promise.all(ids.map(id => api.delete(`/transactions/${id}`)));
+      notifySuccess(`${ids.length} transaksi berhasil dihapus.`);
     } catch (er) {
-      notify("Sebagian gagal dihapus: " + (er.response?.data?.detail || er.message));
+      notifyError("Sebagian gagal dihapus: " + (er.response?.data?.detail || er.message));
     }
     setSelected(new Set());
     load();
@@ -400,299 +418,353 @@ if (!(await confirm({
   return (
     <div className="space-y-6" data-testid="transactions-page">
       {user?.blocked_periods && user.blocked_periods.length > 0 && (
-        <div className="card fade-in" data-testid="tx-blocked-banner"
-             style={{ background: "var(--status-error-bg)", border: "1px solid var(--status-error-border)" }}>
-          <p className="text-sm" style={{ color: "var(--status-error)" }}>
-            <b>Periode terkunci:</b>{" "}
-            {user.blocked_periods.slice().sort().join(", ")}. Anda tidak dapat menambah/mengubah/menghapus transaksi pada periode tersebut.
-          </p>
-        </div>
+        <Card className="fade-in border-destructive/30 bg-destructive/5" data-testid="tx-blocked-banner">
+          <CardContent className="p-4">
+            <p className="text-sm text-destructive">
+              <b>Periode terkunci:</b>{" "}
+              {user.blocked_periods.slice().sort().join(", ")}. Anda tidak dapat menambah/mengubah/menghapus transaksi pada periode tersebut.
+            </p>
+          </CardContent>
+        </Card>
       )}
 
       {refFilter && (
-        <div className="card flex items-center justify-between gap-3 flex-wrap" style={{ borderColor: "var(--primary-dark)" }}>
+        <Card className="flex items-center justify-between gap-3 flex-wrap p-4 border-primary/40">
           <p className="text-sm">
             Menampilkan {filteredTxs.length === 0 ? "0 transaksi" : `${filteredTxs.length} transaksi`} terkait mutasi/penyesuaian stok dari Inventory.
             {filteredTxs.length === 0 && " Kemungkinan mutasi ini tidak berdampak nilai (tidak ada jurnal yang diposting)."}
           </p>
-          <button type="button" className="btn btn-outline text-xs" onClick={clearRefFilter}>
+          <Button type="button" variant="outline" size="sm" onClick={clearRefFilter}>
             Tampilkan semua transaksi
-          </button>
-        </div>
+          </Button>
+        </Card>
       )}
 
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <p className="label mb-1">JOURNAL ENTRY</p>
           <h1 className="font-heading text-3xl font-bold page-h1">Transaksi Keuangan</h1>
-          <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
+          <p className="text-sm mt-1 text-muted-foreground">
             Input transaksi cepat — laporan terbentuk otomatis.
           </p>
         </div>
         <div className="flex gap-2 flex-wrap w-full sm:w-auto">
           {user?.role === "admin" && (
-            <button data-testid="btn-connect-drive" onClick={connectDrive}
-                    className="btn btn-outline flex-1 sm:flex-none"
+            <Button data-testid="btn-connect-drive" onClick={connectDrive}
+                    variant="outline" className="flex-1 sm:flex-none"
                     title={driveStatus?.email ? `Terhubung: ${driveStatus.email}` : "Belum terhubung"}>
               <GoogleDriveLogo size={16} weight="duotone"
-                               color={driveStatus?.connected ? "var(--status-success)" : "var(--status-warning)"} />
+                               className={driveStatus?.connected ? "text-green-600" : "text-amber-500"} />
               {driveStatus?.connected ? "Drive Terhubung" : "Hubungkan Drive"}
-            </button>
+            </Button>
           )}
           {canImport && (
             <>
-              <button data-testid="btn-download-template" onClick={downloadTemplate} className="btn btn-outline flex-1 sm:flex-none">
-                <DownloadSimple size={16} weight="duotone" color="var(--primary-dark)" /> Download Template
-              </button>
+              <Button data-testid="btn-download-template" onClick={downloadTemplate} variant="outline" className="flex-1 sm:flex-none">
+                <DownloadSimple size={16} weight="duotone" /> Download Template
+              </Button>
               <input ref={fileInputRef} type="file" accept=".xlsx,.xls" className="hidden"
                      data-testid="import-file-input" onChange={onFileChange} />
-              <button data-testid="btn-import-excel" onClick={onImportClick} className="btn btn-outline flex-1 sm:flex-none">
-                <FileArrowUp size={16} weight="duotone" color="var(--primary-dark)" /> Impor Excel
-              </button>
+              <Button data-testid="btn-import-excel" onClick={onImportClick} variant="outline" className="flex-1 sm:flex-none">
+                <FileArrowUp size={16} weight="duotone" /> Impor Excel
+              </Button>
             </>
           )}
-          <button data-testid="btn-export-tx-excel" onClick={exportExcel} className="btn btn-outline flex-1 sm:flex-none">
-            <FileXls size={16} weight="duotone" color="var(--primary-dark)" /> Export Excel
-          </button>
-          <button data-testid="btn-export-tx-all" onClick={exportAll} className="btn btn-outline flex-1 sm:flex-none">
-            <FileXls size={16} weight="duotone" color="var(--primary-dark)" /> Export Semua Data
-          </button>
-          <button data-testid="btn-new-tx" onClick={openCreate}
+          <Button data-testid="btn-export-tx-excel" onClick={exportExcel} variant="outline" className="flex-1 sm:flex-none">
+            <FileXls size={16} weight="duotone" /> Export Excel
+          </Button>
+          <Button data-testid="btn-export-tx-all" onClick={exportAll} variant="outline" className="flex-1 sm:flex-none">
+            <FileXls size={16} weight="duotone" /> Export Semua Data
+          </Button>
+          <Button data-testid="btn-new-tx" onClick={openCreate}
                   disabled={!canWrite}
-                  className={`btn btn-primary flex-1 sm:flex-none ${!canWrite ? "opacity-50 cursor-not-allowed" : ""}`}>
+                  className="flex-1 sm:flex-none">
             <Plus size={18} weight="bold" /> Tambah Transaksi
-          </button>
+          </Button>
         </div>
       </div>
 
       {importResult && (
-        <div className="card fade-in" data-testid="import-result"
-             style={{ background: "var(--primary-light)", border: "1px solid var(--legacy-border)" }}>
-          <div className="flex items-start justify-between gap-2">
-            <div>
-              <h4 className="font-heading font-semibold mb-1">Hasil Impor</h4>
-              <p className="text-sm">Berhasil: <b>{importResult.inserted}</b> dari <b>{importResult.total_rows}</b> baris.</p>
-              {importResult.errors?.length > 0 && (
-                <ul className="text-xs mt-2 space-y-0.5" style={{ color: "var(--status-error)" }}>
-                  {importResult.errors.slice(0, 10).map((e, i) => (<li key={i}>Baris {e.row}: {e.error}</li>))}
-                  {importResult.errors.length > 10 && <li>+ {importResult.errors.length - 10} error lainnya</li>}
-                </ul>
-              )}
+        <Card className="fade-in bg-primary/5" data-testid="import-result">
+          <CardContent className="p-4">
+            <div className="flex items-start justify-between gap-2">
+              <div>
+                <h4 className="font-heading font-semibold mb-1">Hasil Impor</h4>
+                <p className="text-sm">Berhasil: <b>{importResult.inserted}</b> dari <b>{importResult.total_rows}</b> baris.</p>
+                {importResult.errors?.length > 0 && (
+                  <ul className="text-xs mt-2 space-y-0.5 text-destructive">
+                    {importResult.errors.slice(0, 10).map((e, i) => (<li key={i}>Baris {e.row}: {e.error}</li>))}
+                    {importResult.errors.length > 10 && <li>+ {importResult.errors.length - 10} error lainnya</li>}
+                  </ul>
+                )}
+              </div>
+              <Button onClick={() => setImportResult(null)} variant="outline" size="sm">Tutup</Button>
             </div>
-            <button onClick={() => setImportResult(null)} className="btn btn-outline text-xs">Tutup</button>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       )}
 
       {showForm && canWrite && (
-        <div className="card fade-in">
-          <h3 className="font-heading text-lg font-semibold mb-4">
-            {editingId ? "Edit Transaksi" : "Transaksi Baru"}
-          </h3>
-          <form onSubmit={submit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="label">Tanggal</label>
-              <input data-testid="tx-date" type="date" required className="input"
-                     value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
-            </div>
-            <div>
-              <label className="label">Unit Usaha (opsional)</label>
-              <select data-testid="tx-unit" className="select" value={form.unit_usaha_id}
-                      onChange={(e) => onUnitChange(e.target.value)}
-                      disabled={isPengelola}>
-                {!isPengelola && <option value="">BUMDES - Pusat</option>}
-                {units
-                  .filter(u => !isPengelola || u.id === user?.unit_usaha_id)
-                  .map(u => <option key={u.id} value={u.id}>{u.code} - {u.name}</option>)}
-              </select>
-            </div>
-            <div className="sm:col-span-2">
-              <label className="label">Jenis Transaksi
-                {form.unit_usaha_id && (
-                  <span className="ml-2 text-xs font-normal" style={{ color: "var(--text-muted)" }}>
-                    (difilter berdasarkan unit terpilih)
-                  </span>
-                )}
-              </label>
-              <select data-testid="tx-type" required className="select" value={form.transaction_type}
-                      onChange={(e) => onTypeChange(e.target.value)}>
-                <option value="">— pilih jenis —</option>
-                {filteredTypes.map(t => <option key={t.code} value={t.code}>{t.name}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="label">Nominal (Rp)</label>
-              <input data-testid="tx-amount" type="number" min="0" step="1" required className="input"
-                     value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })}
-                     placeholder="100000" />
-            </div>
-            <div>
-              <label className="label">Nomor Referensi (opsional)</label>
-              <input data-testid="tx-ref" className="input"
-                     value={form.reference} onChange={(e) => setForm({ ...form, reference: e.target.value })}
-                     placeholder="mis. nota-001" />
-            </div>
-            <div className="sm:col-span-2">
-              <label className="label">Keterangan</label>
-              <input data-testid="tx-desc" required className="input"
-                     value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })}
-                     placeholder="Keterangan detail transaksi" />
-            </div>
-            <div>
-              <label className="label">Debit</label>
-              <select data-testid="tx-debit" className="select" value={form.debit_account_code}
-                      onChange={(e) => setForm({ ...form, debit_account_code: e.target.value })} required>
-                <option value="">— pilih akun —</option>
-                {filteredAccounts.map(a => <option key={a.code} value={a.code}>{a.code} - {a.name}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="label">Kredit</label>
-              <select data-testid="tx-credit" className="select" value={form.credit_account_code}
-                      onChange={(e) => setForm({ ...form, credit_account_code: e.target.value })} required>
-                <option value="">— pilih akun —</option>
-                {filteredAccounts.map(a => <option key={a.code} value={a.code}>{a.code} - {a.name}</option>)}
-              </select>
-            </div>
-            <div className="sm:col-span-2 flex gap-2 justify-end pt-2">
-              <button type="button" onClick={() => { setShowForm(false); setEditingId(null); }} className="btn btn-outline">Batal</button>
-              <button data-testid="tx-save" type="submit" className="btn btn-primary">
+        <Card className="fade-in">
+          <CardHeader>
+            <CardTitle className="font-heading text-lg">
+              {editingId ? "Edit Transaksi" : "Transaksi Baru"}
+            </CardTitle>
+          </CardHeader>
+          <form onSubmit={submit}>
+            <CardContent className="pt-0 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label>Tanggal</Label>
+                <Input data-testid="tx-date" type="date" required
+                       value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Unit Usaha (opsional)</Label>
+                <Select data-testid="tx-unit" value={form.unit_usaha_id || "__bumdes__"}
+                        onValueChange={(v) => onUnitChange(v === "__bumdes__" ? "" : v)}
+                        disabled={isPengelola}>
+                  <SelectTrigger data-testid="tx-unit">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {!isPengelola && <SelectItem value="__bumdes__">BUMDES - Pusat</SelectItem>}
+                    {units
+                      .filter(u => !isPengelola || u.id === user?.unit_usaha_id)
+                      .map(u => <SelectItem key={u.id} value={u.id}>{u.code} - {u.name}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="sm:col-span-2 space-y-1.5">
+                <Label>Jenis Transaksi
+                  {form.unit_usaha_id && (
+                    <span className="ml-2 text-xs font-normal text-muted-foreground">
+                      (difilter berdasarkan unit terpilih)
+                    </span>
+                  )}
+                </Label>
+                <Select data-testid="tx-type" required value={form.transaction_type}
+                        onValueChange={onTypeChange}>
+                  <SelectTrigger data-testid="tx-type">
+                    <SelectValue placeholder="— pilih jenis —" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {filteredTypes.map(t => <SelectItem key={t.code} value={t.code}>{t.name}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Nominal (Rp)</Label>
+                <Input data-testid="tx-amount" type="number" min="0" step="1" required
+                       value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })}
+                       placeholder="100000" />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Nomor Referensi (opsional)</Label>
+                <Input data-testid="tx-ref"
+                       value={form.reference} onChange={(e) => setForm({ ...form, reference: e.target.value })}
+                       placeholder="mis. nota-001" />
+              </div>
+              <div className="sm:col-span-2 space-y-1.5">
+                <Label>Keterangan</Label>
+                <Input data-testid="tx-desc" required
+                       value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })}
+                       placeholder="Keterangan detail transaksi" />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Debit</Label>
+                <Select data-testid="tx-debit" required value={form.debit_account_code}
+                        onValueChange={(v) => setForm({ ...form, debit_account_code: v })}>
+                  <SelectTrigger data-testid="tx-debit">
+                    <SelectValue placeholder="— pilih akun —" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {filteredAccounts.map(a => <SelectItem key={a.code} value={a.code}>{a.code} - {a.name}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Kredit</Label>
+                <Select data-testid="tx-credit" required value={form.credit_account_code}
+                        onValueChange={(v) => setForm({ ...form, credit_account_code: v })}>
+                  <SelectTrigger data-testid="tx-credit">
+                    <SelectValue placeholder="— pilih akun —" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {filteredAccounts.map(a => <SelectItem key={a.code} value={a.code}>{a.code} - {a.name}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardContent>
+            <CardFooter className="sm:col-span-2 justify-end gap-2">
+              <Button type="button" onClick={() => { setShowForm(false); setEditingId(null); }} variant="outline">Batal</Button>
+              <Button data-testid="tx-save" type="submit">
                 {editingId ? "Simpan Perubahan" : "Simpan Transaksi"}
-              </button>
-            </div>
+              </Button>
+            </CardFooter>
           </form>
-        </div>
+        </Card>
       )}
 
       {/* Unified group and monthly period filters */}
-      <div className="card" data-testid="tx-filters">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-start">
-          <div>
-            <label className="label" htmlFor="tx-group-select">Kelompok</label>
-            <select id="tx-group-select" data-testid="tx-group-select" className="select"
-                    value={activeGroup} onChange={(e) => setActiveGroup(e.target.value)} disabled={isPengelola}>
-              {groupTabs.map(g => <option key={g.key} value={g.key}>{g.label}</option>)}
-            </select>
+      <Card data-testid="tx-filters">
+        <CardContent className="p-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-start">
+            <div className="space-y-1.5">
+              <Label htmlFor="tx-group-select">Kelompok</Label>
+              <Select value={activeGroup} onValueChange={setActiveGroup} disabled={isPengelola}>
+                <SelectTrigger id="tx-group-select" data-testid="tx-group-select">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {groupTabs.map(g => <SelectItem key={g.key} value={g.key}>{g.label}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="tx-period-mode">Periode</Label>
+              <Select value={periodMode} onValueChange={setPeriodMode}>
+                <SelectTrigger id="tx-period-mode" data-testid="tx-period-mode">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="monthly">Bulanan</SelectItem>
+                  <SelectItem value="yearly">Tahunan</SelectItem>
+                  <SelectItem value="custom">Custom</SelectItem>
+                </SelectContent>
+              </Select>
+              {periodMode === "custom" && <>
+                <Select value={customPreset} onValueChange={setCustomPreset}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ytd">Year to Date</SelectItem>
+                    <SelectItem value="qtd">Quarter to Date</SelectItem>
+                    <SelectItem value="mtd">Month to Date</SelectItem>
+                    <SelectItem value="dates">Pilih tanggal</SelectItem>
+                  </SelectContent>
+                </Select>
+                {customPreset === "dates" && (
+                  <div className="grid grid-cols-2 gap-2 mt-2">
+                    <Input type="date" value={customStart} onChange={(e) => setCustomStart(e.target.value)} />
+                    <Input type="date" value={customEnd} onChange={(e) => setCustomEnd(e.target.value)} />
+                  </div>
+                )}
+              </>}
+            </div>
+            {periodMode === "monthly" && (
+              <div className="space-y-1.5">
+                <Label htmlFor="tx-month">Bulan</Label>
+                <Select value={String(month)} onValueChange={(v) => setMonth(Number(v))}>
+                  <SelectTrigger id="tx-month" data-testid="tx-month">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {MONTHS.map((m, i) => <SelectItem key={m} value={String(i + 1)}>{m}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+            <div className="space-y-1.5">
+              <Label htmlFor="tx-year">Tahun</Label>
+              <Select value={String(year)} onValueChange={(v) => setYear(Number(v))}>
+                <SelectTrigger id="tx-year" data-testid="tx-year">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {YEARS.map(y => <SelectItem key={y} value={String(y)}>{y}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="text-xs px-3 py-2 rounded-lg bg-primary/10 text-primary font-semibold">
+              Tampilkan: {MONTHS[month - 1]} {year} · {activeGroup}
+            </div>
+            {canBulkDelete && selected.size > 0 && (
+              <Button data-testid="btn-bulk-delete" onClick={bulkDelete}
+                      variant="destructive" size="sm" className="sm:col-span-4 justify-self-start">
+                <Trash size={14} /> Hapus {selected.size} Terpilih
+              </Button>
+            )}
           </div>
-  <div>
-  <label className="label" htmlFor="tx-period-mode">Periode</label>
-  <select id="tx-period-mode" data-testid="tx-period-mode" className="select" value={periodMode} onChange={(e) => setPeriodMode(e.target.value)}>
-  <option value="monthly">Bulanan</option>
-  <option value="yearly">Tahunan</option>
-  <option value="custom">Custom</option>
-  </select>
-  {periodMode === "custom" && <>
-  <select className="select mt-2" value={customPreset} onChange={(e) => setCustomPreset(e.target.value)}>
-    <option value="ytd">Year to Date</option><option value="qtd">Quarter to Date</option><option value="mtd">Month to Date</option><option value="dates">Pilih tanggal</option>
-  </select>
-  {customPreset === "dates" && <div className="grid grid-cols-2 gap-2 mt-2"><input className="input" type="date" value={customStart} onChange={(e) => setCustomStart(e.target.value)} /><input className="input" type="date" value={customEnd} onChange={(e) => setCustomEnd(e.target.value)} /></div>}
-  </>}
-  </div>
-  {periodMode === "monthly" && <div>
-  <label className="label" htmlFor="tx-month">Bulan</label>
-            <select id="tx-month" data-testid="tx-month" className="select"
-                    value={month} onChange={(e) => setMonth(Number(e.target.value))}>
-              {MONTHS.map((m, i) => <option key={m} value={i + 1}>{m}</option>)}
-  </select>
-  </div>}
-  <div>
-  <label className="label" htmlFor="tx-year">Tahun</label>
-            <select id="tx-year" data-testid="tx-year" className="select"
-                    value={year} onChange={(e) => setYear(Number(e.target.value))}>
-              {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
-            </select>
-          </div>
-          <div className="text-xs px-3 py-2 rounded-lg"
-               style={{ background: "var(--primary-light)", color: "var(--primary-dark)", fontWeight: 600 }}>
-            Tampilkan: {MONTHS[month - 1]} {year} · {activeGroup}
-          </div>
-          {canBulkDelete && selected.size > 0 && (
-            <button data-testid="btn-bulk-delete" onClick={bulkDelete}
-                    className="btn text-xs sm:col-span-4 justify-self-start"
-                    style={{ background: "var(--status-error)", color: "white" }}>
-              <Trash size={14} /> Hapus {selected.size} Terpilih
-            </button>
-          )}
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       {/* Unified Table */}
-      <div className="card p-0 overflow-hidden">
-        <div className="p-4" style={{ borderBottom: "1px solid var(--legacy-border)", background: "var(--primary-light)" }}>
-          <h3 className="font-heading font-semibold" data-testid="tx-table-title">
+      <Card className="p-0 overflow-hidden">
+        <CardHeader className="p-4 border-b bg-primary/10 space-y-0.5">
+          <CardTitle className="font-heading font-semibold text-base" data-testid="tx-table-title">
             Transaksi {activeGroup} — {MONTHS[month - 1]} {year}
-          </h3>
-          <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>
+          </CardTitle>
+          <p className="text-xs text-muted-foreground">
             {sortState.sorted.length} transaksi ditemukan.
           </p>
-        </div>
+        </CardHeader>
         <TableShell
           minWidth={720}
           data-testid="tx-table"
         >
-          <table className="tbl tbl-compact-mobile" data-testid="tx-table">
-            <thead>
-              <tr>
+          <Table data-testid="tx-table">
+            <TableHeader>
+              <TableRow>
                 {canBulkDelete && (
-                  <th style={{ width: 32 }}>
-                    <input type="checkbox" data-testid="tx-select-all"
+                  <TableHead style={{ width: 32 }}>
+                    <Checkbox data-testid="tx-select-all"
                            checked={sortState.sorted.length > 0 && sortState.sorted.every(r => selected.has(r.id))}
-                           onChange={(e) => {
-                             if (e.target.checked) setSelected(new Set(sortState.sorted.map(r => r.id)));
+                           onCheckedChange={(checked) => {
+                             if (checked) setSelected(new Set(sortState.sorted.map(r => r.id)));
                              else setSelected(new Set());
                            }} />
-                  </th>
+                  </TableHead>
                 )}
-                <th {...sortState.headerProps("date")}>Tanggal{sortState.sortIndicator("date")}</th>
-                {activeGroup !== "BUMDES" && <th>Unit</th>}
-                <th {...sortState.headerProps("description")}>Keterangan{sortState.sortIndicator("description")}</th>
-                <th {...sortState.headerProps("debit_account_code")}>Debit{sortState.sortIndicator("debit_account_code")}</th>
-                <th {...sortState.headerProps("credit_account_code")}>Kredit{sortState.sortIndicator("credit_account_code")}</th>
-                <th className="num" {...sortState.headerProps("amount")}>Jumlah{sortState.sortIndicator("amount")}</th>
-                <th>Bukti</th>
-                {canWrite && <th></th>}
-              </tr>
-            </thead>
-            <tbody>
+                <TableHead {...sortState.headerProps("date")}>Tanggal{sortState.sortIndicator("date")}</TableHead>
+                {activeGroup !== "BUMDES" && <TableHead>Unit</TableHead>}
+                <TableHead {...sortState.headerProps("description")}>Keterangan{sortState.sortIndicator("description")}</TableHead>
+                <TableHead {...sortState.headerProps("debit_account_code")}>Debit{sortState.sortIndicator("debit_account_code")}</TableHead>
+                <TableHead {...sortState.headerProps("credit_account_code")}>Kredit{sortState.sortIndicator("credit_account_code")}</TableHead>
+                <TableHead className="text-right" {...sortState.headerProps("amount")}>Jumlah{sortState.sortIndicator("amount")}</TableHead>
+                <TableHead>Bukti</TableHead>
+                {canWrite && <TableHead></TableHead>}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {loading ? (
-                <tr><td colSpan={99} className="text-center py-6">Memuat...</td></tr>
+                <TableRow><TableCell colSpan={99} className="text-center py-6"><Spinner className="justify-center" /></TableCell></TableRow>
               ) : sortState.sorted.length === 0 ? (
-                <tr><td colSpan={99} className="text-center py-10">
-                  <Receipt size={32} weight="duotone" color="var(--text-muted)" style={{ margin: "0 auto 8px" }} />
-                  <div style={{ color: "var(--text-muted)" }}>
+                <TableRow><TableCell colSpan={99} className="text-center py-10">
+                  <Receipt size={32} weight="duotone" className="text-muted-foreground mx-auto mb-2" />
+                  <div className="text-muted-foreground">
                     Belum ada transaksi <b>{activeGroup}</b> pada <b>{MONTHS[month - 1]} {year}</b>.
                   </div>
-                </td></tr>
+                </TableCell></TableRow>
               ) : sortState.sorted.map((t) => (
-                <tr key={t.id}>
+                <TableRow key={t.id}>
                   {canBulkDelete && (
-                    <td>
-                      <input type="checkbox" data-testid={`sel-tx-${t.id}`}
+                    <TableCell>
+                      <Checkbox data-testid={`sel-tx-${t.id}`}
                              checked={selected.has(t.id)}
-                             onChange={() => toggleSel(t.id)} />
-                    </td>
+                             onCheckedChange={() => toggleSel(t.id)} />
+                    </TableCell>
                   )}
-                  <td>{fmtDate(t.date)}</td>
+                  <TableCell>{fmtDate(t.date)}</TableCell>
                   {activeGroup !== "BUMDES" && (
-                    <td><span className="badge">{unitOf(t.unit_usaha_id)?.code}</span></td>
+                    <TableCell><Badge variant="secondary">{unitOf(t.unit_usaha_id)?.code}</Badge></TableCell>
                   )}
-                  <td className="max-w-xs truncate">{t.description}</td>
-                  <td className="text-xs">{accName(t.debit_account_code)}</td>
-                  <td className="text-xs">{accName(t.credit_account_code)}</td>
-                  <td className="num font-semibold tabular-nums">{fmtRp(t.amount)}</td>
-                  <td>
+                  <TableCell className="max-w-xs truncate">{t.description}</TableCell>
+                  <TableCell className="text-xs">{accName(t.debit_account_code)}</TableCell>
+                  <TableCell className="text-xs">{accName(t.credit_account_code)}</TableCell>
+                  <TableCell className="text-right font-semibold tabular-nums">{fmtRp(t.amount)}</TableCell>
+                  <TableCell>
                     {(() => {
                       const proofs = t.proofs || (t.proof ? [t.proof] : []);
                       const editable = canEditRow(t);
                       if (proofs.length === 0) {
                         return editable ? (
                           <button data-testid={`upload-proof-${t.id}`} onClick={() => uploadProof(t)}
-                                  className="text-xs flex items-center gap-1"
-                                  style={{ color: "var(--text-muted)" }}>
+                                  className="text-xs flex items-center gap-1 text-muted-foreground">
                             <Paperclip size={13} /> Upload
                           </button>
                         ) : (
-                          <span className="text-xs" style={{ color: "var(--text-muted)" }}>—</span>
+                          <span className="text-xs text-muted-foreground">—</span>
                         );
                       }
                       return (
@@ -701,8 +773,7 @@ if (!(await confirm({
                             <div key={p.file_id} className="flex items-center gap-1.5">
                               <a href={p.url} target="_blank" rel="noreferrer"
                                  data-testid={`view-proof-${t.id}-${p.file_id}`}
-                                 className="text-xs flex items-center gap-1 underline truncate max-w-[180px]"
-                                 style={{ color: "var(--primary-dark)" }}
+                                 className="text-xs flex items-center gap-1 underline truncate max-w-[180px] text-primary"
                                  title={p.file_name}>
                                 <LinkSimple size={13} /> {p.file_name}
                               </a>
@@ -711,34 +782,43 @@ if (!(await confirm({
                                         onClick={() => deleteProof(t, p.file_id, p.file_name)}
                                         title="Hapus bukti"
                                         className="p-1 rounded hover:bg-red-50">
-                                  <X size={12} color="var(--status-error)" />
+                                  <X size={12} className="text-destructive" />
                                 </button>
                               )}
                             </div>
                           ))}
                           {editable && proofs.length < 3 && (
                             <button data-testid={`add-proof-${t.id}`} onClick={() => uploadProof(t)}
-                                    className="text-[11px] flex items-center gap-1 mt-0.5"
-                                    style={{ color: "var(--text-muted)" }}>
+                                    className="text-[11px] flex items-center gap-1 mt-0.5 text-muted-foreground">
                               <Paperclip size={11} /> Tambah ({proofs.length}/3)
                             </button>
                           )}
                         </div>
                       );
                     })()}
-                  </td>
+                  </TableCell>
                   {canWrite && (
-                    <td><div className="flex gap-1">
-                      {canEditRow(t) && <button data-testid={`edit-tx-${t.id}`} onClick={() => openEdit(t)} className="p-1.5 rounded-md hover:bg-yellow-50"><Pencil size={16} color="var(--primary)" /></button>}
-                      {can(user, "admin", "direktur", "bendahara") && <button data-testid={`del-tx-${t.id}`} onClick={() => del(t.id)} className="p-1.5 rounded-md hover:bg-red-50"><Trash size={16} color="var(--status-error)" /></button>}
-                    </div></td>
+                    <TableCell><div className="flex gap-1">
+                      {canEditRow(t) && (
+                        <Button data-testid={`edit-tx-${t.id}`} onClick={() => openEdit(t)}
+                                variant="ghost" size="icon" className="h-8 w-8 text-primary hover:bg-primary/10 hover:text-primary">
+                          <Pencil size={16} />
+                        </Button>
+                      )}
+                      {can(user, "admin", "direktur", "bendahara") && (
+                        <Button data-testid={`del-tx-${t.id}`} onClick={() => del(t.id)}
+                                variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10 hover:text-destructive">
+                          <Trash size={16} />
+                        </Button>
+                      )}
+                    </div></TableCell>
                   )}
-                </tr>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </TableShell>
-      </div>
+      </Card>
     </div>
   );
 }

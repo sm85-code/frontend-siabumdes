@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import api, { fmtRp, ROLE_LABELS } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
+import Spinner from "@/components/Spinner";
 import {
   LineChart, Line, BarChart, Bar,
   XAxis, YAxis, Tooltip, ResponsiveContainer,
@@ -158,7 +159,7 @@ export default function Dashboard() {
   }, [data, currentOpt.bucket]);
   const useBar = chartData.length <= 1;
 
-  if (loading && !data) return <div className="text-sm">Memuat dashboard...</div>;
+  if (loading && !data) return <div className="text-sm"><Spinner label="Memuat dashboard..." /></div>;
   if (!data) return <div className="text-sm">Tidak ada data.</div>;
 
   const jabatan = ROLE_LABELS[user?.role] || "Pengguna";
