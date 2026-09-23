@@ -8,6 +8,11 @@ import { Plus, Pencil, Trash, DownloadSimple, UploadSimple, Warning } from "@pho
 import TableShell from "@/components/TableShell";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const CAT_LABELS = {
   aset: "Aset", kewajiban: "Kewajiban", ekuitas: "Ekuitas",
@@ -268,7 +273,7 @@ export default function COAPage() {
 
       {isAdmin && (
         <div className="space-y-3" data-testid="master-data-controls">
-          <div className="card card-sm">
+          <Card className="p-4">
             <label className="label mb-2" htmlFor="master-group-select">Kelompok</label>
             <Select value={group} onValueChange={(v) => { setGroup(v); setFilter(""); }}>
               <SelectTrigger id="master-group-select" data-testid="master-group-select"><SelectValue /></SelectTrigger>
@@ -276,22 +281,22 @@ export default function COAPage() {
                 {groupTabs.map(g => <SelectItem key={g.key} value={g.key}>{g.key === "BUMDES" ? "BUMDES - Pusat" : `${g.label} - ${g.sub}`}</SelectItem>)}
               </SelectContent>
             </Select>
-          </div>
-          <div className="card card-sm flex flex-wrap gap-2" data-testid="master-type-tabs">
-            <button data-testid="tab-accounts" onClick={() => setActiveSection("accounts")} className={`btn ${activeSection === "accounts" ? "btn-primary" : "btn-outline"}`}>Kode Akun</button>
-            <button data-testid="tab-transaction-types" onClick={() => setActiveSection("transaction-types")} className={`btn ${activeSection === "transaction-types" ? "btn-primary" : "btn-outline"}`}>Jenis Transaksi</button>
-          </div>
+          </Card>
+          <Card className="p-4 flex flex-wrap gap-2" data-testid="master-type-tabs">
+            <Button data-testid="tab-accounts" onClick={() => setActiveSection("accounts")} variant={activeSection === "accounts" ? "default" : "outline"}>Kode Akun</Button>
+            <Button data-testid="tab-transaction-types" onClick={() => setActiveSection("transaction-types")} variant={activeSection === "transaction-types" ? "default" : "outline"}>Jenis Transaksi</Button>
+          </Card>
         </div>
       )}
 
       {activeSection === "accounts" && <>
       {/* ============ KODE AKUN ============ */}
-      <div className="card card-sm flex flex-wrap items-center gap-2" data-testid="account-toolbar">
-        <button data-testid="btn-download-account-template" onClick={() => downloadTemplate("accounts")} className="btn btn-outline"><DownloadSimple size={16} /> Download Template</button>
-        <button data-testid="btn-import-account" onClick={() => accountFileRef.current?.click()} className="btn btn-outline"><UploadSimple size={16} /> Import Excel</button>
-        <button data-testid="btn-export-account" onClick={() => exportMasterData("accounts")} className="btn btn-outline"><DownloadSimple size={16} /> Export Excel</button>
+      <Card className="p-4 flex flex-wrap items-center gap-2" data-testid="account-toolbar">
+        <Button variant="outline" data-testid="btn-download-account-template" onClick={() => downloadTemplate("accounts")}><DownloadSimple size={16} /> Download Template</Button>
+        <Button variant="outline" data-testid="btn-import-account" onClick={() => accountFileRef.current?.click()}><UploadSimple size={16} /> Import Excel</Button>
+        <Button variant="outline" data-testid="btn-export-account" onClick={() => exportMasterData("accounts")}><DownloadSimple size={16} /> Export Excel</Button>
         <input ref={accountFileRef} type="file" accept=".xlsx" onChange={(e) => importFile(e, "accounts")} hidden />
-      </div>
+      </Card>
       <div className="flex justify-between items-center gap-4 flex-wrap pt-2">
         <div>
           <h2 className="font-heading text-2xl font-bold">Kode Akun — {groupLabel}</h2>
@@ -300,14 +305,15 @@ export default function COAPage() {
           </p>
         </div>
         {canAdd && (
-          <button data-testid="btn-new-account" onClick={openCreateAcc} className="btn btn-primary">
+          <Button data-testid="btn-new-account" onClick={openCreateAcc}>
             <Plus size={16} /> Tambah Kode Akun
-          </button>
+          </Button>
         )}
       </div>
 
       {showAcc && canAdd && (
-        <div className="card fade-in">
+        <Card className="fade-in">
+        <CardContent className="pt-6">
           <h3 className="font-heading text-lg font-semibold mb-4">
             {editAccCode
               ? `Edit Kode Akun (${editAccCode}) — ${groupLabel}`
@@ -315,10 +321,10 @@ export default function COAPage() {
           </h3>
           <form onSubmit={submitAcc} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div><label className="label">Kode Akun</label>
-              <input data-testid="acc-code" required className="input"
+              <Input data-testid="acc-code" required
                      value={accForm.code} onChange={(e) => setAccForm({ ...accForm, code: e.target.value })} /></div>
             <div><label className="label">Nama Akun</label>
-              <input data-testid="acc-name" required className="input"
+              <Input data-testid="acc-name" required
                      value={accForm.name} onChange={(e) => setAccForm({ ...accForm, name: e.target.value })} /></div>
             <div><label className="label">Kategori</label>
               <Select value={
@@ -338,7 +344,7 @@ export default function COAPage() {
                 </SelectContent>
               </Select>
               {!Object.keys(CAT_LABELS).includes(accForm.category) && (
-                <input data-testid="acc-category-custom" className="input mt-2"
+                <Input data-testid="acc-category-custom" className="mt-2"
                        placeholder="Ketik nama kategori baru..."
                        value={accForm.category}
                        onChange={(e) => setAccForm(f => ({ ...f, category: e.target.value.toLowerCase() }))} />
@@ -361,7 +367,7 @@ export default function COAPage() {
                 </SelectContent>
               </Select>
               {(!SUBCATEGORIES[accForm.category] || !SUBCATEGORIES[accForm.category].includes(accForm.subcategory)) && (
-                <input data-testid="acc-subcategory-custom" className="input mt-2"
+                <Input data-testid="acc-subcategory-custom" className="mt-2"
                        placeholder="Ketik nama sub-kategori baru..."
                        value={accForm.subcategory}
                        onChange={(e) => setAccForm(f => ({ ...f, subcategory: e.target.value.toLowerCase().replace(/\s+/g, "_") }))} />
@@ -381,30 +387,31 @@ export default function COAPage() {
             {accErr && <div className="sm:col-span-2 text-sm p-3 rounded-lg"
                             style={{ background: "var(--status-error-bg)", color: "var(--status-error)", border: "1px solid var(--status-error-border)" }}>{accErr}</div>}
             <div className="sm:col-span-2 flex justify-end gap-2 pt-2">
-              <button type="button" onClick={() => setShowAcc(false)} className="btn btn-outline">Batal</button>
-              <button data-testid="acc-save" className="btn btn-primary">Simpan</button>
+              <Button type="button" variant="outline" onClick={() => setShowAcc(false)}>Batal</Button>
+              <Button data-testid="acc-save">Simpan</Button>
             </div>
           </form>
-        </div>
+        </CardContent>
+        </Card>
       )}
 
       <div className="flex gap-2 flex-wrap">
         {[["", "Semua"], ...Object.entries(CAT_LABELS)].map(([k, v]) => (
-          <button key={k} data-testid={`cat-filter-${k || "all"}`}
-                  onClick={() => setFilter(k)}
-                  className={`btn ${filter === k ? "btn-secondary" : "btn-outline"} text-sm`}>{v}</button>
+          <Button key={k} data-testid={`cat-filter-${k || "all"}`}
+                  onClick={() => setFilter(k)} size="sm"
+                  variant={filter === k ? "secondary" : "outline"}>{v}</Button>
         ))}
       </div>
 
-      <div className="card p-0 overflow-hidden">
+      <Card className="p-0 overflow-hidden">
         <TableShell minWidth={720}>
         {isAdmin && selAcc.size > 0 && (
           <div className="p-3 flex justify-between items-center" style={{ background: "var(--status-error-bg)", borderBottom: "1px solid var(--status-error-border)" }}>
             <span className="text-sm" style={{ color: "var(--status-error)" }}>{selAcc.size} akun terpilih</span>
-            <button data-testid="bulk-del-acc" onClick={bulkDelAcc} className="btn text-xs"
-                    style={{ background: "var(--status-error)", color: "white" }}>
+            <Button data-testid="bulk-del-acc" onClick={bulkDelAcc} size="sm"
+                    className="text-xs" variant="destructive">
               <Trash size={14} /> Hapus Terpilih
-            </button>
+            </Button>
           </div>
         )}
         <Table data-testid="coa-table">
@@ -412,9 +419,9 @@ export default function COAPage() {
             <TableRow>
               {isAdmin && (
                 <TableHead style={{ width: 32 }}>
-                  <input type="checkbox" data-testid="coa-select-all"
+                  <Checkbox data-testid="coa-select-all"
                          checked={accSort.sorted.length > 0 && accSort.sorted.every(a => selAcc.has(a.code))}
-                         onChange={(e) => setSelAcc(e.target.checked ? new Set(accSort.sorted.map(a => a.code)) : new Set())} />
+                         onCheckedChange={(checked) => setSelAcc(checked ? new Set(accSort.sorted.map(a => a.code)) : new Set())} />
                 </TableHead>
               )}
               <TableHead {...accSort.headerProps("code")}>Kode{accSort.sortIndicator("code")}</TableHead>
@@ -435,9 +442,9 @@ export default function COAPage() {
               <TableRow key={a.code}>
                 {isAdmin && (
                   <TableCell>
-                    <input type="checkbox" data-testid={`sel-acc-${a.code}`}
+                    <Checkbox data-testid={`sel-acc-${a.code}`}
                            checked={selAcc.has(a.code)}
-                           onChange={() => setSelAcc(prev => {
+                           onCheckedChange={() => setSelAcc(prev => {
                              const n = new Set(prev);
                              n.has(a.code) ? n.delete(a.code) : n.add(a.code);
                              return n;
@@ -446,11 +453,11 @@ export default function COAPage() {
                 )}
                 <TableCell className="font-mono font-semibold">{a.code}</TableCell>
                 <TableCell>{a.name}</TableCell>
-                <TableCell>{CAT_LABELS[a.category] ? <span className="badge">{CAT_LABELS[a.category]}</span> : <span className="badge badge-purple">{a.category}</span>}</TableCell>
+                <TableCell>{CAT_LABELS[a.category] ? <Badge>{CAT_LABELS[a.category]}</Badge> : <Badge variant="secondary">{a.category}</Badge>}</TableCell>
                 <TableCell className="text-xs">{a.subcategory}</TableCell>
                 <TableCell>{a.normal_balance === "debit"
-                  ? <span className="badge badge-blue">Debit</span>
-                  : <span className="badge badge-purple">Kredit</span>}</TableCell>
+                  ? <Badge variant="outline">Debit</Badge>
+                  : <Badge variant="secondary">Kredit</Badge>}</TableCell>
                 {isAdmin && (
                   <TableCell>
                     <div className="flex gap-1">
@@ -470,18 +477,18 @@ export default function COAPage() {
           </TableBody>
         </Table>
         </TableShell>
-      </div>
+      </Card>
 
       </>}
 
       {activeSection === "transaction-types" && <>
       {/* ============ JENIS TRANSAKSI ============ */}
-      <div className="card card-sm flex flex-wrap items-center gap-2" data-testid="transaction-toolbar">
-        <button data-testid="btn-download-transaction-template" onClick={() => downloadTemplate("transaction-types")} className="btn btn-outline"><DownloadSimple size={16} /> Download Template</button>
-        <button data-testid="btn-import-transaction" onClick={() => transactionFileRef.current?.click()} className="btn btn-outline"><UploadSimple size={16} /> Import Excel</button>
-        <button data-testid="btn-export-transaction" onClick={() => exportMasterData("transaction-types")} className="btn btn-outline"><DownloadSimple size={16} /> Export Excel</button>
+      <Card className="p-4 flex flex-wrap items-center gap-2" data-testid="transaction-toolbar">
+        <Button variant="outline" data-testid="btn-download-transaction-template" onClick={() => downloadTemplate("transaction-types")}><DownloadSimple size={16} /> Download Template</Button>
+        <Button variant="outline" data-testid="btn-import-transaction" onClick={() => transactionFileRef.current?.click()}><UploadSimple size={16} /> Import Excel</Button>
+        <Button variant="outline" data-testid="btn-export-transaction" onClick={() => exportMasterData("transaction-types")}><DownloadSimple size={16} /> Export Excel</Button>
         <input ref={transactionFileRef} type="file" accept=".xlsx" onChange={(e) => importFile(e, "transaction-types")} hidden />
-      </div>
+      </Card>
       <div className="flex justify-between items-center gap-4 flex-wrap pt-4">
         <div>
           <h2 className="font-heading text-2xl font-bold">Jenis Transaksi — {groupLabel}</h2>
@@ -490,14 +497,15 @@ export default function COAPage() {
           </p>
         </div>
         {isAdmin && (
-          <button data-testid="btn-new-tt" onClick={openCreateTT} className="btn btn-primary">
+          <Button data-testid="btn-new-tt" onClick={openCreateTT}>
             <Plus size={16} /> Tambah Jenis Transaksi
-          </button>
+          </Button>
         )}
       </div>
 
       {showTT && isAdmin && (
-        <div className="card fade-in">
+        <Card className="fade-in">
+        <CardContent className="pt-6">
           <h3 className="font-heading text-lg font-semibold mb-4">
             {editTTCode
               ? `Edit Jenis Transaksi (${editTTCode}) — ${groupLabel}`
@@ -505,11 +513,11 @@ export default function COAPage() {
           </h3>
           <form onSubmit={submitTT} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div><label className="label">Kode</label>
-              <input data-testid="tt-code" required className="input"
+              <Input data-testid="tt-code" required
                      placeholder="mis. penjualan_kios"
                      value={ttForm.code} onChange={(e) => setTtForm({ ...ttForm, code: e.target.value })} /></div>
             <div><label className="label">Nama Transaksi</label>
-              <input data-testid="tt-name" required className="input"
+              <Input data-testid="tt-name" required
                      value={ttForm.name} onChange={(e) => setTtForm({ ...ttForm, name: e.target.value })} /></div>
             <div><label className="label">Akun Debit (default)</label>
               <Select required value={ttForm.debit || "__none__"} onValueChange={(v) => setTtForm({ ...ttForm, debit: v === "__none__" ? "" : v })}>
@@ -533,22 +541,23 @@ export default function COAPage() {
             {ttErr && <div className="sm:col-span-2 text-sm p-3 rounded-lg"
                            style={{ background: "var(--status-error-bg)", color: "var(--status-error)" }}>{ttErr}</div>}
             <div className="sm:col-span-2 flex justify-end gap-2 pt-2">
-              <button type="button" onClick={() => setShowTT(false)} className="btn btn-outline">Batal</button>
-              <button data-testid="tt-save" className="btn btn-primary">Simpan</button>
+              <Button type="button" variant="outline" onClick={() => setShowTT(false)}>Batal</Button>
+              <Button data-testid="tt-save">Simpan</Button>
             </div>
           </form>
-        </div>
+        </CardContent>
+        </Card>
       )}
 
-      <div className="card p-0 overflow-hidden">
+      <Card className="p-0 overflow-hidden">
         <TableShell minWidth={720}>
         {isAdmin && selTT.size > 0 && (
           <div className="p-3 flex justify-between items-center" style={{ background: "var(--status-error-bg)", borderBottom: "1px solid var(--status-error-border)" }}>
             <span className="text-sm" style={{ color: "var(--status-error)" }}>{selTT.size} jenis transaksi terpilih</span>
-            <button data-testid="bulk-del-tt" onClick={bulkDelTT} className="btn text-xs"
-                    style={{ background: "var(--status-error)", color: "white" }}>
+            <Button data-testid="bulk-del-tt" onClick={bulkDelTT} size="sm"
+                    className="text-xs" variant="destructive">
               <Trash size={14} /> Hapus Terpilih
-            </button>
+            </Button>
           </div>
         )}
         <Table data-testid="tt-table">
@@ -556,9 +565,9 @@ export default function COAPage() {
             <TableRow>
               {isAdmin && (
                 <TableHead style={{ width: 32 }}>
-                  <input type="checkbox" data-testid="tt-select-all"
+                  <Checkbox data-testid="tt-select-all"
                          checked={ttSort.sorted.length > 0 && ttSort.sorted.every(t => selTT.has(t.code))}
-                         onChange={(e) => setSelTT(e.target.checked ? new Set(ttSort.sorted.map(t => t.code)) : new Set())} />
+                         onCheckedChange={(checked) => setSelTT(checked ? new Set(ttSort.sorted.map(t => t.code)) : new Set())} />
                 </TableHead>
               )}
               <TableHead {...ttSort.headerProps("name")}>Nama Transaksi{ttSort.sortIndicator("name")}</TableHead>
@@ -575,9 +584,9 @@ export default function COAPage() {
               <TableRow key={t.code}>
                 {isAdmin && (
                   <TableCell>
-                    <input type="checkbox" data-testid={`sel-tt-${t.code}`}
+                    <Checkbox data-testid={`sel-tt-${t.code}`}
                            checked={selTT.has(t.code)}
-                           onChange={() => setSelTT(prev => {
+                           onCheckedChange={() => setSelTT(prev => {
                              const n = new Set(prev);
                              n.has(t.code) ? n.delete(t.code) : n.add(t.code);
                              return n;
@@ -611,7 +620,7 @@ export default function COAPage() {
           </TableBody>
         </Table>
         </TableShell>
-      </div>
+      </Card>
       </>}
     </div>
   );
