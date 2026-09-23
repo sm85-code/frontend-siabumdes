@@ -8,6 +8,10 @@ import { FilePdf, FileXls, FileDoc, ChartLine, Scales, Coins, TrendUp, BookOpen,
 import TableShell from "@/components/TableShell";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 
 const MONTHS = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 const YEAR_MIN = 2022, YEAR_MAX = 2030;
@@ -165,20 +169,21 @@ export default function Reports() {
 
       {isAdmin && (
         <div className="tab-strip" data-testid="reports-toplevel-tabs">
-          <button data-testid="tab-laporan" onClick={() => { setTab("laporan"); setData(null); }}
-                  className={`btn ${tab === "laporan" ? "btn-primary" : "btn-outline"}`}>
+          <Button data-testid="tab-laporan" onClick={() => { setTab("laporan"); setData(null); }}
+                  variant={tab === "laporan" ? "default" : "outline"}>
             <Scales size={16} weight={tab === "laporan" ? "fill" : "regular"} /> Laporan Keuangan
-          </button>
-          <button data-testid="tab-tutup-buku" onClick={() => setTab("tutup-buku")}
-                  className={`btn ${tab === "tutup-buku" ? "btn-primary" : "btn-outline"}`}>
+          </Button>
+          <Button data-testid="tab-tutup-buku" onClick={() => setTab("tutup-buku")}
+                  variant={tab === "tutup-buku" ? "default" : "outline"}>
             <Lock size={16} weight={tab === "tutup-buku" ? "fill" : "regular"} /> Tutup Buku
-          </button>
+          </Button>
         </div>
       )}
 
       {tab === "laporan" && (
         <>
-          <div className="card">
+          <Card>
+          <CardContent className="pt-6">
             <label className="label" htmlFor="report-group-select">Kelompok</label>
             <Select value={groupKey} disabled={isPengelola} onValueChange={(v) => { setGroupKey(v); setData(null); }}>
               <SelectTrigger id="report-group-select" data-testid="report-group-select"><SelectValue /></SelectTrigger>
@@ -186,9 +191,11 @@ export default function Reports() {
                 {groupOptions.map(o => <SelectItem key={o.code} value={o.code}>{o.code === "BUMDES" ? "BUMDES - Pusat" : `${o.code} - ${o.name}`}</SelectItem>)}
               </SelectContent>
             </Select>
-          </div>
+          </CardContent>
+          </Card>
 
-          <div className="card">
+          <Card>
+          <CardContent className="pt-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-start">
               <div>
                 <label className="label" htmlFor="report-type-select">Jenis Laporan Keuangan</label>
@@ -219,7 +226,7 @@ export default function Reports() {
                       <SelectItem value="dates">Pilih tanggal</SelectItem>
                     </SelectContent>
                   </Select>
-                  {customPreset === "dates" && <div className="grid grid-cols-2 gap-2 mt-2"><input className="input" type="date" value={customStart} onChange={(e) => setCustomStart(e.target.value)} /><input className="input" type="date" value={customEnd} onChange={(e) => setCustomEnd(e.target.value)} /></div>}
+                  {customPreset === "dates" && <div className="grid grid-cols-2 gap-2 mt-2"><Input type="date" value={customStart} onChange={(e) => setCustomStart(e.target.value)} /><Input type="date" value={customEnd} onChange={(e) => setCustomEnd(e.target.value)} /></div>}
                 </>}
               </div>
               {periodMode === "monthly" && <div>
@@ -240,30 +247,32 @@ export default function Reports() {
                   </SelectContent>
                 </Select>
               </div>
-              <button data-testid="btn-load-report" onClick={load} className="btn btn-primary">
+              <Button data-testid="btn-load-report" onClick={load}>
                 {loading ? <Spinner size={18} label="Memuat..." /> : "Tampilkan Laporan"}
-              </button>
+              </Button>
             </div>
-          </div>
+          </CardContent>
+          </Card>
         </>
       )}
 
       {tab === "laporan" && data && cfg && (
-        <div className="card fade-in">
+        <Card className="fade-in">
+        <CardContent className="pt-6">
           <div className="flex justify-between items-center mb-4 flex-wrap gap-2">
             <h3 className="font-heading text-xl font-semibold">{cfg.label}
-              <span className="ml-2 badge">{groupKey}</span>
+              <Badge className="ml-2">{groupKey}</Badge>
             </h3>
             <div className="flex gap-2">
-              <button data-testid="btn-export-pdf" onClick={() => download("pdf")} className="btn btn-outline">
+              <Button variant="outline" data-testid="btn-export-pdf" onClick={() => download("pdf")}>
                 <FilePdf size={16} weight="duotone" color="var(--status-error)" /> Export PDF
-              </button>
-              <button data-testid="btn-export-excel" onClick={() => download("excel")} className="btn btn-outline">
+              </Button>
+              <Button variant="outline" data-testid="btn-export-excel" onClick={() => download("excel")}>
                 <FileXls size={16} weight="duotone" color="var(--primary-dark)" /> Export Excel
-              </button>
-              <button data-testid="btn-export-word" onClick={() => download("word")} className="btn btn-outline">
+              </Button>
+              <Button variant="outline" data-testid="btn-export-word" onClick={() => download("word")}>
                 <FileDoc size={16} weight="duotone" color="#2b579a" /> Export Word
-              </button>
+              </Button>
             </div>
           </div>
           <ReportBody active={active} data={data} />
@@ -301,11 +310,13 @@ export default function Reports() {
               </ol>
             </div>
           )}
-        </div>
+        </CardContent>
+        </Card>
       )}
 
       {tab === "tutup-buku" && isAdmin && (
-        <div className="card" data-testid="close-period-card">
+        <Card data-testid="close-period-card">
+        <CardContent className="pt-6">
           <div className="flex items-center gap-2 mb-3">
             <Lock size={20} weight="duotone" color="var(--status-warning)" />
             <h3 className="font-heading font-semibold">Tutup Buku</h3>
@@ -365,7 +376,7 @@ export default function Reports() {
             ) : (
               <div>
                 <label className="label">Periode</label>
-                <input type="month" className="input" data-testid="close-period-input"
+                <Input type="month" data-testid="close-period-input"
                        value={`${closeYear}-${pad(closeMonth)}`}
                        onChange={(e) => {
                          const [y, m] = e.target.value.split("-");
@@ -373,9 +384,9 @@ export default function Reports() {
                        }} />
               </div>
             )}
-            <button data-testid="btn-close-period" onClick={doClose} className="btn btn-primary">
+            <Button data-testid="btn-close-period" onClick={doClose}>
               <Lock size={16} /> Tutup Buku
-            </button>
+            </Button>
           </div>
 
           <div className="mt-6">
@@ -393,14 +404,13 @@ export default function Reports() {
                   ) : closedList.map(c => (
                     <TableRow key={c.period + c.group}>
                       <TableCell className="font-medium">{c.period}</TableCell>
-                      <TableCell><span className="badge">{c.group}</span></TableCell>
+                      <TableCell><Badge>{c.group}</Badge></TableCell>
                       <TableCell className="num">{fmtRp(c.laba_bersih || 0)}</TableCell>
                       <TableCell className="whitespace-nowrap">
-                        <button data-testid={`reopen-${c.period}-${c.group}`}
-                                onClick={() => doReopen(c.period, c.group)}
-                                className="btn btn-outline text-xs">
+                        <Button variant="outline" size="sm" className="text-xs" data-testid={`reopen-${c.period}-${c.group}`}
+                                onClick={() => doReopen(c.period, c.group)}>
                           Batalkan
-                        </button>
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -408,7 +418,8 @@ export default function Reports() {
               </Table>
             </TableShell>
           </div>
-        </div>
+        </CardContent>
+        </Card>
       )}
     </div>
   );
