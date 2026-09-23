@@ -5,6 +5,8 @@ import { notify } from "@/lib/feedback";
 import { useConfirm } from "@/components/ConfirmProvider";
 import Spinner from "@/components/Spinner";
 import { FilePdf, FileXls, FileDoc, ChartLine, Scales, Coins, TrendUp, BookOpen, Lock } from "@phosphor-icons/react";
+import TableShell from "@/components/TableShell";
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 
 const MONTHS = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 const YEAR_MIN = 2022, YEAR_MAX = 2030;
@@ -243,9 +245,7 @@ export default function Reports() {
               </button>
             </div>
           </div>
-          <div className="h-scroll">
-            <ReportBody active={active} data={data} />
-          </div>
+          <ReportBody active={active} data={data} />
           {/* Alokasi Bagi Hasil Unit (30/70) */}
           {active === "laba-rugi" && activeUnitId && (
             <div className="mt-6 p-4 rounded-lg" data-testid="bagi-hasil-info"
@@ -351,33 +351,33 @@ export default function Reports() {
 
           <div className="mt-6">
             <p className="label mb-2">Periode Sudah Ditutup ({closedList.length})</p>
-            <div className="h-scroll">
-              <table className="tbl" data-testid="closed-periods-table" style={{ minWidth: 520 }}>
-                <thead>
-                  <tr>
-                    <th>Periode</th><th>Kelompok</th><th className="num">Laba Bersih</th><th />
-                  </tr>
-                </thead>
-                <tbody>
+            <TableShell minWidth={520}>
+              <Table data-testid="closed-periods-table">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Periode</TableHead><TableHead>Kelompok</TableHead><TableHead className="num">Laba Bersih</TableHead><TableHead />
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                   {closedList.length === 0 ? (
-                    <tr><td colSpan={4} className="text-center py-8" style={{ color: "var(--text-muted)" }}>Belum ada periode yang ditutup.</td></tr>
+                    <TableRow><TableCell colSpan={4} className="text-center py-8" style={{ color: "var(--text-muted)" }}>Belum ada periode yang ditutup.</TableCell></TableRow>
                   ) : closedList.map(c => (
-                    <tr key={c.period + c.group}>
-                      <td className="font-medium">{c.period}</td>
-                      <td><span className="badge">{c.group}</span></td>
-                      <td className="num">{fmtRp(c.laba_bersih || 0)}</td>
-                      <td className="whitespace-nowrap">
+                    <TableRow key={c.period + c.group}>
+                      <TableCell className="font-medium">{c.period}</TableCell>
+                      <TableCell><span className="badge">{c.group}</span></TableCell>
+                      <TableCell className="num">{fmtRp(c.laba_bersih || 0)}</TableCell>
+                      <TableCell className="whitespace-nowrap">
                         <button data-testid={`reopen-${c.period}-${c.group}`}
                                 onClick={() => doReopen(c.period, c.group)}
                                 className="btn btn-outline text-xs">
                           Batalkan
                         </button>
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   ))}
-                </tbody>
-              </table>
-            </div>
+                </TableBody>
+              </Table>
+            </TableShell>
           </div>
         </div>
       )}
@@ -388,39 +388,43 @@ export default function Reports() {
 function ReportBody({ active, data }) {
   if (active === "laba-rugi") {
     return (
-      <table className="tbl" style={{ minWidth: 480 }}>
-        <thead><tr><th>Kode</th><th>Nama Akun</th><th className="num">Jumlah</th></tr></thead>
-        <tbody>
-          <tr><td colSpan={3} className="font-semibold" style={{ background: "var(--primary-light)" }}>PENDAPATAN</td></tr>
-          {data.pendapatan.map((it) => (<tr key={it.code}><td>{it.code}</td><td>{it.name}</td><td className="num">{fmtRp(it.amount)}</td></tr>))}
-          <tr><td></td><td className="font-semibold">Total Pendapatan</td><td className="num font-semibold">{fmtRp(data.total_pendapatan)}</td></tr>
-          <tr><td colSpan={3} className="font-semibold" style={{ background: "var(--primary-light)" }}>BEBAN</td></tr>
-          {data.beban.map((it) => (<tr key={it.code}><td>{it.code}</td><td>{it.name}</td><td className="num">{fmtRp(it.amount)}</td></tr>))}
-          <tr><td></td><td className="font-semibold">Total Beban</td><td className="num font-semibold">{fmtRp(data.total_beban)}</td></tr>
-          <tr style={{ background: "var(--total-row-bg)" }}><td></td><td className="font-bold" style={{ color: "var(--primary-dark)" }}>LABA / (RUGI) BERSIH</td><td className="num font-bold" style={{ color: "var(--primary-dark)" }}>{fmtRp(data.laba_bersih)}</td></tr>
-        </tbody>
-      </table>
+      <TableShell minWidth={480}>
+        <Table>
+          <TableHeader><TableRow><TableHead>Kode</TableHead><TableHead>Nama Akun</TableHead><TableHead className="num">Jumlah</TableHead></TableRow></TableHeader>
+          <TableBody>
+            <TableRow><TableCell colSpan={3} className="font-semibold" style={{ background: "var(--primary-light)" }}>PENDAPATAN</TableCell></TableRow>
+            {data.pendapatan.map((it) => (<TableRow key={it.code}><TableCell>{it.code}</TableCell><TableCell>{it.name}</TableCell><TableCell className="num">{fmtRp(it.amount)}</TableCell></TableRow>))}
+            <TableRow><TableCell></TableCell><TableCell className="font-semibold">Total Pendapatan</TableCell><TableCell className="num font-semibold">{fmtRp(data.total_pendapatan)}</TableCell></TableRow>
+            <TableRow><TableCell colSpan={3} className="font-semibold" style={{ background: "var(--primary-light)" }}>BEBAN</TableCell></TableRow>
+            {data.beban.map((it) => (<TableRow key={it.code}><TableCell>{it.code}</TableCell><TableCell>{it.name}</TableCell><TableCell className="num">{fmtRp(it.amount)}</TableCell></TableRow>))}
+            <TableRow><TableCell></TableCell><TableCell className="font-semibold">Total Beban</TableCell><TableCell className="num font-semibold">{fmtRp(data.total_beban)}</TableCell></TableRow>
+            <TableRow style={{ background: "var(--total-row-bg)" }}><TableCell></TableCell><TableCell className="font-bold" style={{ color: "var(--primary-dark)" }}>LABA / (RUGI) BERSIH</TableCell><TableCell className="num font-bold" style={{ color: "var(--primary-dark)" }}>{fmtRp(data.laba_bersih)}</TableCell></TableRow>
+          </TableBody>
+        </Table>
+      </TableShell>
     );
   }
   if (active === "neraca") {
     return (
       <>
         <p className="text-sm mb-3" style={{ color: "var(--text-secondary)" }}>Per: {data.as_of}</p>
-        <table className="tbl" style={{ minWidth: 480 }}>
-          <thead><tr><th>Kode</th><th>Akun</th><th className="num">Jumlah</th></tr></thead>
-          <tbody>
-            <tr><td colSpan={3} className="font-semibold" style={{ background: "var(--primary-light)" }}>ASET</td></tr>
-            {data.aset.map((it) => (<tr key={`a-${it.code}`}><td>{it.code}</td><td>{it.name}</td><td className="num">{fmtRp(it.amount)}</td></tr>))}
-            <tr><td></td><td className="font-semibold">Total Aset</td><td className="num font-semibold">{fmtRp(data.total_aset)}</td></tr>
-            <tr><td colSpan={3} className="font-semibold" style={{ background: "var(--primary-light)" }}>KEWAJIBAN</td></tr>
-            {data.kewajiban.map((it) => (<tr key={`k-${it.code}`}><td>{it.code}</td><td>{it.name}</td><td className="num">{fmtRp(it.amount)}</td></tr>))}
-            <tr><td></td><td className="font-semibold">Total Kewajiban</td><td className="num font-semibold">{fmtRp(data.total_kewajiban)}</td></tr>
-            <tr><td colSpan={3} className="font-semibold" style={{ background: "var(--primary-light)" }}>EKUITAS</td></tr>
-            {data.ekuitas.map((it, i) => (<tr key={`e-${it.code}-${i}`}><td>{it.code}</td><td>{it.name}</td><td className="num">{fmtRp(it.amount)}</td></tr>))}
-            <tr><td></td><td className="font-semibold">Total Ekuitas</td><td className="num font-semibold">{fmtRp(data.total_ekuitas)}</td></tr>
-            <tr style={{ background: "var(--total-row-bg)" }}><td></td><td className="font-bold">TOTAL PASIVA</td><td className="num font-bold">{fmtRp(data.total_pasiva)}</td></tr>
-          </tbody>
-        </table>
+        <TableShell minWidth={480}>
+          <Table>
+            <TableHeader><TableRow><TableHead>Kode</TableHead><TableHead>Akun</TableHead><TableHead className="num">Jumlah</TableHead></TableRow></TableHeader>
+            <TableBody>
+              <TableRow><TableCell colSpan={3} className="font-semibold" style={{ background: "var(--primary-light)" }}>ASET</TableCell></TableRow>
+              {data.aset.map((it) => (<TableRow key={`a-${it.code}`}><TableCell>{it.code}</TableCell><TableCell>{it.name}</TableCell><TableCell className="num">{fmtRp(it.amount)}</TableCell></TableRow>))}
+              <TableRow><TableCell></TableCell><TableCell className="font-semibold">Total Aset</TableCell><TableCell className="num font-semibold">{fmtRp(data.total_aset)}</TableCell></TableRow>
+              <TableRow><TableCell colSpan={3} className="font-semibold" style={{ background: "var(--primary-light)" }}>KEWAJIBAN</TableCell></TableRow>
+              {data.kewajiban.map((it) => (<TableRow key={`k-${it.code}`}><TableCell>{it.code}</TableCell><TableCell>{it.name}</TableCell><TableCell className="num">{fmtRp(it.amount)}</TableCell></TableRow>))}
+              <TableRow><TableCell></TableCell><TableCell className="font-semibold">Total Kewajiban</TableCell><TableCell className="num font-semibold">{fmtRp(data.total_kewajiban)}</TableCell></TableRow>
+              <TableRow><TableCell colSpan={3} className="font-semibold" style={{ background: "var(--primary-light)" }}>EKUITAS</TableCell></TableRow>
+              {data.ekuitas.map((it, i) => (<TableRow key={`e-${it.code}-${i}`}><TableCell>{it.code}</TableCell><TableCell>{it.name}</TableCell><TableCell className="num">{fmtRp(it.amount)}</TableCell></TableRow>))}
+              <TableRow><TableCell></TableCell><TableCell className="font-semibold">Total Ekuitas</TableCell><TableCell className="num font-semibold">{fmtRp(data.total_ekuitas)}</TableCell></TableRow>
+              <TableRow style={{ background: "var(--total-row-bg)" }}><TableCell></TableCell><TableCell className="font-bold">TOTAL PASIVA</TableCell><TableCell className="num font-bold">{fmtRp(data.total_pasiva)}</TableCell></TableRow>
+            </TableBody>
+          </Table>
+        </TableShell>
         <p className="text-xs mt-3" style={{ color: data.balanced ? "var(--status-success)" : "var(--status-error)" }}>
           {data.balanced ? "✓ Neraca seimbang" : "⚠ Neraca belum seimbang — periksa transaksi."}
         </p>
@@ -429,33 +433,42 @@ function ReportBody({ active, data }) {
   }
   if (active === "arus-kas") {
     return (
-      <table className="tbl" style={{ minWidth: 480 }}>
-        <thead><tr><th>Tanggal</th><th>Keterangan</th><th className="num">Jumlah</th></tr></thead>
-        <tbody>
-          <tr><td colSpan={3} className="font-semibold" style={{ background: "var(--primary-light)" }}>KAS MASUK</td></tr>
-          {data.kas_masuk.map((it, i) => (<tr key={`m-${it.date}-${i}`}><td>{it.date}</td><td>{it.description}</td><td className="num">{fmtRp(it.amount)}</td></tr>))}
-          <tr><td></td><td className="font-semibold">Total Kas Masuk</td><td className="num font-semibold">{fmtRp(data.total_masuk)}</td></tr>
-          <tr><td colSpan={3} className="font-semibold" style={{ background: "var(--primary-light)" }}>KAS KELUAR</td></tr>
-          {data.kas_keluar.map((it, i) => (<tr key={`k-${it.date}-${i}`}><td>{it.date}</td><td>{it.description}</td><td className="num">{fmtRp(it.amount)}</td></tr>))}
-          <tr><td></td><td className="font-semibold">Total Kas Keluar</td><td className="num font-semibold">{fmtRp(data.total_keluar)}</td></tr>
-          <tr style={{ background: "var(--total-row-bg)" }}><td></td><td className="font-bold">ARUS KAS BERSIH</td><td className="num font-bold">{fmtRp(data.arus_kas_bersih)}</td></tr>
-        </tbody>
-      </table>
+      <TableShell minWidth={480}>
+        <Table>
+          <TableHeader><TableRow><TableHead>Tanggal</TableHead><TableHead>Keterangan</TableHead><TableHead className="num">Jumlah</TableHead></TableRow></TableHeader>
+          <TableBody>
+            <TableRow><TableCell colSpan={3} className="font-semibold" style={{ background: "var(--primary-light)" }}>KAS MASUK</TableCell></TableRow>
+            {data.kas_masuk.map((it, i) => (<TableRow key={`m-${it.date}-${i}`}><TableCell>{it.date}</TableCell><TableCell>{it.description}</TableCell><TableCell className="num">{fmtRp(it.amount)}</TableCell></TableRow>))}
+            <TableRow><TableCell></TableCell><TableCell className="font-semibold">Total Kas Masuk</TableCell><TableCell className="num font-semibold">{fmtRp(data.total_masuk)}</TableCell></TableRow>
+            <TableRow><TableCell colSpan={3} className="font-semibold" style={{ background: "var(--primary-light)" }}>KAS KELUAR</TableCell></TableRow>
+            {data.kas_keluar.map((it, i) => (<TableRow key={`k-${it.date}-${i}`}><TableCell>{it.date}</TableCell><TableCell>{it.description}</TableCell><TableCell className="num">{fmtRp(it.amount)}</TableCell></TableRow>))}
+            <TableRow><TableCell></TableCell><TableCell className="font-semibold">Total Kas Keluar</TableCell><TableCell className="num font-semibold">{fmtRp(data.total_keluar)}</TableCell></TableRow>
+            <TableRow style={{ background: "var(--total-row-bg)" }}><TableCell></TableCell><TableCell className="font-bold">ARUS KAS BERSIH</TableCell><TableCell className="num font-bold">{fmtRp(data.arus_kas_bersih)}</TableCell></TableRow>
+          </TableBody>
+        </Table>
+      </TableShell>
     );
   }
   if (active === "perubahan-ekuitas") {
     const row = (item) => item.kind === "section" ? (
-      <tr key={item.no} style={{ background: "var(--total-row-bg)", fontWeight: 700 }}>
-        <td>{item.no}</td><td colSpan={2} className="uppercase tracking-wide" style={{ paddingLeft: 12 + (item.indent || 0) * 20 }}>{item.label}</td>
-      </tr>
+      <TableRow key={item.no} style={{ background: "var(--total-row-bg)", fontWeight: 700 }}>
+        <TableCell>{item.no}</TableCell><TableCell colSpan={2} className="uppercase tracking-wide" style={{ paddingLeft: 12 + (item.indent || 0) * 20 }}>{item.label}</TableCell>
+      </TableRow>
     ) : (
-      <tr key={item.no} style={item.bold ? { background: "var(--primary-light)", fontWeight: 700 } : undefined}>
-        <td>{item.no}</td>
-        <td className="max-w-xs" style={{ paddingLeft: 12 + (item.indent || 0) * 20 }}>{item.label}</td>
-        <td className="num">{fmtRp(item.amount)}</td>
-      </tr>
+      <TableRow key={item.no} style={item.bold ? { background: "var(--primary-light)", fontWeight: 700 } : undefined}>
+        <TableCell>{item.no}</TableCell>
+        <TableCell className="max-w-xs" style={{ paddingLeft: 12 + (item.indent || 0) * 20 }}>{item.label}</TableCell>
+        <TableCell className="num">{fmtRp(item.amount)}</TableCell>
+      </TableRow>
     );
-    return <table className="tbl tbl-compact-mobile" style={{ minWidth: 620 }}><thead><tr><th>No.</th><th>Uraian</th><th className="num">Jumlah (Rp)</th></tr></thead><tbody>{data.rows.map(row)}</tbody></table>;
+    return (
+      <TableShell minWidth={620}>
+        <Table className="tbl-compact-mobile">
+          <TableHeader><TableRow><TableHead>No.</TableHead><TableHead>Uraian</TableHead><TableHead className="num">Jumlah (Rp)</TableHead></TableRow></TableHeader>
+          <TableBody>{data.rows.map(row)}</TableBody>
+        </Table>
+      </TableShell>
+    );
   }
   if (active === "calk") {
     const INFO_LABELS = { nama: "Nama Entitas", periode_awal: "Periode Awal", periode_akhir: "Periode Akhir" };
@@ -470,23 +483,27 @@ function ReportBody({ active, data }) {
       <div className="space-y-6 text-sm leading-relaxed">
         <section>
           <h4 className="font-heading font-semibold mb-2">1. Informasi Umum</h4>
-          <table className="tbl" style={{ minWidth: 320 }}>
-            <tbody>
-              {Object.entries(data.informasi_umum).map(([k, v]) => (
-                <tr key={k}><td style={{ width: "45%" }}>{INFO_LABELS[k] || titleCase(k)}</td><td>{fmtInfoValue(k, v)}</td></tr>
-              ))}
-            </tbody>
-          </table>
+          <TableShell minWidth={320}>
+            <Table>
+              <TableBody>
+                {Object.entries(data.informasi_umum).map(([k, v]) => (
+                  <TableRow key={k}><TableCell style={{ width: "45%" }}>{INFO_LABELS[k] || titleCase(k)}</TableCell><TableCell>{fmtInfoValue(k, v)}</TableCell></TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableShell>
         </section>
         <section>
           <h4 className="font-heading font-semibold mb-2">2. Ringkasan Kinerja</h4>
-          <table className="tbl" style={{ minWidth: 320 }}>
-            <tbody>
-              {Object.entries(data.ringkasan_kinerja).map(([k, v]) => (
-                <tr key={k}><td>{RINGKASAN_LABELS[k] || titleCase(k)}</td><td className="num">{fmtRp(v)}</td></tr>
-              ))}
-            </tbody>
-          </table>
+          <TableShell minWidth={320}>
+            <Table>
+              <TableBody>
+                {Object.entries(data.ringkasan_kinerja).map(([k, v]) => (
+                  <TableRow key={k}><TableCell>{RINGKASAN_LABELS[k] || titleCase(k)}</TableCell><TableCell className="num">{fmtRp(v)}</TableCell></TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableShell>
         </section>
         <section>
           <h4 className="font-heading font-semibold mb-2">3. Kebijakan Akuntansi</h4>

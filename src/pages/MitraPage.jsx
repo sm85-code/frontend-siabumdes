@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import TableShell from "@/components/TableShell";
 
 export default function MitraPage() {
   const { user } = useAuth();
@@ -90,23 +91,25 @@ export default function MitraPage() {
         </Card>
       )}
 
-      <Card className="p-0 overflow-x-auto">
-        <Table className="tbl">
-          <TableHeader><TableRow><TableHead>Nama</TableHead><TableHead>Unit</TableHead><TableHead>Jenis</TableHead><TableHead>HP</TableHead><TableHead className="num text-right">Modal</TableHead>{canDel && <TableHead></TableHead>}</TableRow></TableHeader>
-          <TableBody>
-            {list.length === 0 ? <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Belum ada mitra.</TableCell></TableRow>
-              : list.map(m => (
-                <TableRow key={m.id}>
-                  <TableCell className="font-medium">{m.name}</TableCell>
-                  <TableCell><Badge variant="secondary">{units.find(u => u.id === m.unit_usaha_id)?.code || "-"}</Badge></TableCell>
-                  <TableCell>{m.mitra_type || "-"}</TableCell>
-                  <TableCell>{m.phone || "-"}</TableCell>
-                  <TableCell className="num text-right">{fmtRp(m.modal)}</TableCell>
-                  {canDel && <TableCell><Button variant="ghost" size="icon" onClick={() => del(m.id)} className="h-8 w-8"><Trash size={16} color="var(--status-error)" /></Button></TableCell>}
-                </TableRow>
-              ))}
-          </TableBody>
-        </Table>
+      <Card className="p-0">
+        <TableShell minWidth={720}>
+          <Table>
+            <TableHeader><TableRow><TableHead>Nama</TableHead><TableHead>Unit</TableHead><TableHead>Jenis</TableHead><TableHead>HP</TableHead><TableHead className="num text-right">Modal</TableHead>{canDel && <TableHead></TableHead>}</TableRow></TableHeader>
+            <TableBody>
+              {list.length === 0 ? <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Belum ada mitra.</TableCell></TableRow>
+                : list.map(m => (
+                  <TableRow key={m.id}>
+                    <TableCell className="font-medium">{m.name}</TableCell>
+                    <TableCell><Badge variant="secondary">{units.find(u => u.id === m.unit_usaha_id)?.code || "-"}</Badge></TableCell>
+                    <TableCell>{m.mitra_type || "-"}</TableCell>
+                    <TableCell>{m.phone || "-"}</TableCell>
+                    <TableCell className="num text-right">{fmtRp(m.modal)}</TableCell>
+                    {canDel && <TableCell><Button variant="ghost" size="icon" onClick={() => del(m.id)} className="h-8 w-8"><Trash size={16} color="var(--status-error)" /></Button></TableCell>}
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
+        </TableShell>
       </Card>
     </div>
   );
