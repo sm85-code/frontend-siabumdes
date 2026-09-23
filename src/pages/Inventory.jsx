@@ -192,7 +192,7 @@ export default function Inventory() {
 
   if (!canAccessRole) return <Navigate to="/dashboard" replace />;
   if (loading) {
-    return <div className="flex justify-center py-10"><Spinner label="Memuat inventory…" /></div>;
+    return <div className="flex items-center justify-center min-h-[60vh]"><Spinner label="Memuat inventory…" /></div>;
   }
   if (meta && user?.role === "pengelola" && user.unit_usaha_id !== meta.unit_usaha_id) {
     return <Navigate to="/dashboard" replace />;

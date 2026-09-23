@@ -20,9 +20,6 @@ select option { background: #fff; color: var(--text-primary); }
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 1rem; background: var(--surface-alt); color: var(--text-secondary);
 }
-.page-loader-bar { width: 148px; height: 4px; border-radius: 99px; overflow: hidden; background: var(--legacy-border); }
-.page-loader-bar > i { display: block; height: 100%; width: 38%; background: var(--primary); animation: loader-slide 1.05s ease-in-out infinite; }
-@keyframes loader-slide { 0% { transform: translateX(-120%); } 100% { transform: translateX(350%); } }
 
 .toaster [data-sonner-toast] {
   background: #fff !important; border: 1px solid var(--legacy-border) !important; color: var(--text-primary) !important;

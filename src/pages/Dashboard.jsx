@@ -159,7 +159,7 @@ export default function Dashboard() {
   }, [data, currentOpt.bucket]);
   const useBar = chartData.length <= 1;
 
-  if (loading && !data) return <div className="flex justify-center py-10"><Spinner label="Memuat dashboard..." /></div>;
+  if (loading && !data) return <div className="flex items-center justify-center min-h-[60vh]"><Spinner label="Memuat dashboard..." /></div>;
   if (!data) return <div className="text-sm">Tidak ada data.</div>;
 
   const jabatan = ROLE_LABELS[user?.role] || "Pengguna";
