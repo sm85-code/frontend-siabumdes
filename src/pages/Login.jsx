@@ -51,6 +51,7 @@ export default function Login() {
                 <input data-testid="login-password" className="input pr-10" type={showPw ? "text" : "password"}
                   value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required />
                 <button type="button" data-testid="toggle-password" onClick={() => setShowPw(!showPw)}
+                        aria-label={showPw ? "Sembunyikan password" : "Tampilkan password"}
                         className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: "var(--text-muted)" }}>
                   {showPw ? <EyeSlash size={18} /> : <Eye size={18} />}
                 </button>
