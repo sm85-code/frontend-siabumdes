@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import { Eye, EyeSlash, SignIn, ArrowLeft } from "@phosphor-icons/react";
+import Spinner from "@/components/Spinner";
 
 export default function Login() {
   const { login } = useAuth();
@@ -59,7 +60,7 @@ export default function Login() {
               <div data-testid="login-error" className="text-sm p-3 rounded-xl" style={{ color: "#C45C5C" }}>{err}</div>
             )}
             <button data-testid="login-submit" disabled={loading} className="btn btn-primary w-full">
-              <SignIn size={18} />{loading ? "Memproses..." : "Masuk"}
+              {loading ? <Spinner size={18} label="Memproses..." /> : <><SignIn size={18} />Masuk</>}
             </button>
           </form>
         </div>
