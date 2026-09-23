@@ -248,7 +248,7 @@ export default function Reports() {
           {/* Alokasi Bagi Hasil Unit (30/70) */}
           {active === "laba-rugi" && activeUnitId && (
             <div className="mt-6 p-4 rounded-lg" data-testid="bagi-hasil-info"
-                 style={{ background: "var(--primary-light)", border: "1px solid var(--border)" }}>
+                 style={{ background: "var(--primary-light)", border: "1px solid var(--legacy-border)" }}>
               <h4 className="font-heading font-semibold mb-2" style={{ color: "var(--primary-dark)" }}>
                 Alokasi Bagi Hasil Unit Usaha {groupKey}:
               </h4>
@@ -261,7 +261,7 @@ export default function Reports() {
           {/* Alokasi Bagi Hasil BUMDES 6-way (untuk Laba Rugi BUMDES) */}
           {active === "laba-rugi" && !activeUnitId && !isPengelola && (
             <div className="mt-6 p-4 rounded-lg" data-testid="alokasi-bumdes-info"
-                 style={{ background: "var(--primary-light)", border: "1px solid var(--border)" }}>
+                 style={{ background: "var(--primary-light)", border: "1px solid var(--legacy-border)" }}>
               <h4 className="font-heading font-semibold mb-2" style={{ color: "var(--primary-dark)" }}>
                 Alokasi Bagi Hasil Usaha BUMDES:
               </h4>

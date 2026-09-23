@@ -467,7 +467,7 @@ if (!(await confirm({
 
       {importResult && (
         <div className="card fade-in" data-testid="import-result"
-             style={{ background: "var(--primary-light)", border: "1px solid var(--border)" }}>
+             style={{ background: "var(--primary-light)", border: "1px solid var(--legacy-border)" }}>
           <div className="flex items-start justify-between gap-2">
             <div>
               <h4 className="font-heading font-semibold mb-1">Hasil Impor</h4>
@@ -618,7 +618,7 @@ if (!(await confirm({
 
       {/* Unified Table */}
       <div className="card p-0 overflow-hidden">
-        <div className="p-4" style={{ borderBottom: "1px solid var(--border)", background: "var(--primary-light)" }}>
+        <div className="p-4" style={{ borderBottom: "1px solid var(--legacy-border)", background: "var(--primary-light)" }}>
           <h3 className="font-heading font-semibold" data-testid="tx-table-title">
             Transaksi {activeGroup} — {MONTHS[month - 1]} {year}
           </h3>

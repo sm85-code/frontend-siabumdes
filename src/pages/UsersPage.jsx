@@ -206,7 +206,7 @@ export default function UsersPage() {
                 const yearMonths = MONTHS.map((_, i) => `${y}-${String(i + 1).padStart(2, "0")}`);
                 const allBlocked = yearMonths.every(m => lockPeriods.has(m));
                 return (
-                  <div key={y} className="rounded-lg p-3" style={{ background: "var(--bg)", border: "1px solid var(--border)" }}>
+                  <div key={y} className="rounded-lg p-3" style={{ background: "var(--bg)", border: "1px solid var(--legacy-border)" }}>
                     <div className="flex items-center justify-between mb-2">
                       <span className="font-semibold text-sm">Tahun {y}</span>
                       <button
@@ -235,7 +235,7 @@ export default function UsersPage() {
                                   style={{
                                     background: blocked ? "var(--status-error)" : "white",
                                     color: blocked ? "white" : "var(--text-primary)",
-                                    border: `1px solid ${blocked ? "var(--status-error)" : "var(--border)"}`,
+                                    border: `1px solid ${blocked ? "var(--status-error)" : "var(--legacy-border)"}`,
                                     fontWeight: blocked ? 600 : 400,
                                   }}>
                             {mn}

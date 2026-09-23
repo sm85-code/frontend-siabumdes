@@ -7,7 +7,7 @@ import {
 } from "recharts";
 
 const COLORS = ["var(--chart-1)", "var(--chart-5)", "var(--chart-3)", "var(--chart-4)", "var(--chart-2)", "var(--chart-6)"];
-const TOOLTIP_STYLE = { background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8 };
+const TOOLTIP_STYLE = { background: "var(--surface)", border: "1px solid var(--legacy-border)", borderRadius: 8 };
 function Stat({ label, value, hint }) {
   return (
     <div className="card p-4">
@@ -126,7 +126,7 @@ export default function InventorySummary({ products = [], movements = [], valuat
           {topOut.length > 0 ? (
             <ResponsiveContainer width="99%" height={280}>
               <BarChart data={topOut} layout="vertical" margin={{ top: 4, right: 16, left: 8, bottom: 4 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" horizontal={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--legacy-border)" horizontal={false} />
                 <XAxis type="number" tick={{ fontSize: 11 }} />
                 <YAxis type="category" dataKey="name" width={110} tick={{ fontSize: 11 }} />
                 <Tooltip
