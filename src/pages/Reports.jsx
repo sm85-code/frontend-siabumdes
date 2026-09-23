@@ -7,6 +7,7 @@ import Spinner from "@/components/Spinner";
 import { FilePdf, FileXls, FileDoc, ChartLine, Scales, Coins, TrendUp, BookOpen, Lock } from "@phosphor-icons/react";
 import TableShell from "@/components/TableShell";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const MONTHS = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 const YEAR_MIN = 2022, YEAR_MAX = 2030;
@@ -179,45 +180,65 @@ export default function Reports() {
         <>
           <div className="card">
             <label className="label" htmlFor="report-group-select">Kelompok</label>
-            <select id="report-group-select" data-testid="report-group-select" className="select" value={groupKey}
-                    disabled={isPengelola}
-                    onChange={(e) => { setGroupKey(e.target.value); setData(null); }}>
-              {groupOptions.map(o => <option key={o.code} value={o.code}>{o.code === "BUMDES" ? "BUMDES - Pusat" : `${o.code} - ${o.name}`}</option>)}
-            </select>
+            <Select value={groupKey} disabled={isPengelola} onValueChange={(v) => { setGroupKey(v); setData(null); }}>
+              <SelectTrigger id="report-group-select" data-testid="report-group-select"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {groupOptions.map(o => <SelectItem key={o.code} value={o.code}>{o.code === "BUMDES" ? "BUMDES - Pusat" : `${o.code} - ${o.name}`}</SelectItem>)}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="card">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-start">
               <div>
                 <label className="label" htmlFor="report-type-select">Jenis Laporan Keuangan</label>
-                <select id="report-type-select" data-testid="report-type-select" className="select" value={active}
-                        onChange={(e) => { setActive(e.target.value); setData(null); }}>
-                  {visibleReports.map(r => <option key={r.key} value={r.key}>{r.label}</option>)}
-                </select>
+                <Select value={active} onValueChange={(v) => { setActive(v); setData(null); }}>
+                  <SelectTrigger id="report-type-select" data-testid="report-type-select"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {visibleReports.map(r => <SelectItem key={r.key} value={r.key}>{r.label}</SelectItem>)}
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <label className="label" htmlFor="report-period-mode">Periode</label>
-                <select id="report-period-mode" data-testid="report-period-mode" className="select" value={periodMode} onChange={(e) => { setPeriodMode(e.target.value); setData(null); }}>
-                  <option value="monthly">Bulanan</option>
-                  <option value="yearly">Tahunan</option>
-                  <option value="custom">Custom</option>
-                </select>
+                <Select value={periodMode} onValueChange={(v) => { setPeriodMode(v); setData(null); }}>
+                  <SelectTrigger id="report-period-mode" data-testid="report-period-mode"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="monthly">Bulanan</SelectItem>
+                    <SelectItem value="yearly">Tahunan</SelectItem>
+                    <SelectItem value="custom">Custom</SelectItem>
+                  </SelectContent>
+                </Select>
                 {periodMode === "custom" && <>
-                  <select className="select mt-2" value={customPreset} onChange={(e) => setCustomPreset(e.target.value)}><option value="ytd">Year to Date</option><option value="qtd">Quarter to Date</option><option value="mtd">Month to Date</option><option value="dates">Pilih tanggal</option></select>
+                  <Select value={customPreset} onValueChange={(v) => setCustomPreset(v)}>
+                    <SelectTrigger className="mt-2"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ytd">Year to Date</SelectItem>
+                      <SelectItem value="qtd">Quarter to Date</SelectItem>
+                      <SelectItem value="mtd">Month to Date</SelectItem>
+                      <SelectItem value="dates">Pilih tanggal</SelectItem>
+                    </SelectContent>
+                  </Select>
                   {customPreset === "dates" && <div className="grid grid-cols-2 gap-2 mt-2"><input className="input" type="date" value={customStart} onChange={(e) => setCustomStart(e.target.value)} /><input className="input" type="date" value={customEnd} onChange={(e) => setCustomEnd(e.target.value)} /></div>}
                 </>}
               </div>
               {periodMode === "monthly" && <div>
                 <label className="label" htmlFor="report-month">Bulan</label>
-                <select id="report-month" data-testid="report-month" className="select" value={month} onChange={(e) => { setMonth(Number(e.target.value)); setData(null); }}>
-                  {MONTHS.map((m, i) => <option key={m} value={i + 1}>{m}</option>)}
-                </select>
+                <Select value={String(month)} onValueChange={(v) => { setMonth(Number(v)); setData(null); }}>
+                  <SelectTrigger id="report-month" data-testid="report-month"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {MONTHS.map((m, i) => <SelectItem key={m} value={String(i + 1)}>{m}</SelectItem>)}
+                  </SelectContent>
+                </Select>
               </div>}
               <div>
                 <label className="label" htmlFor="report-year">Tahun</label>
-                <select id="report-year" data-testid="report-year" className="select" value={year} onChange={(e) => { setYear(Number(e.target.value)); setData(null); }}>
-                  {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
-                </select>
+                <Select value={String(year)} onValueChange={(v) => { setYear(Number(v)); setData(null); }}>
+                  <SelectTrigger id="report-year" data-testid="report-year"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {YEARS.map(y => <SelectItem key={y} value={String(y)}>{y}</SelectItem>)}
+                  </SelectContent>
+                </Select>
               </div>
               <button data-testid="btn-load-report" onClick={load} className="btn btn-primary">
                 {loading ? <Spinner size={18} label="Memuat..." /> : "Tampilkan Laporan"}
@@ -297,40 +318,48 @@ export default function Reports() {
           <div className="grid grid-cols-1 sm:grid-cols-5 gap-3 items-end">
             <div>
               <label className="label">Kelompok</label>
-              <select className="select" data-testid="close-group-select"
-                      value={closeGroup} onChange={(e) => setCloseGroup(e.target.value)}>
-                <option value="BUMDES">BUMDES</option>
-                {units.map(u => <option key={u.code} value={u.code}>{u.code} - {u.name}</option>)}
-              </select>
+              <Select value={closeGroup} onValueChange={(v) => setCloseGroup(v)}>
+                <SelectTrigger data-testid="close-group-select"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="BUMDES">BUMDES</SelectItem>
+                  {units.map(u => <SelectItem key={u.code} value={u.code}>{u.code} - {u.name}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
             {closeGroup === "BUMDES" ? (
               <>
                 <div>
                   <label className="label">Jenis Periode</label>
-                  <select className="select" data-testid="close-kind-select"
-                          value={closeKind} onChange={(e) => setCloseKind(e.target.value)}>
-                    <option value="quarter">Triwulan</option>
-                    <option value="year">Tahunan</option>
-                  </select>
+                  <Select value={closeKind} onValueChange={(v) => setCloseKind(v)}>
+                    <SelectTrigger data-testid="close-kind-select"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="quarter">Triwulan</SelectItem>
+                      <SelectItem value="year">Tahunan</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 {closeKind === "quarter" && (
                   <div>
                     <label className="label">Triwulan</label>
-                    <select className="select" data-testid="close-quarter-select"
-                            value={closeQuarter} onChange={(e) => setCloseQuarter(Number(e.target.value))}>
-                      <option value={1}>Q1 (Jan–Mar)</option>
-                      <option value={2}>Q2 (Apr–Jun)</option>
-                      <option value={3}>Q3 (Jul–Sep)</option>
-                      <option value={4}>Q4 (Okt–Des)</option>
-                    </select>
+                    <Select value={String(closeQuarter)} onValueChange={(v) => setCloseQuarter(Number(v))}>
+                      <SelectTrigger data-testid="close-quarter-select"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">Q1 (Jan–Mar)</SelectItem>
+                        <SelectItem value="2">Q2 (Apr–Jun)</SelectItem>
+                        <SelectItem value="3">Q3 (Jul–Sep)</SelectItem>
+                        <SelectItem value="4">Q4 (Okt–Des)</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 )}
                 <div>
                   <label className="label">Tahun</label>
-                  <select className="select" data-testid="close-year-select"
-                          value={closeYear} onChange={(e) => setCloseYear(Number(e.target.value))}>
-                    {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
-                  </select>
+                  <Select value={String(closeYear)} onValueChange={(v) => setCloseYear(Number(v))}>
+                    <SelectTrigger data-testid="close-year-select"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {YEARS.map(y => <SelectItem key={y} value={String(y)}>{y}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
                 </div>
               </>
             ) : (
