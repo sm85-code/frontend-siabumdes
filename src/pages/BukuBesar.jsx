@@ -8,6 +8,7 @@ import Spinner from "@/components/Spinner";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
 const MONTHS = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
@@ -128,36 +129,61 @@ export default function BukuBesar() {
       <Card className="p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-start" data-testid="ledger-filters">
         <div>
           <label className="label" htmlFor="ledger-group-select">Kelompok</label>
-          <select id="ledger-group-select" data-testid="ledger-group-select" className="select"
-                  value={group} disabled={isPengelola} onChange={(e) => setGroup(e.target.value)}>
-            {groupTabs.map(g => <option key={g.key} value={g.key}>{g.label}</option>)}
-          </select>
+          <Select value={group} disabled={isPengelola} onValueChange={(v) => setGroup(v)}>
+            <SelectTrigger id="ledger-group-select" data-testid="ledger-group-select">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {groupTabs.map(g => <SelectItem key={g.key} value={g.key}>{g.label}</SelectItem>)}
+            </SelectContent>
+          </Select>
         </div>
         <div>
           <label className="label" htmlFor="ledger-period-mode">Periode</label>
-          <select id="ledger-period-mode" data-testid="ledger-period-mode" className="select" value={periodMode} onChange={(e) => { setPeriodMode(e.target.value); setSelected(""); setLedger(null); }}>
-            <option value="monthly">Bulanan</option>
-            <option value="yearly">Tahunan</option>
-            <option value="custom">Custom</option>
-          </select>
+          <Select value={periodMode} onValueChange={(v) => { setPeriodMode(v); setSelected(""); setLedger(null); }}>
+            <SelectTrigger id="ledger-period-mode" data-testid="ledger-period-mode">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="monthly">Bulanan</SelectItem>
+              <SelectItem value="yearly">Tahunan</SelectItem>
+              <SelectItem value="custom">Custom</SelectItem>
+            </SelectContent>
+          </Select>
           {periodMode === "custom" && <>
-            <select className="select mt-2" value={customPreset} onChange={(e) => setCustomPreset(e.target.value)}><option value="ytd">Year to Date</option><option value="qtd">Quarter to Date</option><option value="mtd">Month to Date</option><option value="dates">Pilih tanggal</option></select>
+            <Select value={customPreset} onValueChange={(v) => setCustomPreset(v)}>
+              <SelectTrigger className="mt-2"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ytd">Year to Date</SelectItem>
+                <SelectItem value="qtd">Quarter to Date</SelectItem>
+                <SelectItem value="mtd">Month to Date</SelectItem>
+                <SelectItem value="dates">Pilih tanggal</SelectItem>
+              </SelectContent>
+            </Select>
             {customPreset === "dates" && <div className="grid grid-cols-2 gap-2 mt-2"><input className="input" type="date" value={customStart} onChange={(e) => setCustomStart(e.target.value)} /><input className="input" type="date" value={customEnd} onChange={(e) => setCustomEnd(e.target.value)} /></div>}
           </>}
         </div>
         {periodMode === "monthly" && <div>
           <label className="label" htmlFor="ledger-month">Bulan</label>
-          <select id="ledger-month" data-testid="ledger-month" className="select" value={month}
-                  onChange={(e) => { setMonth(Number(e.target.value)); setSelected(""); setLedger(null); }}>
-            {MONTHS.map((m, i) => <option key={m} value={i + 1}>{m}</option>)}
-          </select>
+          <Select value={String(month)} onValueChange={(v) => { setMonth(Number(v)); setSelected(""); setLedger(null); }}>
+            <SelectTrigger id="ledger-month" data-testid="ledger-month">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {MONTHS.map((m, i) => <SelectItem key={m} value={String(i + 1)}>{m}</SelectItem>)}
+            </SelectContent>
+          </Select>
         </div>}
         <div>
           <label className="label" htmlFor="ledger-year">Tahun</label>
-          <select id="ledger-year" data-testid="ledger-year" className="select" value={year}
-                  onChange={(e) => { setYear(Number(e.target.value)); setSelected(""); setLedger(null); }}>
-            {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
-          </select>
+          <Select value={String(year)} onValueChange={(v) => { setYear(Number(v)); setSelected(""); setLedger(null); }}>
+            <SelectTrigger id="ledger-year" data-testid="ledger-year">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {YEARS.map(y => <SelectItem key={y} value={String(y)}>{y}</SelectItem>)}
+            </SelectContent>
+          </Select>
         </div>
         <div className="sm:col-span-3">
           <label className="label" htmlFor="ledger-search">Cari Akun</label>
