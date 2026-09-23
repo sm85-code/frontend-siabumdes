@@ -17,6 +17,7 @@ import Spinner from "@/components/Spinner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 function formatApiError(err, fallback = "Terjadi kesalahan") {
   const detail = err?.response?.data?.detail;
@@ -516,10 +517,13 @@ export default function Inventory() {
             </div>
             <div>
               <label className="label">Kategori</label>
-              <select className="select" value={catFilter} onChange={(e) => setCatFilter(e.target.value)}>
-                <option value="">Semua kategori</option>
-                {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-              </select>
+              <Select value={catFilter || "__all__"} onValueChange={(v) => setCatFilter(v === "__all__" ? "" : v)}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__all__">Semua kategori</SelectItem>
+                  {categories.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
@@ -534,10 +538,13 @@ export default function Inventory() {
                 <div><label className="label">Nama produk</label><input required className="input" value={productForm.name} onChange={(e) => setProductForm({ ...productForm, name: e.target.value })} /></div>
                 <div>
                   <label className="label">Kategori</label>
-                  <select required className="select" value={productForm.category_id} onChange={(e) => setProductForm({ ...productForm, category_id: e.target.value })}>
-                    <option value="">— pilih —</option>
-                    {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-                  </select>
+                  <Select required value={productForm.category_id || "__none__"} onValueChange={(v) => setProductForm({ ...productForm, category_id: v === "__none__" ? "" : v })}>
+                    <SelectTrigger><SelectValue placeholder="— pilih —" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__">— pilih —</SelectItem>
+                      {categories.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div><label className="label">Satuan</label><input className="input" value={productForm.unit_of_measure} onChange={(e) => setProductForm({ ...productForm, unit_of_measure: e.target.value })} /></div>
                 <div><label className="label">Harga pokok (Rp)</label><input type="number" min="0" className="input" value={productForm.cost_price} onChange={(e) => setProductForm({ ...productForm, cost_price: e.target.value })} /></div>
@@ -605,20 +612,27 @@ export default function Inventory() {
               <form onSubmit={submitStockIn} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="label">Produk</label>
-                  <select required className="select" value={stockIn.product_id} onChange={(e) => {
-                    const p = products.find((x) => x.id === e.target.value);
-                    setStockIn({ ...stockIn, product_id: e.target.value, unit_cost: p ? Number(p.cost_price) : 0 });
+                  <Select required value={stockIn.product_id || "__none__"} onValueChange={(v) => {
+                    const id = v === "__none__" ? "" : v;
+                    const p = products.find((x) => x.id === id);
+                    setStockIn({ ...stockIn, product_id: id, unit_cost: p ? Number(p.cost_price) : 0 });
                   }}>
-                    <option value="">— pilih —</option>
-                    {productOptions.map((o) => <option key={o.id} value={o.id}>{o.label}</option>)}
-                  </select>
+                    <SelectTrigger><SelectValue placeholder="— pilih —" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__">— pilih —</SelectItem>
+                      {productOptions.map((o) => <SelectItem key={o.id} value={o.id}>{o.label}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <label className="label">Mitra Pemasok</label>
-                  <select required className="select" value={stockIn.vendor_id} onChange={(e) => setStockIn({ ...stockIn, vendor_id: e.target.value })}>
-                    <option value="">— pilih mitra pemasok —</option>
-                    {activeVendors.map((v) => <option key={v.id} value={v.id}>{v.name}</option>)}
-                  </select>
+                  <Select required value={stockIn.vendor_id || "__none__"} onValueChange={(v) => setStockIn({ ...stockIn, vendor_id: v === "__none__" ? "" : v })}>
+                    <SelectTrigger><SelectValue placeholder="— pilih mitra pemasok —" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__">— pilih mitra pemasok —</SelectItem>
+                      {activeVendors.map((v) => <SelectItem key={v.id} value={v.id}>{v.name}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
                   {activeVendors.length === 0 && (
                     <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>Belum ada mitra pemasok — tambahkan di tab Mitra Pemasok.</p>
                   )}
@@ -629,16 +643,18 @@ export default function Inventory() {
                 <div><label className="label">HPP / unit (Rp)</label><input type="number" min="0" required className="input" value={stockIn.unit_cost} onChange={(e) => setStockIn({ ...stockIn, unit_cost: e.target.value })} /></div>
                 <div>
                   <label className="label">Metode bayar</label>
-                  <select className="select" value={stockIn.payment_method} onChange={(e) => {
-                    const method = e.target.value;
+                  <Select value={stockIn.payment_method} onValueChange={(method) => {
                     setStockIn({
                       ...stockIn, payment_method: method,
                       credit_account_code: method === "credit" ? UTANG_ACCOUNT_CODE : KAS_ACCOUNT_CODE,
                     });
                   }}>
-                    <option value="cash">Tunai</option>
-                    <option value="credit">Kredit (Utang Usaha)</option>
-                  </select>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="cash">Tunai</SelectItem>
+                      <SelectItem value="credit">Kredit (Utang Usaha)</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 {stockIn.payment_method === "credit" && (
                   <div><label className="label">Jatuh tempo</label><input type="date" required className="input" value={stockIn.due_date} onChange={(e) => setStockIn({ ...stockIn, due_date: e.target.value })} /></div>
@@ -668,20 +684,27 @@ export default function Inventory() {
               <form onSubmit={submitStockOut} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="label">Produk</label>
-                  <select required className="select" value={stockOut.product_id} onChange={(e) => {
-                    const p = products.find((x) => x.id === e.target.value);
-                    setStockOut({ ...stockOut, product_id: e.target.value, sell_price: p ? Number(p.sell_price) : 0 });
+                  <Select required value={stockOut.product_id || "__none__"} onValueChange={(v) => {
+                    const id = v === "__none__" ? "" : v;
+                    const p = products.find((x) => x.id === id);
+                    setStockOut({ ...stockOut, product_id: id, sell_price: p ? Number(p.sell_price) : 0 });
                   }}>
-                    <option value="">— pilih —</option>
-                    {productOptions.map((o) => <option key={o.id} value={o.id}>{o.label}</option>)}
-                  </select>
+                    <SelectTrigger><SelectValue placeholder="— pilih —" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__">— pilih —</SelectItem>
+                      {productOptions.map((o) => <SelectItem key={o.id} value={o.id}>{o.label}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <label className="label">Customer</label>
-                  <select required className="select" value={stockOut.customer_id} onChange={(e) => setStockOut({ ...stockOut, customer_id: e.target.value })}>
-                    <option value="">— pilih customer —</option>
-                    {activeCustomers.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-                  </select>
+                  <Select required value={stockOut.customer_id || "__none__"} onValueChange={(v) => setStockOut({ ...stockOut, customer_id: v === "__none__" ? "" : v })}>
+                    <SelectTrigger><SelectValue placeholder="— pilih customer —" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__">— pilih customer —</SelectItem>
+                      {activeCustomers.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
                   {activeCustomers.length === 0 && (
                     <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>Belum ada customer — tambahkan di tab Customer.</p>
                   )}
@@ -692,16 +715,18 @@ export default function Inventory() {
                 <div><label className="label">Harga jual / unit (Rp)</label><input type="number" min="0" required className="input" value={stockOut.sell_price} onChange={(e) => setStockOut({ ...stockOut, sell_price: e.target.value })} /></div>
                 <div>
                   <label className="label">Metode bayar</label>
-                  <select className="select" value={stockOut.payment_method} onChange={(e) => {
-                    const method = e.target.value;
+                  <Select value={stockOut.payment_method} onValueChange={(method) => {
                     setStockOut({
                       ...stockOut, payment_method: method,
                       revenue_debit_account_code: method === "piutang" ? PIUTANG_ACCOUNT_CODE : KAS_ACCOUNT_CODE,
                     });
                   }}>
-                    <option value="cash">Tunai</option>
-                    <option value="piutang">Piutang</option>
-                  </select>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="cash">Tunai</SelectItem>
+                      <SelectItem value="piutang">Piutang</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 {stockOut.payment_method === "piutang" && (
                   <div><label className="label">Jatuh tempo</label><input type="date" required className="input" value={stockOut.due_date} onChange={(e) => setStockOut({ ...stockOut, due_date: e.target.value })} /></div>
@@ -746,20 +771,26 @@ export default function Inventory() {
               <form onSubmit={submitAdjust} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="label">Produk</label>
-                  <select required className="select" value={adjust.product_id} onChange={(e) => setAdjust({ ...adjust, product_id: e.target.value })}>
-                    <option value="">— pilih —</option>
-                    {productOptions.map((o) => <option key={o.id} value={o.id}>{o.label}</option>)}
-                  </select>
+                  <Select required value={adjust.product_id || "__none__"} onValueChange={(v) => setAdjust({ ...adjust, product_id: v === "__none__" ? "" : v })}>
+                    <SelectTrigger><SelectValue placeholder="— pilih —" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__">— pilih —</SelectItem>
+                      {productOptions.map((o) => <SelectItem key={o.id} value={o.id}>{o.label}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div><label className="label">Tanggal</label><input type="date" required className="input" value={adjust.adjustment_date} onChange={(e) => setAdjust({ ...adjust, adjustment_date: e.target.value })} /></div>
                 <div><label className="label">Delta qty (+/-)</label><input type="number" required className="input" value={adjust.quantity_delta} onChange={(e) => setAdjust({ ...adjust, quantity_delta: e.target.value })} /></div>
                 <div>
                   <label className="label">Alasan</label>
-                  <select className="select" value={adjust.reason} onChange={(e) => setAdjust({ ...adjust, reason: e.target.value })}>
-                    <option value="rusak">Rusak</option>
-                    <option value="kadaluarsa">Kadaluarsa</option>
-                    <option value="koreksi">Koreksi</option>
-                  </select>
+                  <Select value={adjust.reason} onValueChange={(v) => setAdjust({ ...adjust, reason: v })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="rusak">Rusak</SelectItem>
+                      <SelectItem value="kadaluarsa">Kadaluarsa</SelectItem>
+                      <SelectItem value="koreksi">Koreksi</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 {Number(adjust.quantity_delta) < 0 ? (

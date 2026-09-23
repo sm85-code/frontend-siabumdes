@@ -10,6 +10,7 @@ import {
 import { TrendUp, TrendDown, Coin, Storefront, ReceiptX, CalendarBlank, Lock } from "@phosphor-icons/react";
 import TableShell from "@/components/TableShell";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const INK = "#14353A"; // --primary-dark
 const TEAL = "#1C8A8A"; // --primary
@@ -209,28 +210,33 @@ export default function Dashboard() {
             <label className="label flex items-center gap-1">
               <CalendarBlank size={14} color={INK} /> Periode
             </label>
-            <select data-testid="period-select" className="select"
-                    value={state.period}
-                    onChange={(e) => setState(s => ({ ...s, period: e.target.value }))}>
-              {PERIOD_OPTIONS.map(p => <option key={p.key} value={p.key}>{p.label}</option>)}
-            </select>
+            <Select value={state.period} onValueChange={(v) => setState(s => ({ ...s, period: v }))}>
+              <SelectTrigger data-testid="period-select"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {PERIOD_OPTIONS.map(p => <SelectItem key={p.key} value={p.key}>{p.label}</SelectItem>)}
+              </SelectContent>
+            </Select>
           </div>
           {state.period === "bulanan" && (
             <div className="min-w-[160px]">
               <label className="label">Pilih Bulan</label>
-              <select data-testid="period-month" className="select" value={state.month}
-                      onChange={(e) => setState(s => ({ ...s, month: Number(e.target.value) }))}>
-                {MONTHS.map((m, i) => <option key={m} value={i + 1}>{m}</option>)}
-              </select>
+              <Select value={String(state.month)} onValueChange={(v) => setState(s => ({ ...s, month: Number(v) }))}>
+                <SelectTrigger data-testid="period-month"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {MONTHS.map((m, i) => <SelectItem key={m} value={String(i + 1)}>{m}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
           )}
           {state.period === "tahunan" && (
             <div className="min-w-[140px]">
               <label className="label">Pilih Tahun</label>
-              <select data-testid="period-year" className="select" value={state.year}
-                      onChange={(e) => setState(s => ({ ...s, year: Number(e.target.value) }))}>
-                {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
-              </select>
+              <Select value={String(state.year)} onValueChange={(v) => setState(s => ({ ...s, year: Number(v) }))}>
+                <SelectTrigger data-testid="period-year"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {YEARS.map(y => <SelectItem key={y} value={String(y)}>{y}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
           )}
           {state.period === "custom" && (

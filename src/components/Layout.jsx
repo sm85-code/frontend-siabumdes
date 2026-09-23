@@ -8,6 +8,7 @@ import {
   BookOpenText, SignOut, List, X, Books, UserCircle, Package, Buildings,
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const READ_MOST = ["admin", "direktur", "bendahara", "pengelola", "pengawas", "penasihat"];
 const INK = "var(--primary-dark)";
@@ -94,17 +95,16 @@ export default function Layout({ children }) {
           <div className="shrink-0 p-4">
             <div className="mb-3">
               <label className="label" htmlFor="font-switcher">Font</label>
-              <select
-                id="font-switcher"
-                data-testid="font-switcher"
-                className="select text-sm"
-                value={font}
-                onChange={(e) => setFont(e.target.value)}
-              >
-                {FONTS.map((f) => (
-                  <option key={f.id} value={f.id}>{f.label}</option>
-                ))}
-              </select>
+              <Select value={font} onValueChange={(v) => setFont(v)}>
+                <SelectTrigger id="font-switcher" data-testid="font-switcher" className="text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {FONTS.map((f) => (
+                    <SelectItem key={f.id} value={f.id}>{f.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="flex items-center gap-3 mb-3">
               <div className="w-9 h-9 rounded-full flex items-center justify-center font-heading font-semibold text-sm"
