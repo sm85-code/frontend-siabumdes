@@ -13,6 +13,7 @@ import {
 } from "@/lib/uu05InventoryCoa";
 import InventorySummary from "@/pages/InventorySummary";
 import TableShell from "@/components/TableShell";
+import Spinner from "@/components/Spinner";
 
 function formatApiError(err, fallback = "Terjadi kesalahan") {
   const detail = err?.response?.data?.detail;
@@ -188,7 +189,7 @@ export default function Inventory() {
 
   if (!canAccessRole) return <Navigate to="/dashboard" replace />;
   if (loading) {
-    return <div className="text-sm" style={{ color: "var(--text-muted)" }}>Memuat inventory…</div>;
+    return <Spinner label="Memuat inventory…" />;
   }
   if (meta && user?.role === "pengelola" && user.unit_usaha_id !== meta.unit_usaha_id) {
     return <Navigate to="/dashboard" replace />;

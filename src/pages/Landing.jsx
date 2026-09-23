@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { fmtRp, API } from "@/lib/api";
+import Spinner from "@/components/Spinner";
 import {
   LineChart, Line, XAxis, YAxis, Tooltip,
   CartesianGrid, ResponsiveContainer, Legend,
@@ -55,7 +56,7 @@ export default function Landing() {
 
       <section className="max-w-5xl mx-auto px-5 pb-6" data-testid="landing-stats">
         {err && <p className="text-center text-sm" style={{ color: "var(--status-error)" }}>Gagal memuat data ringkasan.</p>}
-        {!data && !err && <p className="text-center text-sm" style={{ color: "var(--text-muted)" }}>Memuat...</p>}
+        {!data && !err && <div className="flex justify-center"><Spinner /></div>}
         {data && (
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <StatCard icon={ChartLineUp} label="Total Pendapatan" value={fmtRp(data.total_pendapatan)} testId="stat-pendapatan" />
