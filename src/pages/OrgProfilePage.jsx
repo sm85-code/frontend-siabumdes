@@ -78,7 +78,7 @@ export default function OrgProfilePage() {
         <h2 className="font-heading text-lg font-semibold mb-4">Logo</h2>
         <div className="flex items-center gap-4 flex-wrap">
           <div className="w-20 h-20 rounded-lg flex items-center justify-center overflow-hidden shrink-0"
-               style={{ background: "var(--surface-alt)", border: "1px solid var(--border)" }}>
+               style={{ background: "var(--surface-alt)", border: "1px solid var(--legacy-border)" }}>
             {form.logo_url ? (
               <img src={form.logo_url} alt="Logo BUMDES" className="w-full h-full object-contain" />
             ) : (
@@ -111,7 +111,7 @@ export default function OrgProfilePage() {
             <label className="label">Telepon<input className="input mt-1" value={form.phone} onChange={set("phone")} /></label>
             <label className="label">Email<input className="input mt-1" type="email" value={form.email} onChange={set("email")} /></label>
             <label className="label">Warna Kop Surat<div className="flex items-center gap-2 mt-1">
-              <input type="color" className="h-11 w-14 rounded-md border" style={{ borderColor: "var(--border)" }}
+              <input type="color" className="h-11 w-14 rounded-md border" style={{ borderColor: "var(--legacy-border)" }}
                      value={`#${(form.primary_color || "1F4E79").replace("#", "")}`}
                      onChange={(e) => setForm((f) => ({ ...f, primary_color: e.target.value.replace("#", "") }))} />
               <span className="text-sm font-mono">#{(form.primary_color || "1F4E79").replace("#", "").toUpperCase()}</span>

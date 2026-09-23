@@ -168,7 +168,7 @@ export default function BukuBesar() {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Left: list akun */}
         <div className="card p-0 overflow-hidden lg:col-span-1" style={{ maxHeight: 600, overflowY: "auto" }}>
-          <div className="p-4" style={{ borderBottom: "1px solid var(--border)", background: "var(--primary-light)" }}>
+          <div className="p-4" style={{ borderBottom: "1px solid var(--legacy-border)", background: "var(--primary-light)" }}>
             <p className="label mb-0">Akun {group} ({filteredAccounts.length})</p>
           </div>
           <ul data-testid="ledger-account-list">
@@ -185,7 +185,7 @@ export default function BukuBesar() {
                           className="w-full text-left px-4 py-2.5 border-b transition-colors"
                           style={{
                             background: active ? "var(--primary-light)" : "transparent",
-                            borderColor: "var(--border)",
+                            borderColor: "var(--legacy-border)",
                           }}>
                     <div className="font-mono text-xs font-semibold" style={{ color: active ? "var(--primary-dark)" : "var(--text-secondary)" }}>{a.code}</div>
                     <div className="text-sm" style={{ color: active ? "var(--primary-dark)" : "var(--text-primary)" }}>{a.name}</div>
@@ -207,7 +207,7 @@ export default function BukuBesar() {
             <div className="card text-center py-10">Memuat...</div>
           ) : ledger ? (
             <div className="card p-0 overflow-hidden">
-              <div className="p-5" style={{ borderBottom: "1px solid var(--border)" }}>
+              <div className="p-5" style={{ borderBottom: "1px solid var(--legacy-border)" }}>
                 <div className="flex items-start justify-between gap-3 flex-wrap">
                   <div>
                     <p className="label mb-0">Buku Besar · {group}</p>

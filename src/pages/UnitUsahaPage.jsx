@@ -18,7 +18,7 @@ export default function UnitUsahaPage() {
             </div>
             <h3 className="font-heading text-lg font-bold mb-2">{u.name}</h3>
             <p className="text-sm mb-3" style={{ color: "var(--text-secondary)" }}>{u.description}</p>
-            <div className="p-3 rounded-lg text-xs" style={{ background: "var(--primary-light)", border: "1px solid var(--border)" }}>
+            <div className="p-3 rounded-lg text-xs" style={{ background: "var(--primary-light)", border: "1px solid var(--legacy-border)" }}>
               <div className="label mb-1">Skema Bagi Hasil</div>
               <p style={{ color: "var(--text-primary)" }}>{u.revenue_scheme}</p>
             </div>
