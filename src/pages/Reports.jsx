@@ -52,8 +52,15 @@ export default function Reports() {
   const [loading, setLoading] = useState(false);
 
   // Tutup Buku (admin only)
-  const [closePeriod, setClosePeriod] = useState(new Date().toISOString().slice(0, 7));
+  // BUMDES (Pusat) tutup buku per triwulan/tahun; unit usaha (UU01..UU06) tetap bulanan.
   const [closeGroup, setCloseGroup] = useState("BUMDES");
+  const [closeKind, setCloseKind] = useState("quarter"); // quarter | year -- BUMDES only
+  const [closeYear, setCloseYear] = useState(currentYear);
+  const [closeQuarter, setCloseQuarter] = useState(Math.floor((currentMonth - 1) / 3) + 1);
+  const [closeMonth, setCloseMonth] = useState(currentMonth); // unit usaha only
+  const closePeriod = closeGroup === "BUMDES"
+    ? (closeKind === "year" ? `${closeYear}` : `${closeYear}-Q${closeQuarter}`)
+    : `${closeYear}-${pad(closeMonth)}`;
   const [closedList, setClosedList] = useState([]);
   const loadClosed = () => api.get("/reports/closed-periods").then(r => setClosedList(r.data));
   useEffect(() => { if (isAdmin) loadClosed(); }, [isAdmin]);
@@ -279,18 +286,14 @@ export default function Reports() {
         <div className="card" data-testid="close-period-card">
           <div className="flex items-center gap-2 mb-3">
             <Lock size={20} weight="duotone" color="var(--status-warning)" />
-            <h3 className="font-heading font-semibold">Tutup Buku Bulanan</h3>
+            <h3 className="font-heading font-semibold">Tutup Buku</h3>
           </div>
           <p className="text-xs mb-3" style={{ color: "var(--text-muted)" }}>
-            Generate jurnal penutup fisik (tutup pendapatan/beban ke Ikhtisar L/R, transfer ke Saldo Laba) untuk 1 grup 1 bulan.
+            Generate jurnal penutup fisik (tutup pendapatan/beban ke Ikhtisar L/R, transfer ke Saldo Laba) untuk 1 grup 1 periode.
             Grup harus punya akun ber-subcategory <b>ikhtisar_laba_rugi</b> dan <b>saldo_laba</b>.
+            BUMDES (Pusat) tutup buku per <b>triwulan/tahun</b>; unit usaha tutup buku <b>bulanan</b>.
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end">
-            <div>
-              <label className="label">Periode</label>
-              <input type="month" className="input" data-testid="close-period-input"
-                     value={closePeriod} onChange={(e) => setClosePeriod(e.target.value)} />
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-5 gap-3 items-end">
             <div>
               <label className="label">Kelompok</label>
               <select className="select" data-testid="close-group-select"
@@ -299,6 +302,47 @@ export default function Reports() {
                 {units.map(u => <option key={u.code} value={u.code}>{u.code} - {u.name}</option>)}
               </select>
             </div>
+            {closeGroup === "BUMDES" ? (
+              <>
+                <div>
+                  <label className="label">Jenis Periode</label>
+                  <select className="select" data-testid="close-kind-select"
+                          value={closeKind} onChange={(e) => setCloseKind(e.target.value)}>
+                    <option value="quarter">Triwulan</option>
+                    <option value="year">Tahunan</option>
+                  </select>
+                </div>
+                {closeKind === "quarter" && (
+                  <div>
+                    <label className="label">Triwulan</label>
+                    <select className="select" data-testid="close-quarter-select"
+                            value={closeQuarter} onChange={(e) => setCloseQuarter(Number(e.target.value))}>
+                      <option value={1}>Q1 (Jan–Mar)</option>
+                      <option value={2}>Q2 (Apr–Jun)</option>
+                      <option value={3}>Q3 (Jul–Sep)</option>
+                      <option value={4}>Q4 (Okt–Des)</option>
+                    </select>
+                  </div>
+                )}
+                <div>
+                  <label className="label">Tahun</label>
+                  <select className="select" data-testid="close-year-select"
+                          value={closeYear} onChange={(e) => setCloseYear(Number(e.target.value))}>
+                    {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
+                  </select>
+                </div>
+              </>
+            ) : (
+              <div>
+                <label className="label">Periode</label>
+                <input type="month" className="input" data-testid="close-period-input"
+                       value={`${closeYear}-${pad(closeMonth)}`}
+                       onChange={(e) => {
+                         const [y, m] = e.target.value.split("-");
+                         setCloseYear(Number(y)); setCloseMonth(Number(m));
+                       }} />
+              </div>
+            )}
             <button data-testid="btn-close-period" onClick={doClose} className="btn btn-primary">
               <Lock size={16} /> Tutup Buku
             </button>
