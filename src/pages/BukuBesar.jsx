@@ -7,6 +7,7 @@ import TableShell from "@/components/TableShell";
 import Spinner from "@/components/Spinner";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 
 const MONTHS = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
@@ -245,49 +246,49 @@ export default function BukuBesar() {
                 minWidth={760}
                 data-testid="ledger-table"
               >
-                <table className="tbl tbl-compact-mobile" data-testid="ledger-table">
-                  <thead>
-                    <tr>
-                      <th>Tanggal</th>
-                      <th>Keterangan</th>
-                      <th>Akun Lawan</th>
-                      <th>Ref.</th>
-                      <th className="num">Debit</th>
-                      <th className="num">Kredit</th>
-                      <th className="num">Saldo</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr style={{ background: "var(--primary-light)" }}>
-                      <td colSpan={6} className="font-semibold">Saldo Awal</td>
-                      <td className="num font-semibold">{fmtRp(ledger.saldo_awal)}</td>
-                    </tr>
+                <Table className="tbl-compact-mobile" data-testid="ledger-table">
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Tanggal</TableHead>
+                      <TableHead>Keterangan</TableHead>
+                      <TableHead>Akun Lawan</TableHead>
+                      <TableHead>Ref.</TableHead>
+                      <TableHead className="num">Debit</TableHead>
+                      <TableHead className="num">Kredit</TableHead>
+                      <TableHead className="num">Saldo</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    <TableRow style={{ background: "var(--primary-light)" }}>
+                      <TableCell colSpan={6} className="font-semibold">Saldo Awal</TableCell>
+                      <TableCell className="num font-semibold">{fmtRp(ledger.saldo_awal)}</TableCell>
+                    </TableRow>
                     {ledger.entries.length === 0 ? (
-                      <tr><td colSpan={7} className="text-center py-8" style={{ color: "var(--text-muted)" }}>
+                      <TableRow><TableCell colSpan={7} className="text-center py-8" style={{ color: "var(--text-muted)" }}>
                         Tidak ada transaksi pada periode ini.
-                      </td></tr>
+                      </TableCell></TableRow>
                     ) : ledger.entries.map((e) => (
-                      <tr key={e.id}>
-                        <td>{fmtDate(e.date)}</td>
-                        <td className="max-w-xs">{e.description}</td>
-                        <td className="text-xs">
+                      <TableRow key={e.id}>
+                        <TableCell>{fmtDate(e.date)}</TableCell>
+                        <TableCell className="max-w-xs">{e.description}</TableCell>
+                        <TableCell className="text-xs">
                           <div className="font-mono">{e.other_account_code}</div>
                           <div style={{ color: "var(--text-muted)" }}>{e.other_account_name}</div>
-                        </td>
-                        <td className="text-xs">{e.reference || "-"}</td>
-                        <td className="num">{e.debit ? fmtRp(e.debit) : "-"}</td>
-                        <td className="num">{e.credit ? fmtRp(e.credit) : "-"}</td>
-                        <td className="num font-semibold tabular-nums">{fmtRp(e.balance)}</td>
-                      </tr>
+                        </TableCell>
+                        <TableCell className="text-xs">{e.reference || "-"}</TableCell>
+                        <TableCell className="num">{e.debit ? fmtRp(e.debit) : "-"}</TableCell>
+                        <TableCell className="num">{e.credit ? fmtRp(e.credit) : "-"}</TableCell>
+                        <TableCell className="num font-semibold tabular-nums">{fmtRp(e.balance)}</TableCell>
+                      </TableRow>
                     ))}
-                    <tr style={{ background: "var(--total-row-bg)" }}>
-                      <td colSpan={4} className="font-bold" style={{ color: "var(--primary-dark)" }}>TOTAL PERIODE</td>
-                      <td className="num font-bold">{fmtRp(ledger.total_debit)}</td>
-                      <td className="num font-bold">{fmtRp(ledger.total_credit)}</td>
-                      <td className="num font-bold">{fmtRp(ledger.saldo_akhir)}</td>
-                    </tr>
-                  </tbody>
-                </table>
+                    <TableRow style={{ background: "var(--total-row-bg)" }}>
+                      <TableCell colSpan={4} className="font-bold" style={{ color: "var(--primary-dark)" }}>TOTAL PERIODE</TableCell>
+                      <TableCell className="num font-bold">{fmtRp(ledger.total_debit)}</TableCell>
+                      <TableCell className="num font-bold">{fmtRp(ledger.total_credit)}</TableCell>
+                      <TableCell className="num font-bold">{fmtRp(ledger.saldo_akhir)}</TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
               </TableShell>
             </Card>
           ) : null}

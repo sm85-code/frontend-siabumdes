@@ -16,6 +16,7 @@ import TableShell from "@/components/TableShell";
 import Spinner from "@/components/Spinner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 
 function formatApiError(err, fallback = "Terjadi kesalahan") {
   const detail = err?.response?.data?.detail;
@@ -554,42 +555,42 @@ export default function Inventory() {
 
           <div className="card p-0 overflow-hidden">
             <TableShell minWidth={720}>
-            <table className="tbl">
-              <thead>
-                <tr>
-                  <th>SKU</th><th>Nama</th><th>Kategori</th><th>Satuan</th>
-                  <th className="num">HPP</th><th className="num">Harga jual</th>
-                  <th className="num">Stok</th><th className="num">Nilai</th>
-                  {canWrite && <th />}
-                </tr>
-              </thead>
-              <tbody>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>SKU</TableHead><TableHead>Nama</TableHead><TableHead>Kategori</TableHead><TableHead>Satuan</TableHead>
+                  <TableHead className="num">HPP</TableHead><TableHead className="num">Harga jual</TableHead>
+                  <TableHead className="num">Stok</TableHead><TableHead className="num">Nilai</TableHead>
+                  {canWrite && <TableHead />}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {products.length === 0 ? (
-                  <tr><td colSpan={9} className="text-center py-8" style={{ color: "var(--text-muted)" }}>Belum ada produk di katalog.</td></tr>
+                  <TableRow><TableCell colSpan={9} className="text-center py-8" style={{ color: "var(--text-muted)" }}>Belum ada produk di katalog.</TableCell></TableRow>
                 ) : products.map((p) => (
-                  <tr key={p.id}>
-                    <td className="font-medium">{p.sku}</td>
-                    <td>{p.name}</td>
-                    <td><Badge variant="secondary">{p.category_name || "-"}</Badge></td>
-                    <td>{p.unit_of_measure}</td>
-                    <td className="num">{fmtRp(Number(p.cost_price))}</td>
-                    <td className="num">{fmtRp(Number(p.sell_price))}</td>
-                    <td className="num">{p.qty_on_hand}</td>
-                    <td className="num">{fmtRp(Number(p.stock_value))}</td>
+                  <TableRow key={p.id}>
+                    <TableCell className="font-medium">{p.sku}</TableCell>
+                    <TableCell>{p.name}</TableCell>
+                    <TableCell><Badge variant="secondary">{p.category_name || "-"}</Badge></TableCell>
+                    <TableCell>{p.unit_of_measure}</TableCell>
+                    <TableCell className="num">{fmtRp(Number(p.cost_price))}</TableCell>
+                    <TableCell className="num">{fmtRp(Number(p.sell_price))}</TableCell>
+                    <TableCell className="num">{p.qty_on_hand}</TableCell>
+                    <TableCell className="num">{fmtRp(Number(p.stock_value))}</TableCell>
                     {canWrite && (
-                      <td className="whitespace-nowrap">
+                      <TableCell className="whitespace-nowrap">
                         <button type="button" className="p-1.5" title="Edit" onClick={() => openEditProduct(p)} data-testid={`btn-edit-product-${p.id}`}>
                           <PencilSimple size={16} />
                         </button>
                         <button type="button" className="p-1.5" title="Hapus" onClick={() => removeProduct(p.id)}>
                           <Trash size={16} color="var(--status-error)" />
                         </button>
-                      </td>
+                      </TableCell>
                     )}
-                  </tr>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
             </TableShell>
           </div>
         </div>
@@ -799,20 +800,20 @@ export default function Inventory() {
 
           <div className="card p-0 overflow-hidden">
             <TableShell minWidth={720}>
-            <table className="tbl">
-              <thead><tr><th>Tanggal</th><th>SKU</th><th>Produk</th><th className="num">Delta</th><th>Alasan</th><th>Catatan</th><th>Ref</th>{canWrite && <th />}</tr></thead>
-              <tbody>
+            <Table>
+              <TableHeader><TableRow><TableHead>Tanggal</TableHead><TableHead>SKU</TableHead><TableHead>Produk</TableHead><TableHead className="num">Delta</TableHead><TableHead>Alasan</TableHead><TableHead>Catatan</TableHead><TableHead>Ref</TableHead>{canWrite && <TableHead />}</TableRow></TableHeader>
+              <TableBody>
                 {adjustments.length === 0 ? (
-                  <tr><td colSpan={canWrite ? 8 : 7} className="text-center py-8" style={{ color: "var(--text-muted)" }}>Belum ada penyesuaian.</td></tr>
+                  <TableRow><TableCell colSpan={canWrite ? 8 : 7} className="text-center py-8" style={{ color: "var(--text-muted)" }}>Belum ada penyesuaian.</TableCell></TableRow>
                 ) : adjustments.map((a) => (
-                  <tr key={a.id}>
-                    <td>{fmtDate(a.adjustment_date)}</td>
-                    <td>{a.sku}</td>
-                    <td>{a.product_name}</td>
-                    <td className="num">{a.quantity_delta > 0 ? `+${a.quantity_delta}` : a.quantity_delta}</td>
-                    <td><Badge variant="secondary">{a.reason}</Badge></td>
-                    <td>{a.notes || "-"}</td>
-                    <td className="text-xs">
+                  <TableRow key={a.id}>
+                    <TableCell>{fmtDate(a.adjustment_date)}</TableCell>
+                    <TableCell>{a.sku}</TableCell>
+                    <TableCell>{a.product_name}</TableCell>
+                    <TableCell className="num">{a.quantity_delta > 0 ? `+${a.quantity_delta}` : a.quantity_delta}</TableCell>
+                    <TableCell><Badge variant="secondary">{a.reason}</Badge></TableCell>
+                    <TableCell>{a.notes || "-"}</TableCell>
+                    <TableCell className="text-xs">
                       <Link
                         to={`/transactions?reference=${encodeURIComponent(a.id)}`}
                         className="underline"
@@ -820,18 +821,18 @@ export default function Inventory() {
                       >
                         Lihat transaksi
                       </Link>
-                    </td>
+                    </TableCell>
                     {canWrite && (
-                      <td>
+                      <TableCell>
                         <Button type="button" variant="outline" size="sm" onClick={() => cancelAdjustment(a.id)}>
                           Batalkan
                         </Button>
-                      </td>
+                      </TableCell>
                     )}
-                  </tr>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
             </TableShell>
           </div>
         </div>
@@ -855,27 +856,27 @@ export default function Inventory() {
           )}
           <div className="card p-0 overflow-hidden">
             <TableShell minWidth={640}>
-              <table className="tbl">
-                <thead><tr><th>Nama</th><th>Kontak</th><th>Alamat</th><th>Status</th>{canWrite && <th />}</tr></thead>
-                <tbody>
+              <Table>
+                <TableHeader><TableRow><TableHead>Nama</TableHead><TableHead>Kontak</TableHead><TableHead>Alamat</TableHead><TableHead>Status</TableHead>{canWrite && <TableHead />}</TableRow></TableHeader>
+                <TableBody>
                   {vendors.length === 0 ? (
-                    <tr><td colSpan={5} className="text-center py-8" style={{ color: "var(--text-muted)" }}>Belum ada mitra pemasok.</td></tr>
+                    <TableRow><TableCell colSpan={5} className="text-center py-8" style={{ color: "var(--text-muted)" }}>Belum ada mitra pemasok.</TableCell></TableRow>
                   ) : vendors.map((v) => (
-                    <tr key={v.id}>
-                      <td className="font-medium">{v.name}</td>
-                      <td>{v.contact || "-"}</td>
-                      <td>{v.address || "-"}</td>
-                      <td><Badge variant={v.is_active ? "default" : "outline"}>{v.is_active ? "aktif" : "nonaktif"}</Badge></td>
+                    <TableRow key={v.id}>
+                      <TableCell className="font-medium">{v.name}</TableCell>
+                      <TableCell>{v.contact || "-"}</TableCell>
+                      <TableCell>{v.address || "-"}</TableCell>
+                      <TableCell><Badge variant={v.is_active ? "default" : "outline"}>{v.is_active ? "aktif" : "nonaktif"}</Badge></TableCell>
                       {canWrite && (
-                        <td className="whitespace-nowrap">
+                        <TableCell className="whitespace-nowrap">
                           <button type="button" className="p-1.5" title="Edit" onClick={() => setVendorForm({ id: v.id, name: v.name, contact: v.contact || "", address: v.address || "" })}><PencilSimple size={16} /></button>
                           <Button type="button" variant="outline" size="sm" className="ml-2" onClick={() => toggleVendorActive(v)}>{v.is_active ? "Nonaktifkan" : "Aktifkan"}</Button>
-                        </td>
+                        </TableCell>
                       )}
-                    </tr>
+                    </TableRow>
                   ))}
-                </tbody>
-              </table>
+                </TableBody>
+              </Table>
             </TableShell>
           </div>
         </div>
@@ -899,27 +900,27 @@ export default function Inventory() {
           )}
           <div className="card p-0 overflow-hidden">
             <TableShell minWidth={640}>
-              <table className="tbl">
-                <thead><tr><th>Nama</th><th>Kontak</th><th>Alamat</th><th>Status</th>{canWrite && <th />}</tr></thead>
-                <tbody>
+              <Table>
+                <TableHeader><TableRow><TableHead>Nama</TableHead><TableHead>Kontak</TableHead><TableHead>Alamat</TableHead><TableHead>Status</TableHead>{canWrite && <TableHead />}</TableRow></TableHeader>
+                <TableBody>
                   {customers.length === 0 ? (
-                    <tr><td colSpan={5} className="text-center py-8" style={{ color: "var(--text-muted)" }}>Belum ada customer.</td></tr>
+                    <TableRow><TableCell colSpan={5} className="text-center py-8" style={{ color: "var(--text-muted)" }}>Belum ada customer.</TableCell></TableRow>
                   ) : customers.map((c) => (
-                    <tr key={c.id}>
-                      <td className="font-medium">{c.name}</td>
-                      <td>{c.contact || "-"}</td>
-                      <td>{c.address || "-"}</td>
-                      <td><Badge variant={c.is_active ? "default" : "outline"}>{c.is_active ? "aktif" : "nonaktif"}</Badge></td>
+                    <TableRow key={c.id}>
+                      <TableCell className="font-medium">{c.name}</TableCell>
+                      <TableCell>{c.contact || "-"}</TableCell>
+                      <TableCell>{c.address || "-"}</TableCell>
+                      <TableCell><Badge variant={c.is_active ? "default" : "outline"}>{c.is_active ? "aktif" : "nonaktif"}</Badge></TableCell>
                       {canWrite && (
-                        <td className="whitespace-nowrap">
+                        <TableCell className="whitespace-nowrap">
                           <button type="button" className="p-1.5" title="Edit" onClick={() => setCustomerForm({ id: c.id, name: c.name, contact: c.contact || "", address: c.address || "" })}><PencilSimple size={16} /></button>
                           <Button type="button" variant="outline" size="sm" className="ml-2" onClick={() => toggleCustomerActive(c)}>{c.is_active ? "Nonaktifkan" : "Aktifkan"}</Button>
-                        </td>
+                        </TableCell>
                       )}
-                    </tr>
+                    </TableRow>
                   ))}
-                </tbody>
-              </table>
+                </TableBody>
+              </Table>
             </TableShell>
           </div>
         </div>
@@ -928,32 +929,32 @@ export default function Inventory() {
       {tab === "utang" && (
         <div className="card p-0 overflow-hidden">
           <TableShell minWidth={800}>
-            <table className="tbl">
-              <thead><tr><th>Invoice</th><th>Mitra Pemasok</th><th>Metode</th><th className="num">Total</th><th className="num">Terbayar</th><th className="num">Sisa</th><th>Jatuh tempo</th><th>Status</th>{canWrite && <th />}</tr></thead>
-              <tbody>
+            <Table>
+              <TableHeader><TableRow><TableHead>Invoice</TableHead><TableHead>Mitra Pemasok</TableHead><TableHead>Metode</TableHead><TableHead className="num">Total</TableHead><TableHead className="num">Terbayar</TableHead><TableHead className="num">Sisa</TableHead><TableHead>Jatuh tempo</TableHead><TableHead>Status</TableHead>{canWrite && <TableHead />}</TableRow></TableHeader>
+              <TableBody>
                 {purchases.filter((p) => p.payment_method === "credit").length === 0 ? (
-                  <tr><td colSpan={9} className="text-center py-8" style={{ color: "var(--text-muted)" }}>Belum ada utang usaha.</td></tr>
+                  <TableRow><TableCell colSpan={9} className="text-center py-8" style={{ color: "var(--text-muted)" }}>Belum ada utang usaha.</TableCell></TableRow>
                 ) : purchases.filter((p) => p.payment_method === "credit").map((p) => (
-                  <tr key={p.id}>
-                    <td>{p.invoice_number || "-"}</td>
-                    <td>{p.vendor_name}</td>
-                    <td><Badge variant="secondary">{p.payment_method}</Badge></td>
-                    <td className="num">{fmtRp(Number(p.total_amount))}</td>
-                    <td className="num">{fmtRp(Number(p.paid_amount))}</td>
-                    <td className="num">{fmtRp(Number(p.outstanding))}</td>
-                    <td>{p.due_date ? fmtDate(p.due_date) : "-"}</td>
-                    <td><Badge variant={p.status === "paid" ? "default" : "outline"}>{p.status}</Badge></td>
+                  <TableRow key={p.id}>
+                    <TableCell>{p.invoice_number || "-"}</TableCell>
+                    <TableCell>{p.vendor_name}</TableCell>
+                    <TableCell><Badge variant="secondary">{p.payment_method}</Badge></TableCell>
+                    <TableCell className="num">{fmtRp(Number(p.total_amount))}</TableCell>
+                    <TableCell className="num">{fmtRp(Number(p.paid_amount))}</TableCell>
+                    <TableCell className="num">{fmtRp(Number(p.outstanding))}</TableCell>
+                    <TableCell>{p.due_date ? fmtDate(p.due_date) : "-"}</TableCell>
+                    <TableCell><Badge variant={p.status === "paid" ? "default" : "outline"}>{p.status}</Badge></TableCell>
                     {canWrite && (
-                      <td>
+                      <TableCell>
                         {p.status !== "paid" && (
                           <Button type="button" variant="outline" size="sm" onClick={() => payPurchase(p)}>Catat pelunasan</Button>
                         )}
-                      </td>
+                      </TableCell>
                     )}
-                  </tr>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </TableShell>
         </div>
       )}
@@ -961,32 +962,32 @@ export default function Inventory() {
       {tab === "piutang" && (
         <div className="card p-0 overflow-hidden">
           <TableShell minWidth={800}>
-            <table className="tbl">
-              <thead><tr><th>Invoice</th><th>Customer</th><th>Metode</th><th className="num">Total</th><th className="num">Terbayar</th><th className="num">Sisa</th><th>Jatuh tempo</th><th>Status</th>{canWrite && <th />}</tr></thead>
-              <tbody>
+            <Table>
+              <TableHeader><TableRow><TableHead>Invoice</TableHead><TableHead>Customer</TableHead><TableHead>Metode</TableHead><TableHead className="num">Total</TableHead><TableHead className="num">Terbayar</TableHead><TableHead className="num">Sisa</TableHead><TableHead>Jatuh tempo</TableHead><TableHead>Status</TableHead>{canWrite && <TableHead />}</TableRow></TableHeader>
+              <TableBody>
                 {sales.filter((s) => s.payment_method === "piutang").length === 0 ? (
-                  <tr><td colSpan={9} className="text-center py-8" style={{ color: "var(--text-muted)" }}>Belum ada piutang usaha.</td></tr>
+                  <TableRow><TableCell colSpan={9} className="text-center py-8" style={{ color: "var(--text-muted)" }}>Belum ada piutang usaha.</TableCell></TableRow>
                 ) : sales.filter((s) => s.payment_method === "piutang").map((s) => (
-                  <tr key={s.id}>
-                    <td>{s.invoice_number || "-"}</td>
-                    <td>{s.customer_name}</td>
-                    <td><Badge variant="secondary">{s.payment_method}</Badge></td>
-                    <td className="num">{fmtRp(Number(s.total_amount))}</td>
-                    <td className="num">{fmtRp(Number(s.paid_amount))}</td>
-                    <td className="num">{fmtRp(Number(s.outstanding))}</td>
-                    <td>{s.due_date ? fmtDate(s.due_date) : "-"}</td>
-                    <td><Badge variant={s.status === "paid" ? "default" : "outline"}>{s.status}</Badge></td>
+                  <TableRow key={s.id}>
+                    <TableCell>{s.invoice_number || "-"}</TableCell>
+                    <TableCell>{s.customer_name}</TableCell>
+                    <TableCell><Badge variant="secondary">{s.payment_method}</Badge></TableCell>
+                    <TableCell className="num">{fmtRp(Number(s.total_amount))}</TableCell>
+                    <TableCell className="num">{fmtRp(Number(s.paid_amount))}</TableCell>
+                    <TableCell className="num">{fmtRp(Number(s.outstanding))}</TableCell>
+                    <TableCell>{s.due_date ? fmtDate(s.due_date) : "-"}</TableCell>
+                    <TableCell><Badge variant={s.status === "paid" ? "default" : "outline"}>{s.status}</Badge></TableCell>
                     {canWrite && (
-                      <td>
+                      <TableCell>
                         {s.status !== "paid" && (
                           <Button type="button" variant="outline" size="sm" onClick={() => paySale(s)}>Catat pelunasan</Button>
                         )}
-                      </td>
+                      </TableCell>
                     )}
-                  </tr>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </TableShell>
         </div>
       )}
@@ -1025,19 +1026,19 @@ export default function Inventory() {
           {valuation?.by_category?.length > 0 && (
             <div className="card p-0 overflow-hidden">
               <TableShell minWidth={720}>
-              <table className="tbl">
-                <thead><tr><th>Kategori</th><th className="num">SKU</th><th className="num">Qty</th><th className="num">Nilai</th></tr></thead>
-                <tbody>
+              <Table>
+                <TableHeader><TableRow><TableHead>Kategori</TableHead><TableHead className="num">SKU</TableHead><TableHead className="num">Qty</TableHead><TableHead className="num">Nilai</TableHead></TableRow></TableHeader>
+                <TableBody>
                   {valuation.by_category.map((c) => (
-                    <tr key={c.category}>
-                      <td>{c.category}</td>
-                      <td className="num">{c.sku_count}</td>
-                      <td className="num">{c.qty}</td>
-                      <td className="num">{fmtRp(Number(c.value))}</td>
-                    </tr>
+                    <TableRow key={c.category}>
+                      <TableCell>{c.category}</TableCell>
+                      <TableCell className="num">{c.sku_count}</TableCell>
+                      <TableCell className="num">{c.qty}</TableCell>
+                      <TableCell className="num">{fmtRp(Number(c.value))}</TableCell>
+                    </TableRow>
                   ))}
-                </tbody>
-              </table>
+                </TableBody>
+              </Table>
               </TableShell>
             </div>
           )}
@@ -1060,25 +1061,25 @@ function MovementTable({ rows, onCancel }) {
   return (
     <div className="card p-0 overflow-hidden">
       <TableShell minWidth={720}>
-      <table className="tbl">
-        <thead>
-          <tr>
-            <th>Tanggal</th><th>SKU</th><th>Produk</th><th className="num">Qty</th>
-            <th className="num">Nilai</th><th>Status</th><th>Ref</th>{onCancel && <th />}
-          </tr>
-        </thead>
-        <tbody>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Tanggal</TableHead><TableHead>SKU</TableHead><TableHead>Produk</TableHead><TableHead className="num">Qty</TableHead>
+            <TableHead className="num">Nilai</TableHead><TableHead>Status</TableHead><TableHead>Ref</TableHead>{onCancel && <TableHead />}
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {rows.length === 0 ? (
-            <tr><td colSpan={8} className="text-center py-8" style={{ color: "var(--text-muted)" }}>Belum ada mutasi.</td></tr>
+            <TableRow><TableCell colSpan={8} className="text-center py-8" style={{ color: "var(--text-muted)" }}>Belum ada mutasi.</TableCell></TableRow>
           ) : rows.map((m) => (
-            <tr key={m.id}>
-              <td>{fmtDate(m.movement_date)}</td>
-              <td>{m.sku}</td>
-              <td>{m.product_name}</td>
-              <td className="num">{m.quantity}</td>
-              <td className="num">{fmtRp(Number(m.total_value))}</td>
-              <td><Badge variant="secondary">{m.finance_status}</Badge></td>
-              <td className="text-xs">
+            <TableRow key={m.id}>
+              <TableCell>{fmtDate(m.movement_date)}</TableCell>
+              <TableCell>{m.sku}</TableCell>
+              <TableCell>{m.product_name}</TableCell>
+              <TableCell className="num">{m.quantity}</TableCell>
+              <TableCell className="num">{fmtRp(Number(m.total_value))}</TableCell>
+              <TableCell><Badge variant="secondary">{m.finance_status}</Badge></TableCell>
+              <TableCell className="text-xs">
                 {m.reference ? (
                   <Link
                     to={`/transactions?reference=${encodeURIComponent(m.id)}`}
@@ -1090,18 +1091,18 @@ function MovementTable({ rows, onCancel }) {
                 ) : (
                   "-"
                 )}
-              </td>
+              </TableCell>
               {onCancel && (
-                <td>
+                <TableCell>
                   {m.finance_status !== "cancelled" && (
                     <Button type="button" variant="outline" size="sm" onClick={() => onCancel(m.id)}>Batalkan</Button>
                   )}
-                </td>
+                </TableCell>
               )}
-            </tr>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
       </TableShell>
     </div>
   );

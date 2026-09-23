@@ -1,17 +1,27 @@
+import { Children, cloneElement, isValidElement } from "react";
+
 /**
- * Responsive table shell: horizontal scroll + sticky first column on desktop/tablet,
- * optional card list on mobile.
+ * Responsive table shell: horizontal scroll + sticky first column on all
+ * screen sizes, including phones (no mobile "card list" fallback).
  *
  * Usage:
- *   <TableShell minWidth={720} mobileCards={...}>
- *     <table className="tbl">...</table>
+ *   <TableShell minWidth={720}>
+ *     <Table>...</Table>
  *   </TableShell>
+ *
+ * Some callers render extra markup (e.g. a bulk-delete banner) alongside the
+ * table, so children may be an array rather than a single element. Whichever
+ * child is the shadcn <Table> component (identified by its displayName) is
+ * cloned with `disableWrapper` (so it doesn't add its own nested
+ * overflow-auto div — TableShell already provides the single scroll
+ * container) and with the `tbl` class added (the sticky-first-column CSS in
+ * src/index.css targets `.table-shell--sticky .tbl thead th:first-child` /
+ * `tbody td:first-child`). Other children are passed through unchanged.
  */
 export default function TableShell({
   children,
   minWidth = 640,
   stickyFirst = true,
-  mobileCards = null,
   className = "",
   "data-testid": testId,
 }) {
@@ -19,45 +29,20 @@ export default function TableShell({
     "h-scroll",
     "table-shell",
     stickyFirst ? "table-shell--sticky" : "",
-    mobileCards ? "hidden sm:block" : "",
     className,
   ].filter(Boolean).join(" ");
 
-  return (
-    <>
-      {mobileCards ? (
-        <div className="table-cards sm:hidden space-y-3" data-testid={testId ? `${testId}-cards` : undefined}>
-          {mobileCards}
-        </div>
-      ) : null}
-      <div className={shellClass} data-testid={testId ? `${testId}-scroll` : undefined}>
-        <div style={{ minWidth }}>{children}</div>
-      </div>
-    </>
-  );
-}
+  const content = Children.map(children, (child) => {
+    if (!isValidElement(child) || child.type?.displayName !== "Table") return child;
+    return cloneElement(child, {
+      className: [child.props.className, "tbl"].filter(Boolean).join(" "),
+      disableWrapper: true,
+    });
+  });
 
-/** Small labeled row inside a mobile card */
-export function TableCardField({ label, children, emphasize = false }) {
   return (
-    <div className={`table-card-field${emphasize ? " table-card-field--em" : ""}`}>
-      <span className="table-card-label">{label}</span>
-      <span className="table-card-value">{children}</span>
-    </div>
-  );
-}
-
-export function TableCard({ title, subtitle, children, footer, className = "" }) {
-  return (
-    <div className={`table-card ${className}`.trim()}>
-      {(title || subtitle) && (
-        <div className="table-card-head">
-          {title ? <div className="table-card-title">{title}</div> : null}
-          {subtitle ? <div className="table-card-sub">{subtitle}</div> : null}
-        </div>
-      )}
-      <div className="table-card-body">{children}</div>
-      {footer ? <div className="table-card-footer">{footer}</div> : null}
+    <div className={shellClass} data-testid={testId ? `${testId}-scroll` : undefined}>
+      <div style={{ minWidth }}>{content}</div>
     </div>
   );
 }

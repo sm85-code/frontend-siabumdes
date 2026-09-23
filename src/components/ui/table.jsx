@@ -2,14 +2,20 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
-const Table = React.forwardRef(({ className, ...props }, ref) => (
-  <div className="relative w-full overflow-auto">
+const Table = React.forwardRef(({ className, disableWrapper = false, ...props }, ref) => {
+  const tableEl = (
     <table
       ref={ref}
       className={cn("w-full caption-bottom text-sm", className)}
       {...props} />
-  </div>
-))
+  );
+  // `disableWrapper` skips this component's own overflow-auto div. Used when the
+  // Table is already placed inside another scroll container (e.g. TableShell),
+  // so we don't end up with two nested overflow-auto elements fighting over the
+  // horizontal scrollbar and breaking `position: sticky` on the first column.
+  if (disableWrapper) return tableEl;
+  return <div className="relative w-full overflow-auto">{tableEl}</div>;
+})
 Table.displayName = "Table"
 
 const TableHeader = React.forwardRef(({ className, ...props }, ref) => (
