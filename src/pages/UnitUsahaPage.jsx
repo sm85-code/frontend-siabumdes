@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 export default function UnitUsahaPage() {
   const [list, setList] = useState([]);
@@ -12,17 +14,19 @@ export default function UnitUsahaPage() {
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {list.map((u) => (
-          <div key={u.id} className="card" data-testid={`unit-card-${u.code}`}>
-            <div className="flex items-start justify-between mb-3">
-              <span className="badge">{u.code}</span>
-            </div>
-            <h3 className="font-heading text-lg font-bold mb-2">{u.name}</h3>
-            <p className="text-sm mb-3" style={{ color: "var(--text-secondary)" }}>{u.description}</p>
-            <div className="p-3 rounded-lg text-xs" style={{ background: "var(--primary-light)", border: "1px solid var(--legacy-border)" }}>
-              <div className="label mb-1">Skema Bagi Hasil</div>
-              <p style={{ color: "var(--text-primary)" }}>{u.revenue_scheme}</p>
-            </div>
-          </div>
+          <Card key={u.id} data-testid={`unit-card-${u.code}`}>
+            <CardContent className="pt-6">
+              <div className="flex items-start justify-between mb-3">
+                <Badge variant="secondary">{u.code}</Badge>
+              </div>
+              <h3 className="font-heading text-lg font-bold mb-2">{u.name}</h3>
+              <p className="text-sm mb-3 text-muted-foreground">{u.description}</p>
+              <div className="p-3 rounded-lg text-xs bg-primary/10 border border-border">
+                <div className="label mb-1">Skema Bagi Hasil</div>
+                <p className="text-foreground">{u.revenue_scheme}</p>
+              </div>
+            </CardContent>
+          </Card>
         ))}
       </div>
     </div>
