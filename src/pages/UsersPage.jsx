@@ -1,10 +1,21 @@
 import { useCallback, useEffect, useState } from "react";
 import api, { ROLE_LABELS } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
-import { notify } from "@/lib/feedback";
+import { notify, notifySuccess, notifyError } from "@/lib/feedback";
 import { useConfirm } from "@/components/ConfirmProvider";
 import { Plus, Trash, Key, Lock } from "@phosphor-icons/react";
-import TableShell, { TableCard, TableCardField } from "@/components/TableShell";
+import TableShell from "@/components/TableShell";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
+import {
+  Table, TableHeader, TableBody, TableRow, TableHead, TableCell,
+} from "@/components/ui/table";
 
 const ROLE_OPTIONS = [
   { value: "admin", label: "Admin Utama" },
@@ -15,9 +26,9 @@ const ROLE_OPTIONS = [
   { value: "penasihat", label: "Penasihat (read-only)" },
 ];
 
-const ROLE_BADGE = {
-  admin: "", direktur: "badge-purple", bendahara: "badge-blue",
-  pengelola: "badge-warn", pengawas: "badge-blue", penasihat: "badge-purple",
+const ROLE_BADGE_VARIANT = {
+  admin: "default", direktur: "secondary", bendahara: "secondary",
+  pengelola: "outline", pengawas: "secondary", penasihat: "secondary",
 };
 
 export default function UsersPage() {
@@ -49,13 +60,17 @@ export default function UsersPage() {
       setShow(false);
       setForm({ username: "", email: "", name: "", password: "", role: "pengelola", unit_usaha_id: "" });
       load();
-    } catch (er) { notify(er.response?.data?.detail || "Gagal"); }
+      notifySuccess("Pengguna berhasil ditambahkan.");
+    } catch (er) { notifyError(er.response?.data?.detail || "Gagal"); }
   };
 
   const del = async (id) => {
     if (!(await confirm({ title: "Hapus pengguna", description: "Pengguna akan dihapus dan tidak dapat dipulihkan.", confirmLabel: "Hapus", destructive: true }))) return;
-    await api.delete(`/users/${id}`);
-    load();
+    try {
+      await api.delete(`/users/${id}`);
+      load();
+      notifySuccess("Pengguna berhasil dihapus.");
+    } catch (er) { notifyError(er.response?.data?.detail || "Gagal menghapus pengguna"); }
   };
 
   const resetPw = async (e) => {
@@ -65,8 +80,8 @@ export default function UsersPage() {
       await api.post(`/users/${showResetFor}/reset-password`, { new_password: newPw });
       setShowResetFor(null); setNewPw("");
       load();
-      notify("Password berhasil direset.");
-    } catch (er) { notify(er.response?.data?.detail || "Gagal reset"); }
+      notifySuccess("Password berhasil direset.");
+    } catch (er) { notifyError(er.response?.data?.detail || "Gagal reset"); }
   };
 
   // ---- Period Access Control ----
@@ -88,21 +103,65 @@ export default function UsersPage() {
       });
       setShowLockFor(null); setLockPeriods(new Set());
       load();
-    } catch (er) { notify(er.response?.data?.detail || "Gagal menyimpan"); }
+      notifySuccess("Periode terkunci berhasil disimpan.");
+    } catch (er) { notifyError(er.response?.data?.detail || "Gagal menyimpan"); }
   };
 
   const isAdmin = user.role === "admin";
 
   if (!isAdmin) {
     return (
-      <div data-testid="users-page-forbidden" className="card">
-        <h2 className="font-heading text-xl font-bold">Akses Ditolak</h2>
-        <p className="text-sm mt-2" style={{ color: "var(--text-secondary)" }}>
-          Hanya Admin Utama yang berwenang melihat dan mengelola pengguna.
-        </p>
-      </div>
+      <Card data-testid="users-page-forbidden">
+        <CardHeader>
+          <CardTitle className="font-heading text-xl">Akses Ditolak</CardTitle>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <p className="text-sm text-muted-foreground">
+            Hanya Admin Utama yang berwenang melihat dan mengelola pengguna.
+          </p>
+        </CardContent>
+      </Card>
     );
   }
+
+  const actionButtons = (u) => (
+    <div className="flex gap-1">
+      {u.role !== "admin" && (
+        <Button
+          data-testid={`btn-lock-${u.id}`}
+          onClick={() => openLock(u)}
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 text-destructive hover:bg-destructive/10 hover:text-destructive"
+          title="Kunci Periode"
+        >
+          <Lock size={16} />
+        </Button>
+      )}
+      <Button
+        data-testid={`btn-reset-${u.id}`}
+        onClick={() => setShowResetFor(u.id)}
+        variant="ghost"
+        size="icon"
+        className="h-8 w-8 text-primary hover:bg-primary/10 hover:text-primary"
+        title="Reset Password"
+      >
+        <Key size={16} />
+      </Button>
+      {u.id !== user.id && (
+        <Button
+          data-testid={`btn-del-${u.id}`}
+          onClick={() => del(u.id)}
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 text-destructive hover:bg-destructive/10 hover:text-destructive"
+          title="Hapus"
+        >
+          <Trash size={16} />
+        </Button>
+      )}
+    </div>
+  );
 
   return (
     <div className="space-y-6" data-testid="users-page">
@@ -110,74 +169,103 @@ export default function UsersPage() {
         <div>
           <p className="label mb-1">Manajemen Akses (Admin Utama)</p>
           <h1 className="font-heading text-3xl font-bold page-h1">Kelola Pengguna</h1>
-          <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
+          <p className="text-sm mt-1 text-muted-foreground">
             Password tidak dapat dilihat. Gunakan Reset Password jika pengguna kehilangan akses.
           </p>
         </div>
         <div className="flex gap-2">
-          <button data-testid="btn-new-user" onClick={() => setShow(true)} className="btn btn-primary">
+          <Button data-testid="btn-new-user" onClick={() => setShow(true)}>
             <Plus size={16} /> Tambah Pengguna
-          </button>
+          </Button>
         </div>
       </div>
 
       {show && (
-        <div className="card fade-in">
-          <h3 className="font-heading text-lg font-semibold mb-4">Tambah Pengguna Baru</h3>
-          <form onSubmit={submit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div><label className="label">Nama Lengkap</label>
-              <input required className="input" value={form.name}
-                     onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
-            <div><label className="label">Username</label>
-              <input required className="input" value={form.username}
-                     onChange={(e) => setForm({ ...form, username: e.target.value })} /></div>
-            <div><label className="label">Email</label>
-              <input type="email" required className="input" value={form.email}
-                     onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
-            <div><label className="label">Password</label>
-              <input type="text" required minLength={6} className="input" value={form.password}
-                     onChange={(e) => setForm({ ...form, password: e.target.value })} placeholder="min. 6 karakter" /></div>
-            <div><label className="label">Role</label>
-              <select required className="select" value={form.role}
-                      onChange={(e) => setForm({ ...form, role: e.target.value })}>
-                {ROLE_OPTIONS.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
-              </select></div>
-            {form.role === "pengelola" && (
-              <div><label className="label">Unit Usaha</label>
-                <select required className="select" value={form.unit_usaha_id}
-                        onChange={(e) => setForm({ ...form, unit_usaha_id: e.target.value })}>
-                  <option value="">— pilih unit —</option>
-                  {units.map(u => <option key={u.id} value={u.id}>{u.code} - {u.name}</option>)}
-                </select></div>
-            )}
-            <div className="sm:col-span-2 flex justify-end gap-2">
-              <button type="button" onClick={() => setShow(false)} className="btn btn-outline">Batal</button>
-              <button data-testid="btn-save-user" className="btn btn-primary">Simpan</button>
-            </div>
+        <Card className="fade-in">
+          <CardHeader>
+            <CardTitle className="font-heading text-lg">Tambah Pengguna Baru</CardTitle>
+          </CardHeader>
+          <form onSubmit={submit}>
+            <CardContent className="pt-0 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label>Nama Lengkap</Label>
+                <Input required value={form.name}
+                       onChange={(e) => setForm({ ...form, name: e.target.value })} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Username</Label>
+                <Input required value={form.username}
+                       onChange={(e) => setForm({ ...form, username: e.target.value })} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Email</Label>
+                <Input type="email" required value={form.email}
+                       onChange={(e) => setForm({ ...form, email: e.target.value })} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Password</Label>
+                <Input type="text" required minLength={6} value={form.password}
+                       onChange={(e) => setForm({ ...form, password: e.target.value })} placeholder="min. 6 karakter" />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Role</Label>
+                <Select required value={form.role}
+                        onValueChange={(v) => setForm({ ...form, role: v })}>
+                  <SelectTrigger data-testid="select-role">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ROLE_OPTIONS.map(r => <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              {form.role === "pengelola" && (
+                <div className="space-y-1.5">
+                  <Label>Unit Usaha</Label>
+                  <Select required value={form.unit_usaha_id}
+                          onValueChange={(v) => setForm({ ...form, unit_usaha_id: v })}>
+                    <SelectTrigger data-testid="select-unit-usaha">
+                      <SelectValue placeholder="— pilih unit —" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {units.map(u => <SelectItem key={u.id} value={u.id}>{u.code} - {u.name}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+            </CardContent>
+            <CardFooter className="sm:col-span-2 justify-end gap-2">
+              <Button type="button" onClick={() => setShow(false)} variant="outline">Batal</Button>
+              <Button type="submit" data-testid="btn-save-user">Simpan</Button>
+            </CardFooter>
           </form>
-        </div>
+        </Card>
       )}
 
       {showResetFor && (
-        <div className="card fade-in" data-testid="reset-pw-form">
-          <h3 className="font-heading text-lg font-semibold mb-4 flex items-center gap-2">
-            <Key size={20} weight="duotone" color="var(--primary-dark)" /> Reset Password
-          </h3>
-          <form onSubmit={resetPw} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="sm:col-span-2">
-              <label className="label">Password Sementara</label>
-              <input data-testid="reset-pw-input" type="password" required minLength={8} className="input"
-                     value={newPw} onChange={(e) => setNewPw(e.target.value)} placeholder="min. 8 karakter" />
-              <p className="text-xs mt-2" style={{ color: "var(--text-secondary)" }}>
-                Pengguna wajib mengganti password ini setelah login berikutnya.
-              </p>
-            </div>
-            <div className="sm:col-span-2 flex justify-end gap-2">
-              <button type="button" onClick={() => { setShowResetFor(null); setNewPw(""); }} className="btn btn-outline">Batal</button>
-              <button data-testid="btn-confirm-reset" className="btn btn-primary">Reset & Simpan</button>
-            </div>
+        <Card className="fade-in" data-testid="reset-pw-form">
+          <CardHeader>
+            <CardTitle className="font-heading text-lg flex items-center gap-2">
+              <Key size={20} weight="duotone" className="text-primary" /> Reset Password
+            </CardTitle>
+          </CardHeader>
+          <form onSubmit={resetPw}>
+            <CardContent className="pt-0 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="sm:col-span-2 space-y-1.5">
+                <Label>Password Sementara</Label>
+                <Input data-testid="reset-pw-input" type="password" required minLength={8}
+                       value={newPw} onChange={(e) => setNewPw(e.target.value)} placeholder="min. 8 karakter" />
+                <p className="text-xs mt-2 text-muted-foreground">
+                  Pengguna wajib mengganti password ini setelah login berikutnya.
+                </p>
+              </div>
+            </CardContent>
+            <CardFooter className="justify-end gap-2">
+              <Button type="button" onClick={() => { setShowResetFor(null); setNewPw(""); }} variant="outline">Batal</Button>
+              <Button type="submit" data-testid="btn-confirm-reset">Reset &amp; Simpan</Button>
+            </CardFooter>
           </form>
-        </div>
+        </Card>
       )}
 
       {showLockFor && (() => {
@@ -186,30 +274,30 @@ export default function UsersPage() {
         const YEARS = [];
         for (let y = 2022; y <= 2030; y++) YEARS.push(y);
         return (
-          <div className="card fade-in" data-testid="lock-periods-form">
-            <div className="flex items-start justify-between gap-2 mb-4">
+          <Card className="fade-in" data-testid="lock-periods-form">
+            <CardHeader className="flex-row items-start justify-between gap-2 space-y-0">
               <div>
-                <h3 className="font-heading text-lg font-semibold flex items-center gap-2">
-                  <Lock size={20} weight="duotone" color="var(--status-error)" /> Kunci Periode Transaksi
-                </h3>
-                <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
+                <CardTitle className="font-heading text-lg flex items-center gap-2">
+                  <Lock size={20} weight="duotone" className="text-destructive" /> Kunci Periode Transaksi
+                </CardTitle>
+                <p className="text-sm mt-1 text-muted-foreground">
                   Untuk <b>{targetUser?.name}</b>. Bulan yang dicentang akan diblokir dari input/edit/hapus transaksi.
                 </p>
               </div>
               <div className="flex gap-2">
-                <button onClick={() => { setShowLockFor(null); setLockPeriods(new Set()); }} className="btn btn-outline">Batal</button>
-                <button data-testid="btn-save-lock" onClick={saveLock} className="btn btn-primary">Simpan</button>
+                <Button onClick={() => { setShowLockFor(null); setLockPeriods(new Set()); }} variant="outline">Batal</Button>
+                <Button data-testid="btn-save-lock" onClick={saveLock}>Simpan</Button>
               </div>
-            </div>
-            <div className="space-y-2 max-h-[420px] overflow-y-auto pr-2">
+            </CardHeader>
+            <CardContent className="pt-0 space-y-2 max-h-[420px] overflow-y-auto pr-2">
               {YEARS.map(y => {
                 const yearMonths = MONTHS.map((_, i) => `${y}-${String(i + 1).padStart(2, "0")}`);
                 const allBlocked = yearMonths.every(m => lockPeriods.has(m));
                 return (
-                  <div key={y} className="rounded-lg p-3" style={{ background: "var(--bg)", border: "1px solid var(--legacy-border)" }}>
+                  <div key={y} className="rounded-lg p-3 bg-muted/40 border">
                     <div className="flex items-center justify-between mb-2">
                       <span className="font-semibold text-sm">Tahun {y}</span>
-                      <button
+                      <Button
                         data-testid={`lock-year-${y}`}
                         onClick={() => {
                           setLockPeriods(prev => {
@@ -219,139 +307,79 @@ export default function UsersPage() {
                             return n;
                           });
                         }}
-                        className="btn text-xs btn-outline">
+                        variant="outline"
+                        size="sm"
+                        className="h-7 text-xs"
+                      >
                         {allBlocked ? "Buka Semua" : "Kunci Semua"}
-                      </button>
+                      </Button>
                     </div>
                     <div className="grid grid-cols-6 gap-1.5">
                       {MONTHS.map((mn, i) => {
                         const ym = `${y}-${String(i + 1).padStart(2, "0")}`;
                         const blocked = lockPeriods.has(ym);
                         return (
-                          <button key={ym}
+                          <Button key={ym}
+                                  type="button"
                                   data-testid={`lock-${ym}`}
                                   onClick={() => togglePeriod(ym)}
-                                  className="text-xs py-1.5 rounded-md transition-colors"
-                                  style={{
-                                    background: blocked ? "var(--status-error)" : "white",
-                                    color: blocked ? "white" : "var(--text-primary)",
-                                    border: `1px solid ${blocked ? "var(--status-error)" : "var(--legacy-border)"}`,
-                                    fontWeight: blocked ? 600 : 400,
-                                  }}>
+                                  variant={blocked ? "destructive" : "outline"}
+                                  size="sm"
+                                  className="h-7 px-0 text-xs font-normal data-[blocked=true]:font-semibold">
                             {mn}
-                          </button>
+                          </Button>
                         );
                       })}
                     </div>
                   </div>
                 );
               })}
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         );
       })()}
 
-      <div className="card p-0 overflow-hidden">
+      <Card className="p-0 overflow-hidden">
         <TableShell
           minWidth={720}
           data-testid="users-table"
-          mobileCards={users.map((u) => {
-            const blockedCnt = (u.blocked_periods || []).length;
-            return (
-              <TableCard
-                key={u.id}
-                title={u.name}
-                subtitle={u.username}
-                footer={(
-                  <div className="flex gap-1">
-                    {u.role !== "admin" && (
-                      <button data-testid={`btn-lock-${u.id}`} onClick={() => openLock(u)}
-                              className="p-1.5 rounded-md hover:bg-red-50" title="Kunci Periode">
-                        <Lock size={16} color="var(--status-error)" />
-                      </button>
-                    )}
-                    <button data-testid={`btn-reset-${u.id}`} onClick={() => setShowResetFor(u.id)}
-                            className="p-1.5 rounded-md hover:bg-yellow-50" title="Reset Password">
-                      <Key size={16} color="var(--primary)" />
-                    </button>
-                    {u.id !== user.id && (
-                      <button data-testid={`btn-del-${u.id}`} onClick={() => del(u.id)}
-                              className="p-1.5 rounded-md hover:bg-red-50" title="Hapus">
-                        <Trash size={16} color="var(--status-error)" />
-                      </button>
-                    )}
-                  </div>
-                )}
-              >
-                <TableCardField label="Email">{u.email || "—"}</TableCardField>
-                <TableCardField label="Role">
-                  <span className={`badge ${ROLE_BADGE[u.role] || ""}`}>{ROLE_LABELS[u.role] || u.role}</span>
-                </TableCardField>
-                <TableCardField label="Unit">{units.find(x => x.id === u.unit_usaha_id)?.code || "-"}</TableCardField>
-                <TableCardField label="Terkunci" emphasize>
-                  <span data-testid={`blocked-count-${u.id}`}>
-                    {blockedCnt > 0
-                      ? <span className="badge badge-warn">{blockedCnt} bulan</span>
-                      : <span style={{ color: "var(--text-muted)" }}>—</span>}
-                  </span>
-                </TableCardField>
-              </TableCard>
-            );
-          })}
         >
-          <table className="tbl" data-testid="users-table">
-            <thead>
-              <tr>
-                <th>Nama</th><th>Username</th><th>Email</th>
-                <th>Role</th><th>Unit</th>
-                <th>Periode Terkunci</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
+          <Table data-testid="users-table">
+            <TableHeader>
+              <TableRow>
+                <TableHead>Nama</TableHead><TableHead>Username</TableHead><TableHead>Email</TableHead>
+                <TableHead>Role</TableHead><TableHead>Unit</TableHead>
+                <TableHead>Periode Terkunci</TableHead>
+                <TableHead></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {users.map(u => {
                 const blockedCnt = (u.blocked_periods || []).length;
                 return (
-                  <tr key={u.id}>
-                    <td className="font-medium">{u.name}</td>
-                    <td>{u.username}</td>
-                    <td className="text-xs">{u.email}</td>
-                    <td>
-                      <span className={`badge ${ROLE_BADGE[u.role] || ""}`}>{ROLE_LABELS[u.role] || u.role}</span>
-                    </td>
-                    <td className="text-xs">{units.find(x => x.id === u.unit_usaha_id)?.code || "-"}</td>
-                    <td className="text-xs" data-testid={`blocked-count-${u.id}`}>
+                  <TableRow key={u.id}>
+                    <TableCell className="font-medium">{u.name}</TableCell>
+                    <TableCell>{u.username}</TableCell>
+                    <TableCell className="text-xs">{u.email}</TableCell>
+                    <TableCell>
+                      <Badge variant={ROLE_BADGE_VARIANT[u.role] || "outline"}>{ROLE_LABELS[u.role] || u.role}</Badge>
+                    </TableCell>
+                    <TableCell className="text-xs">{units.find(x => x.id === u.unit_usaha_id)?.code || "-"}</TableCell>
+                    <TableCell className="text-xs" data-testid={`blocked-count-${u.id}`}>
                       {blockedCnt > 0
-                        ? <span className="badge badge-warn">{blockedCnt} bulan</span>
-                        : <span style={{ color: "var(--text-muted)" }}>—</span>}
-                    </td>
-                    <td>
-                      <div className="flex gap-1">
-                        {u.role !== "admin" && (
-                          <button data-testid={`btn-lock-${u.id}`} onClick={() => openLock(u)}
-                                  className="p-1.5 rounded-md hover:bg-red-50" title="Kunci Periode">
-                            <Lock size={16} color="var(--status-error)" />
-                          </button>
-                        )}
-                        <button data-testid={`btn-reset-${u.id}`} onClick={() => setShowResetFor(u.id)}
-                                className="p-1.5 rounded-md hover:bg-yellow-50" title="Reset Password">
-                          <Key size={16} color="var(--primary)" />
-                        </button>
-                        {u.id !== user.id && (
-                          <button data-testid={`btn-del-${u.id}`} onClick={() => del(u.id)}
-                                  className="p-1.5 rounded-md hover:bg-red-50" title="Hapus">
-                            <Trash size={16} color="var(--status-error)" />
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
+                        ? <Badge variant="secondary">{blockedCnt} bulan</Badge>
+                        : <span className="text-muted-foreground">—</span>}
+                    </TableCell>
+                    <TableCell>
+                      {actionButtons(u)}
+                    </TableCell>
+                  </TableRow>
                 );
               })}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </TableShell>
-      </div>
+      </Card>
     </div>
   );
 }
