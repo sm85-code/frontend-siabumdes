@@ -10,15 +10,16 @@
  *   <Spinner />                          // inline, default label "Memuat..."
  *   <Spinner size={48} label="Memuat dashboard..." />
  *   <Spinner label={null} />             // rings only, no text
+ *   <Spinner column size={56} label="Memuat dashboard..." /> // full-page: ring on top, label below
  */
-export default function Spinner({ size = 32, label = "Memuat...", className = "", ...rest }) {
+export default function Spinner({ size = 32, label = "Memuat...", column = false, className = "", ...rest }) {
   const outerBorder = Math.max(3, Math.round(size * 0.1));
   const innerSize = Math.round(size * 0.7);
   const innerBorder = Math.max(2, Math.round(size * 0.08));
 
   return (
     <span
-      className={`spinner-wrap ${className}`.trim()}
+      className={`spinner-wrap ${column ? "spinner-wrap--column" : ""} ${className}`.trim()}
       role="status"
       aria-live="polite"
       data-testid="spinner"
