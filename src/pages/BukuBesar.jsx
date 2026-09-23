@@ -5,6 +5,9 @@ import { notify } from "@/lib/feedback";
 import { Books, MagnifyingGlass, FilePdf, FileXls, FileDoc } from "@phosphor-icons/react";
 import TableShell from "@/components/TableShell";
 import Spinner from "@/components/Spinner";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 const MONTHS = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 const YEAR_MIN = 2022, YEAR_MAX = 2030;
@@ -121,7 +124,7 @@ export default function BukuBesar() {
         </p>
       </div>
 
-      <div className="card grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-start" data-testid="ledger-filters">
+      <Card className="p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-start" data-testid="ledger-filters">
         <div>
           <label className="label" htmlFor="ledger-group-select">Kelompok</label>
           <select id="ledger-group-select" data-testid="ledger-group-select" className="select"
@@ -164,11 +167,11 @@ export default function BukuBesar() {
                    value={search} onChange={(e) => setSearch(e.target.value)} />
           </div>
         </div>
-      </div>
+      </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Left: list akun */}
-        <div className="card p-0 overflow-hidden lg:col-span-1" style={{ maxHeight: 600, overflowY: "auto" }}>
+        <Card className="p-0 overflow-hidden lg:col-span-1" style={{ maxHeight: 600, overflowY: "auto" }}>
           <div className="p-4" style={{ borderBottom: "1px solid var(--legacy-border)", background: "var(--primary-light)" }}>
             <p className="label mb-0">Akun {group} ({filteredAccounts.length})</p>
           </div>
@@ -183,31 +186,31 @@ export default function BukuBesar() {
                 <li key={a.code}>
                   <button data-testid={`ledger-acc-${a.code}`}
                           onClick={() => setSelected(a.code)}
-                          className="w-full text-left px-4 py-2.5 border-b transition-colors"
-                          style={{
-                            background: active ? "var(--primary-light)" : "transparent",
-                            borderColor: "var(--legacy-border)",
-                          }}>
-                    <div className="font-mono text-xs font-semibold" style={{ color: active ? "var(--primary-dark)" : "var(--text-secondary)" }}>{a.code}</div>
-                    <div className="text-sm" style={{ color: active ? "var(--primary-dark)" : "var(--text-primary)" }}>{a.name}</div>
+                          className={cn(
+                            "w-full text-left px-4 py-2.5 border-b transition-colors",
+                            active ? "bg-primary/10" : "bg-transparent hover:bg-muted/50",
+                          )}
+                          style={{ borderColor: "var(--legacy-border)" }}>
+                    <div className={cn("font-mono text-xs font-semibold", active ? "text-primary" : "text-muted-foreground")}>{a.code}</div>
+                    <div className={cn("text-sm", active ? "text-primary" : "text-foreground")}>{a.name}</div>
                   </button>
                 </li>
               );
             })}
           </ul>
-        </div>
+        </Card>
 
         {/* Right: ledger detail */}
         <div className="lg:col-span-3">
           {!selected ? (
-            <div className="card text-center py-16">
+            <Card className="text-center py-16">
               <Books size={40} weight="duotone" color="var(--text-muted)" style={{ margin: "0 auto 12px" }} />
               <p style={{ color: "var(--text-muted)" }}>Pilih akun di sebelah kiri untuk melihat buku besar <b>{group}</b>.</p>
-            </div>
+            </Card>
           ) : loading ? (
-            <div className="card text-center py-10"><Spinner className="justify-center" /></div>
+            <Card className="text-center py-10"><Spinner className="justify-center" /></Card>
           ) : ledger ? (
-            <div className="card p-0 overflow-hidden">
+            <Card className="p-0 overflow-hidden">
               <div className="p-5" style={{ borderBottom: "1px solid var(--legacy-border)" }}>
                 <div className="flex items-start justify-between gap-3 flex-wrap">
                   <div>
@@ -226,15 +229,15 @@ export default function BukuBesar() {
                         {fmtRp(ledger.saldo_akhir)}
                       </div>
                     </div>
-                    <button data-testid="btn-ledger-pdf" onClick={downloadPdf} className="btn btn-outline">
+                    <Button variant="outline" data-testid="btn-ledger-pdf" onClick={downloadPdf}>
                       <FilePdf size={16} weight="duotone" color="var(--status-error)" /> Export PDF
-                    </button>
-                    <button data-testid="btn-ledger-excel" onClick={downloadExcel} className="btn btn-outline">
+                    </Button>
+                    <Button variant="outline" data-testid="btn-ledger-excel" onClick={downloadExcel}>
                       <FileXls size={16} weight="duotone" color="var(--primary-dark)" /> Export Excel
-                    </button>
-                    <button data-testid="btn-ledger-word" onClick={downloadWord} className="btn btn-outline">
+                    </Button>
+                    <Button variant="outline" data-testid="btn-ledger-word" onClick={downloadWord}>
                       <FileDoc size={16} weight="duotone" color="#2b579a" /> Export Word
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -286,7 +289,7 @@ export default function BukuBesar() {
                   </tbody>
                 </table>
               </TableShell>
-            </div>
+            </Card>
           ) : null}
         </div>
       </div>

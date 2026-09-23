@@ -14,6 +14,8 @@ import {
 import InventorySummary from "@/pages/InventorySummary";
 import TableShell from "@/components/TableShell";
 import Spinner from "@/components/Spinner";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 function formatApiError(err, fallback = "Terjadi kesalahan") {
   const detail = err?.response?.data?.detail;
@@ -460,9 +462,9 @@ export default function Inventory() {
           </p>
         </div>
         {tab === "katalog" && canWrite && (
-          <button type="button" className="btn btn-primary" onClick={openCreateProduct} data-testid="btn-new-product">
+          <Button type="button" onClick={openCreateProduct} data-testid="btn-new-product">
             <Plus size={16} /> Tambah Produk
-          </button>
+          </Button>
         )}
       </div>
 
@@ -479,17 +481,18 @@ export default function Inventory() {
           const Icon = t.icon;
           const active = tab === t.id;
           return (
-            <button
+            <Button
               key={t.id}
               type="button"
               role="tab"
               aria-selected={active}
-              className={`btn ${active ? "btn-primary" : "btn-outline"} text-sm`}
+              variant={active ? "default" : "outline"}
+              size="sm"
               onClick={() => setTab(t.id)}
               data-testid={`tab-${t.id}`}
             >
               <Icon size={16} /> {t.label}
-            </button>
+            </Button>
           );
         })}
       </div>
@@ -542,8 +545,8 @@ export default function Inventory() {
                   <div><label className="label">Qty awal</label><input type="number" min="0" className="input" value={productForm.opening_qty} onChange={(e) => setProductForm({ ...productForm, opening_qty: e.target.value })} /></div>
                 )}
                 <div className="sm:col-span-2 flex justify-end gap-2">
-                  <button type="button" className="btn btn-outline" onClick={closeProductForm}>Batal</button>
-                  <button type="submit" className="btn btn-primary">{editingId ? "Simpan perubahan" : "Simpan produk"}</button>
+                  <Button type="button" variant="outline" onClick={closeProductForm}>Batal</Button>
+                  <Button type="submit">{editingId ? "Simpan perubahan" : "Simpan produk"}</Button>
                 </div>
               </form>
             </div>
@@ -567,7 +570,7 @@ export default function Inventory() {
                   <tr key={p.id}>
                     <td className="font-medium">{p.sku}</td>
                     <td>{p.name}</td>
-                    <td><span className="badge">{p.category_name || "-"}</span></td>
+                    <td><Badge variant="secondary">{p.category_name || "-"}</Badge></td>
                     <td>{p.unit_of_measure}</td>
                     <td className="num">{fmtRp(Number(p.cost_price))}</td>
                     <td className="num">{fmtRp(Number(p.sell_price))}</td>
@@ -647,7 +650,7 @@ export default function Inventory() {
                   <label className="label">Akun kredit ({stockIn.payment_method === "credit" ? "Utang Usaha" : "Kas/Bank"})</label>
                   <CoaSelect value={stockIn.credit_account_code} onChange={(e) => setStockIn({ ...stockIn, credit_account_code: e.target.value })} />
                 </div>
-                <div className="sm:col-span-2 flex justify-end"><button type="submit" className="btn btn-primary" disabled={submitting}>{submitting ? "Menyimpan…" : "Catat stock in"}</button></div>
+                <div className="sm:col-span-2 flex justify-end"><Button type="submit" disabled={submitting}>{submitting ? "Menyimpan…" : "Catat stock in"}</Button></div>
               </form>
             ) : <p className="text-sm">Role Anda read-only.</p>}
           </div>
@@ -722,7 +725,7 @@ export default function Inventory() {
                   <p>Preview jurnal HPP: <strong>{fmtRp(Number(stockOut.quantity || 0) * Number(products.find((p) => p.id === stockOut.product_id)?.cost_price || 0))}</strong></p>
                   <p>Preview jurnal Penjualan: <strong>{fmtRp(Number(stockOut.quantity || 0) * Number(stockOut.sell_price || 0))}</strong></p>
                 </div>
-                <div className="sm:col-span-2 flex justify-end"><button type="submit" className="btn btn-primary" disabled={submitting}>{submitting ? "Menyimpan…" : "Catat stock out"}</button></div>
+                <div className="sm:col-span-2 flex justify-end"><Button type="submit" disabled={submitting}>{submitting ? "Menyimpan…" : "Catat stock out"}</Button></div>
               </form>
             ) : <p className="text-sm">Role Anda read-only.</p>}
           </div>
@@ -789,7 +792,7 @@ export default function Inventory() {
                 )}
 
                 <div className="sm:col-span-2"><label className="label">Catatan</label><input className="input" value={adjust.notes} onChange={(e) => setAdjust({ ...adjust, notes: e.target.value })} /></div>
-                <div className="sm:col-span-2 flex justify-end"><button type="submit" className="btn btn-primary" disabled={submitting}>{submitting ? "Menyimpan…" : "Simpan penyesuaian"}</button></div>
+                <div className="sm:col-span-2 flex justify-end"><Button type="submit" disabled={submitting}>{submitting ? "Menyimpan…" : "Simpan penyesuaian"}</Button></div>
               </form>
             ) : <p className="text-sm">Role Anda read-only.</p>}
           </div>
@@ -807,7 +810,7 @@ export default function Inventory() {
                     <td>{a.sku}</td>
                     <td>{a.product_name}</td>
                     <td className="num">{a.quantity_delta > 0 ? `+${a.quantity_delta}` : a.quantity_delta}</td>
-                    <td><span className="badge">{a.reason}</span></td>
+                    <td><Badge variant="secondary">{a.reason}</Badge></td>
                     <td>{a.notes || "-"}</td>
                     <td className="text-xs">
                       <Link
@@ -820,9 +823,9 @@ export default function Inventory() {
                     </td>
                     {canWrite && (
                       <td>
-                        <button type="button" className="btn btn-outline text-xs" onClick={() => cancelAdjustment(a.id)}>
+                        <Button type="button" variant="outline" size="sm" onClick={() => cancelAdjustment(a.id)}>
                           Batalkan
-                        </button>
+                        </Button>
                       </td>
                     )}
                   </tr>
@@ -844,8 +847,8 @@ export default function Inventory() {
                 <div><label className="label">Kontak</label><input className="input" value={vendorForm.contact} onChange={(e) => setVendorForm({ ...vendorForm, contact: e.target.value })} /></div>
                 <div><label className="label">Alamat</label><input className="input" value={vendorForm.address} onChange={(e) => setVendorForm({ ...vendorForm, address: e.target.value })} /></div>
                 <div className="sm:col-span-3 flex justify-end gap-2">
-                  {vendorForm.id && <button type="button" className="btn btn-outline" onClick={() => setVendorForm(emptyPartnerForm())}>Batal</button>}
-                  <button type="submit" className="btn btn-primary">{vendorForm.id ? "Simpan perubahan" : "Simpan mitra pemasok"}</button>
+                  {vendorForm.id && <Button type="button" variant="outline" onClick={() => setVendorForm(emptyPartnerForm())}>Batal</Button>}
+                  <Button type="submit">{vendorForm.id ? "Simpan perubahan" : "Simpan mitra pemasok"}</Button>
                 </div>
               </form>
             </div>
@@ -862,11 +865,11 @@ export default function Inventory() {
                       <td className="font-medium">{v.name}</td>
                       <td>{v.contact || "-"}</td>
                       <td>{v.address || "-"}</td>
-                      <td><span className={`badge ${v.is_active ? "" : "badge-purple"}`}>{v.is_active ? "aktif" : "nonaktif"}</span></td>
+                      <td><Badge variant={v.is_active ? "default" : "outline"}>{v.is_active ? "aktif" : "nonaktif"}</Badge></td>
                       {canWrite && (
                         <td className="whitespace-nowrap">
                           <button type="button" className="p-1.5" title="Edit" onClick={() => setVendorForm({ id: v.id, name: v.name, contact: v.contact || "", address: v.address || "" })}><PencilSimple size={16} /></button>
-                          <button type="button" className="btn btn-outline text-xs ml-2" onClick={() => toggleVendorActive(v)}>{v.is_active ? "Nonaktifkan" : "Aktifkan"}</button>
+                          <Button type="button" variant="outline" size="sm" className="ml-2" onClick={() => toggleVendorActive(v)}>{v.is_active ? "Nonaktifkan" : "Aktifkan"}</Button>
                         </td>
                       )}
                     </tr>
@@ -888,8 +891,8 @@ export default function Inventory() {
                 <div><label className="label">Kontak</label><input className="input" value={customerForm.contact} onChange={(e) => setCustomerForm({ ...customerForm, contact: e.target.value })} /></div>
                 <div><label className="label">Alamat</label><input className="input" value={customerForm.address} onChange={(e) => setCustomerForm({ ...customerForm, address: e.target.value })} /></div>
                 <div className="sm:col-span-3 flex justify-end gap-2">
-                  {customerForm.id && <button type="button" className="btn btn-outline" onClick={() => setCustomerForm(emptyPartnerForm())}>Batal</button>}
-                  <button type="submit" className="btn btn-primary">{customerForm.id ? "Simpan perubahan" : "Simpan customer"}</button>
+                  {customerForm.id && <Button type="button" variant="outline" onClick={() => setCustomerForm(emptyPartnerForm())}>Batal</Button>}
+                  <Button type="submit">{customerForm.id ? "Simpan perubahan" : "Simpan customer"}</Button>
                 </div>
               </form>
             </div>
@@ -906,11 +909,11 @@ export default function Inventory() {
                       <td className="font-medium">{c.name}</td>
                       <td>{c.contact || "-"}</td>
                       <td>{c.address || "-"}</td>
-                      <td><span className={`badge ${c.is_active ? "" : "badge-purple"}`}>{c.is_active ? "aktif" : "nonaktif"}</span></td>
+                      <td><Badge variant={c.is_active ? "default" : "outline"}>{c.is_active ? "aktif" : "nonaktif"}</Badge></td>
                       {canWrite && (
                         <td className="whitespace-nowrap">
                           <button type="button" className="p-1.5" title="Edit" onClick={() => setCustomerForm({ id: c.id, name: c.name, contact: c.contact || "", address: c.address || "" })}><PencilSimple size={16} /></button>
-                          <button type="button" className="btn btn-outline text-xs ml-2" onClick={() => toggleCustomerActive(c)}>{c.is_active ? "Nonaktifkan" : "Aktifkan"}</button>
+                          <Button type="button" variant="outline" size="sm" className="ml-2" onClick={() => toggleCustomerActive(c)}>{c.is_active ? "Nonaktifkan" : "Aktifkan"}</Button>
                         </td>
                       )}
                     </tr>
@@ -934,16 +937,16 @@ export default function Inventory() {
                   <tr key={p.id}>
                     <td>{p.invoice_number || "-"}</td>
                     <td>{p.vendor_name}</td>
-                    <td><span className="badge">{p.payment_method}</span></td>
+                    <td><Badge variant="secondary">{p.payment_method}</Badge></td>
                     <td className="num">{fmtRp(Number(p.total_amount))}</td>
                     <td className="num">{fmtRp(Number(p.paid_amount))}</td>
                     <td className="num">{fmtRp(Number(p.outstanding))}</td>
                     <td>{p.due_date ? fmtDate(p.due_date) : "-"}</td>
-                    <td><span className={`badge ${p.status === "paid" ? "" : "badge-purple"}`}>{p.status}</span></td>
+                    <td><Badge variant={p.status === "paid" ? "default" : "outline"}>{p.status}</Badge></td>
                     {canWrite && (
                       <td>
                         {p.status !== "paid" && (
-                          <button type="button" className="btn btn-outline text-xs" onClick={() => payPurchase(p)}>Catat pelunasan</button>
+                          <Button type="button" variant="outline" size="sm" onClick={() => payPurchase(p)}>Catat pelunasan</Button>
                         )}
                       </td>
                     )}
@@ -967,16 +970,16 @@ export default function Inventory() {
                   <tr key={s.id}>
                     <td>{s.invoice_number || "-"}</td>
                     <td>{s.customer_name}</td>
-                    <td><span className="badge">{s.payment_method}</span></td>
+                    <td><Badge variant="secondary">{s.payment_method}</Badge></td>
                     <td className="num">{fmtRp(Number(s.total_amount))}</td>
                     <td className="num">{fmtRp(Number(s.paid_amount))}</td>
                     <td className="num">{fmtRp(Number(s.outstanding))}</td>
                     <td>{s.due_date ? fmtDate(s.due_date) : "-"}</td>
-                    <td><span className={`badge ${s.status === "paid" ? "" : "badge-purple"}`}>{s.status}</span></td>
+                    <td><Badge variant={s.status === "paid" ? "default" : "outline"}>{s.status}</Badge></td>
                     {canWrite && (
                       <td>
                         {s.status !== "paid" && (
-                          <button type="button" className="btn btn-outline text-xs" onClick={() => paySale(s)}>Catat pelunasan</button>
+                          <Button type="button" variant="outline" size="sm" onClick={() => paySale(s)}>Catat pelunasan</Button>
                         )}
                       </td>
                     )}
@@ -993,7 +996,7 @@ export default function Inventory() {
           <div className="card p-4 flex flex-wrap gap-4 items-end">
             <div><label className="label">Dari</label><input type="date" className="input" value={reportRange.date_from} onChange={(e) => setReportRange({ ...reportRange, date_from: e.target.value })} /></div>
             <div><label className="label">Sampai</label><input type="date" className="input" value={reportRange.date_to} onChange={(e) => setReportRange({ ...reportRange, date_to: e.target.value })} /></div>
-            <button type="button" className="btn btn-outline" onClick={loadReports}>Muat ulang</button>
+            <Button type="button" variant="outline" onClick={loadReports}>Muat ulang</Button>
           </div>
 
           {valuation && (
@@ -1074,7 +1077,7 @@ function MovementTable({ rows, onCancel }) {
               <td>{m.product_name}</td>
               <td className="num">{m.quantity}</td>
               <td className="num">{fmtRp(Number(m.total_value))}</td>
-              <td><span className="badge">{m.finance_status}</span></td>
+              <td><Badge variant="secondary">{m.finance_status}</Badge></td>
               <td className="text-xs">
                 {m.reference ? (
                   <Link
@@ -1091,7 +1094,7 @@ function MovementTable({ rows, onCancel }) {
               {onCancel && (
                 <td>
                   {m.finance_status !== "cancelled" && (
-                    <button type="button" className="btn btn-outline text-xs" onClick={() => onCancel(m.id)}>Batalkan</button>
+                    <Button type="button" variant="outline" size="sm" onClick={() => onCancel(m.id)}>Batalkan</Button>
                   )}
                 </td>
               )}
