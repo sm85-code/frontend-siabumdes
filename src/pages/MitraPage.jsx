@@ -3,6 +3,13 @@ import api, { fmtRp } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { useConfirm } from "@/components/ConfirmProvider";
 import { Plus, Trash } from "@phosphor-icons/react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 export default function MitraPage() {
   const { user } = useAuth();
@@ -39,57 +46,68 @@ export default function MitraPage() {
     <div className="space-y-6" data-testid="mitra-page">
       <div className="flex justify-between items-start gap-4 flex-wrap">
         <div><p className="label mb-1">Kemitraan</p><h1 className="font-heading text-3xl font-bold">Data Mitra Usaha</h1></div>
-        <button data-testid="btn-new-mitra" onClick={() => setShow(true)}
+        <Button data-testid="btn-new-mitra" onClick={() => setShow(true)}
                 disabled={!canAdd}
-                className={`btn btn-primary ${!canAdd ? "opacity-50 cursor-not-allowed" : ""}`}
                 title={canAdd ? "" : "Read-only role"}>
           <Plus size={16} /> Tambah Mitra
-        </button>
+        </Button>
       </div>
 
-      <div className="card p-4">
-        <label className="label">Filter Unit</label>
-        <select className="select max-w-md" value={filter} onChange={(e) => setFilter(e.target.value)}>
-          <option value="">Semua unit</option>
-          {units.map(u => <option key={u.id} value={u.id}>{u.code} - {u.name}</option>)}
-        </select>
-      </div>
+      <Card>
+        <CardContent className="p-4">
+          <Label className="label">Filter Unit</Label>
+          <Select value={filter} onValueChange={(v) => setFilter(v === "__all__" ? "" : v)}>
+            <SelectTrigger className="max-w-md mt-1">
+              <SelectValue placeholder="Semua unit" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="__all__">Semua unit</SelectItem>
+              {units.map(u => <SelectItem key={u.id} value={u.id}>{u.code} - {u.name}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </CardContent>
+      </Card>
 
       {show && canAdd && (
-        <div className="card fade-in">
-          <form onSubmit={submit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div><label className="label">Unit Usaha</label>
-              <select className="select" required value={form.unit_usaha_id} onChange={(e) => setForm({ ...form, unit_usaha_id: e.target.value })}>
-                <option value="">— pilih —</option>{units.map(u => <option key={u.id} value={u.id}>{u.code} - {u.name}</option>)}
-              </select></div>
-            <div><label className="label">Nama Mitra</label><input required className="input" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
-            <div><label className="label">Jenis</label><input className="input" placeholder="peternak_domba / tukang_kayu / dll" value={form.mitra_type} onChange={(e) => setForm({ ...form, mitra_type: e.target.value })} /></div>
-            <div><label className="label">HP</label><input className="input" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div>
-            <div className="sm:col-span-2"><label className="label">Alamat</label><input className="input" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} /></div>
-            <div><label className="label">Modal Dititipkan (Rp)</label><input type="number" className="input" value={form.modal} onChange={(e) => setForm({ ...form, modal: e.target.value })} /></div>
-            <div className="sm:col-span-2 flex justify-end gap-2"><button type="button" onClick={() => setShow(false)} className="btn btn-outline">Batal</button><button className="btn btn-primary">Simpan</button></div>
-          </form>
-        </div>
+        <Card className="fade-in">
+          <CardContent className="pt-6">
+            <form onSubmit={submit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div><Label className="label">Unit Usaha</Label>
+                <Select required value={form.unit_usaha_id} onValueChange={(v) => setForm({ ...form, unit_usaha_id: v })}>
+                  <SelectTrigger className="mt-1"><SelectValue placeholder="— pilih —" /></SelectTrigger>
+                  <SelectContent>
+                    {units.map(u => <SelectItem key={u.id} value={u.id}>{u.code} - {u.name}</SelectItem>)}
+                  </SelectContent>
+                </Select></div>
+              <div><Label className="label">Nama Mitra</Label><Input required className="mt-1" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
+              <div><Label className="label">Jenis</Label><Input className="mt-1" placeholder="peternak_domba / tukang_kayu / dll" value={form.mitra_type} onChange={(e) => setForm({ ...form, mitra_type: e.target.value })} /></div>
+              <div><Label className="label">HP</Label><Input className="mt-1" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div>
+              <div className="sm:col-span-2"><Label className="label">Alamat</Label><Input className="mt-1" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} /></div>
+              <div><Label className="label">Modal Dititipkan (Rp)</Label><Input type="number" className="mt-1" value={form.modal} onChange={(e) => setForm({ ...form, modal: e.target.value })} /></div>
+              <div className="sm:col-span-2 flex justify-end gap-2"><Button type="button" variant="outline" onClick={() => setShow(false)}>Batal</Button><Button type="submit">Simpan</Button></div>
+            </form>
+          </CardContent>
+        </Card>
       )}
 
-      <div className="card p-0 overflow-x-auto">
-        <table className="tbl">
-          <thead><tr><th>Nama</th><th>Unit</th><th>Jenis</th><th>HP</th><th className="num">Modal</th>{canDel && <th></th>}</tr></thead>
-          <tbody>
-            {list.length === 0 ? <tr><td colSpan={6} className="text-center py-8" style={{ color: "var(--text-muted)" }}>Belum ada mitra.</td></tr>
+      <Card className="p-0 overflow-x-auto">
+        <Table className="tbl">
+          <TableHeader><TableRow><TableHead>Nama</TableHead><TableHead>Unit</TableHead><TableHead>Jenis</TableHead><TableHead>HP</TableHead><TableHead className="num text-right">Modal</TableHead>{canDel && <TableHead></TableHead>}</TableRow></TableHeader>
+          <TableBody>
+            {list.length === 0 ? <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Belum ada mitra.</TableCell></TableRow>
               : list.map(m => (
-                <tr key={m.id}>
-                  <td className="font-medium">{m.name}</td>
-                  <td><span className="badge">{units.find(u => u.id === m.unit_usaha_id)?.code || "-"}</span></td>
-                  <td>{m.mitra_type || "-"}</td>
-                  <td>{m.phone || "-"}</td>
-                  <td className="num">{fmtRp(m.modal)}</td>
-                  {canDel && <td><button onClick={() => del(m.id)} className="p-1.5"><Trash size={16} color="var(--status-error)" /></button></td>}
-                </tr>
+                <TableRow key={m.id}>
+                  <TableCell className="font-medium">{m.name}</TableCell>
+                  <TableCell><Badge variant="secondary">{units.find(u => u.id === m.unit_usaha_id)?.code || "-"}</Badge></TableCell>
+                  <TableCell>{m.mitra_type || "-"}</TableCell>
+                  <TableCell>{m.phone || "-"}</TableCell>
+                  <TableCell className="num text-right">{fmtRp(m.modal)}</TableCell>
+                  {canDel && <TableCell><Button variant="ghost" size="icon" onClick={() => del(m.id)} className="h-8 w-8"><Trash size={16} color="var(--status-error)" /></Button></TableCell>}
+                </TableRow>
               ))}
-          </tbody>
-        </table>
-      </div>
+          </TableBody>
+        </Table>
+      </Card>
     </div>
   );
 }
