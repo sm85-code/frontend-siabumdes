@@ -11,6 +11,9 @@ import { TrendUp, TrendDown, Coin, Storefront, ReceiptX, CalendarBlank, Lock } f
 import TableShell from "@/components/TableShell";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 
 const INK = "#14353A"; // --primary-dark
 const TEAL = "#1C8A8A"; // --primary
@@ -173,7 +176,8 @@ export default function Dashboard() {
   return (
     <div className="space-y-6" data-testid="dashboard-page">
       {user?.blocked_periods && user.blocked_periods.length > 0 && (
-        <div className="card fade-in" data-testid="blocked-periods-banner">
+        <Card className="fade-in" data-testid="blocked-periods-banner">
+          <CardContent className="pt-6">
           <div className="flex items-start gap-3">
             <Lock size={22} color={INK} style={{ flexShrink: 0, marginTop: 2 }} />
             <div>
@@ -191,7 +195,8 @@ export default function Dashboard() {
               </p>
             </div>
           </div>
-        </div>
+          </CardContent>
+        </Card>
       )}
 
       <div>
@@ -204,7 +209,8 @@ export default function Dashboard() {
         </p>
       </div>
 
-      <div className="card card-sm" data-testid="period-card">
+      <Card data-testid="period-card">
+        <CardContent className="p-4">
         <div className="flex flex-wrap items-end gap-3">
           <div className="flex-1 min-w-[220px]">
             <label className="label flex items-center gap-1">
@@ -243,14 +249,14 @@ export default function Dashboard() {
             <>
               <div className="min-w-[160px]">
                 <label className="label">Tanggal Awal</label>
-                <input data-testid="period-custom-start" type="date" className="input"
+                <Input data-testid="period-custom-start" type="date"
                        min={`${YEAR_MIN}-01-01`} max={`${YEAR_MAX}-12-31`}
                        value={state.customStart}
                        onChange={(e) => setState(s => ({ ...s, customStart: e.target.value }))} />
               </div>
               <div className="min-w-[160px]">
                 <label className="label">Tanggal Akhir</label>
-                <input data-testid="period-custom-end" type="date" className="input"
+                <Input data-testid="period-custom-end" type="date"
                        min={`${YEAR_MIN}-01-01`} max={`${YEAR_MAX}-12-31`}
                        value={state.customEnd}
                        onChange={(e) => setState(s => ({ ...s, customEnd: e.target.value }))} />
@@ -259,27 +265,31 @@ export default function Dashboard() {
           )}
           <div className="text-xs px-3 py-2 rounded-full" data-testid="period-label" style={chip}>{pLabel}</div>
         </div>
-      </div>
+        </CardContent>
+      </Card>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {kpis.map((k) => {
           const Icon = k.icon;
           return (
-            <div key={k.key} className="card card-sm" data-testid={`kpi-${k.key}`}>
-              <div className="w-9 h-9 rounded-xl flex items-center justify-center mb-3" style={icoBox}>
-                <Icon size={18} color={INK} />
-              </div>
-              <p className="text-xs uppercase tracking-wider font-semibold" style={{ color: "var(--text-secondary)" }}>{k.label}</p>
-              <p className="font-heading text-xl sm:text-2xl font-bold mt-1 tabular-nums">
-                {k.isCount ? k.value : fmtRp(k.value)}
-              </p>
-            </div>
+            <Card key={k.key} data-testid={`kpi-${k.key}`}>
+              <CardContent className="p-4">
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center mb-3" style={icoBox}>
+                  <Icon size={18} color={INK} />
+                </div>
+                <p className="text-xs uppercase tracking-wider font-semibold" style={{ color: "var(--text-secondary)" }}>{k.label}</p>
+                <p className="font-heading text-xl sm:text-2xl font-bold mt-1 tabular-nums">
+                  {k.isCount ? k.value : fmtRp(k.value)}
+                </p>
+              </CardContent>
+            </Card>
           );
         })}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="card lg:col-span-2">
+        <Card className="lg:col-span-2">
+        <CardContent className="pt-6">
           <h3 className="font-heading text-lg font-semibold mb-4" data-testid="trend-title">Pendapatan & Beban ({pLabel})</h3>
           {chartData.length > 0 ? (
             <ResponsiveContainer width="99%" height={280}>
@@ -308,8 +318,10 @@ export default function Dashboard() {
           ) : (
             <p className="text-sm py-16 text-center" style={{ color: "var(--text-muted)" }}>Belum ada transaksi pada periode ini.</p>
           )}
-        </div>
-        <div className="card">
+        </CardContent>
+        </Card>
+        <Card>
+        <CardContent className="pt-6">
           <h3 className="font-heading text-lg font-semibold mb-4">Kontribusi Per Unit</h3>
           <p className="text-[11px] -mt-3 mb-3" style={{ color: "var(--text-muted)" }}>Berdasarkan laba bersih per unit (unit dengan laba positif).</p>
           {data.unit_summaries?.some(u => (u.laba || 0) > 0) ? (
@@ -327,10 +339,11 @@ export default function Dashboard() {
           ) : (
             <p className="text-sm py-16 text-center" style={{ color: "var(--text-muted)" }}>Belum ada unit dengan laba positif pada periode ini.</p>
           )}
-        </div>
+        </CardContent>
+        </Card>
       </div>
 
-      <div className="card p-0 overflow-hidden">
+      <Card className="p-0 overflow-hidden">
         <div className="p-5">
           <h3 className="font-heading text-lg font-semibold flex items-center gap-2" data-testid="unit-table-title">
             <Storefront size={20} color={INK} /> Data Unit Usaha
@@ -350,7 +363,7 @@ export default function Dashboard() {
             <TableBody>
               {data.unit_summaries.map((u) => (
                 <TableRow key={u.id}>
-                  <TableCell><span className="badge">{u.code}</span></TableCell>
+                  <TableCell><Badge>{u.code}</Badge></TableCell>
                   <TableCell className="font-medium">{u.name}</TableCell>
                   <TableCell className="num">{fmtRp(u.pendapatan)}</TableCell>
                   <TableCell className="num">{fmtRp(u.beban)}</TableCell>
@@ -374,7 +387,7 @@ export default function Dashboard() {
             </TableBody>
           </Table>
         </TableShell>
-      </div>
+      </Card>
     </div>
   );
 }
