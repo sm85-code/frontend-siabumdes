@@ -160,7 +160,7 @@ export default function Dashboard() {
   const useBar = chartData.length <= 1;
 
   if (loading && !data) return <div className="flex items-center justify-center min-h-[60vh]"><Spinner label="Memuat dashboard..." /></div>;
-  if (!data) return <div className="text-sm">Tidak ada data.</div>;
+  if (!data) return <div className="text-sm" style={{ color: "var(--text-muted)" }}>Tidak ada data.</div>;
 
   const jabatan = ROLE_LABELS[user?.role] || "Pengguna";
   const pLabel = periodLabel(state);

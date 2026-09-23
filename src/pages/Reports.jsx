@@ -254,7 +254,7 @@ export default function Reports() {
                 Alokasi Bagi Hasil Unit Usaha {groupKey}:
               </h4>
               <ol className="text-sm space-y-1 ml-5" style={{ listStyleType: "decimal" }}>
-                <li>Pengelola Unit (30%) = <b style={{ color: "var(--primary)" }} data-testid="share-pengelola">{fmtRp(Math.round((data.laba_bersih || 0) * 0.30))}</b></li>
+                <li>Pengelola Unit (30%) = <b style={{ color: "hsl(var(--primary))" }} data-testid="share-pengelola">{fmtRp(Math.round((data.laba_bersih || 0) * 0.30))}</b></li>
                 <li>BUMDES (70%) = <b style={{ color: "var(--primary-dark)" }} data-testid="share-bumdes">{fmtRp(Math.round((data.laba_bersih || 0) * 0.70))}</b></li>
               </ol>
             </div>
