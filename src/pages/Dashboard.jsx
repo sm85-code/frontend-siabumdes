@@ -8,6 +8,8 @@ import {
   PieChart, Pie, Cell, Legend, CartesianGrid,
 } from "recharts";
 import { TrendUp, TrendDown, Coin, Storefront, ReceiptX, CalendarBlank, Lock } from "@phosphor-icons/react";
+import TableShell from "@/components/TableShell";
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 
 const INK = "#14353A"; // --primary-dark
 const TEAL = "#1C8A8A"; // --primary
@@ -329,43 +331,43 @@ export default function Dashboard() {
           </h3>
           <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>Periode: {pLabel}</p>
         </div>
-        <div className="h-scroll">
-          <table className="tbl" data-testid="unit-summary-table" style={{ minWidth: 560 }}>
-            <thead>
-              <tr>
-                <th>Kode</th><th>Unit Usaha</th>
-                <th className="num">Pendapatan</th>
-                <th className="num">Beban</th>
-                <th className="num">Laba Bersih</th>
-              </tr>
-            </thead>
-            <tbody>
+        <TableShell minWidth={560}>
+          <Table data-testid="unit-summary-table">
+            <TableHeader>
+              <TableRow>
+                <TableHead>Kode</TableHead><TableHead>Unit Usaha</TableHead>
+                <TableHead className="num">Pendapatan</TableHead>
+                <TableHead className="num">Beban</TableHead>
+                <TableHead className="num">Laba Bersih</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {data.unit_summaries.map((u) => (
-                <tr key={u.id}>
-                  <td><span className="badge">{u.code}</span></td>
-                  <td className="font-medium">{u.name}</td>
-                  <td className="num">{fmtRp(u.pendapatan)}</td>
-                  <td className="num">{fmtRp(u.beban)}</td>
-                  <td className="num font-semibold">{fmtRp(u.laba)}</td>
-                </tr>
+                <TableRow key={u.id}>
+                  <TableCell><span className="badge">{u.code}</span></TableCell>
+                  <TableCell className="font-medium">{u.name}</TableCell>
+                  <TableCell className="num">{fmtRp(u.pendapatan)}</TableCell>
+                  <TableCell className="num">{fmtRp(u.beban)}</TableCell>
+                  <TableCell className="num font-semibold">{fmtRp(u.laba)}</TableCell>
+                </TableRow>
               ))}
               {data.unit_summaries.length > 0 && (() => {
                 const totP = data.unit_summaries.reduce((s, u) => s + (u.pendapatan || 0), 0);
                 const totB = data.unit_summaries.reduce((s, u) => s + (u.beban || 0), 0);
                 const totL = data.unit_summaries.reduce((s, u) => s + (u.laba || 0), 0);
                 return (
-                  <tr data-testid="unit-total-row">
-                    <td></td>
-                    <td className="font-bold">TOTAL 6 UNIT USAHA</td>
-                    <td className="num font-bold tabular-nums">{fmtRp(totP)}</td>
-                    <td className="num font-bold tabular-nums">{fmtRp(totB)}</td>
-                    <td className="num font-bold tabular-nums">{fmtRp(totL)}</td>
-                  </tr>
+                  <TableRow data-testid="unit-total-row">
+                    <TableCell></TableCell>
+                    <TableCell className="font-bold">TOTAL 6 UNIT USAHA</TableCell>
+                    <TableCell className="num font-bold tabular-nums">{fmtRp(totP)}</TableCell>
+                    <TableCell className="num font-bold tabular-nums">{fmtRp(totB)}</TableCell>
+                    <TableCell className="num font-bold tabular-nums">{fmtRp(totL)}</TableCell>
+                  </TableRow>
                 );
               })()}
-            </tbody>
-          </table>
-        </div>
+            </TableBody>
+          </Table>
+        </TableShell>
       </div>
     </div>
   );
