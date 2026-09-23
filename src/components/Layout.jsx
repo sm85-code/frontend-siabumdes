@@ -7,6 +7,7 @@ import {
   House, Receipt, ChartLine, Storefront, UsersThree,
   BookOpenText, SignOut, List, X, Books, UserCircle, Package, Buildings,
 } from "@phosphor-icons/react";
+import { Button } from "@/components/ui/button";
 
 const READ_MOST = ["admin", "direktur", "bendahara", "pengelola", "pengawas", "penasihat"];
 const INK = "var(--primary-dark)";
@@ -128,9 +129,9 @@ export default function Layout({ children }) {
                 <div className="text-xs" style={{ color: "var(--text-muted)" }}>{ROLE_LABELS[user.role]}</div>
               </div>
             </div>
-            <button data-testid="logout-btn" onClick={logout} className="btn btn-outline w-full text-sm">
+            <Button data-testid="logout-btn" onClick={logout} variant="outline" size="sm" className="w-full">
               <SignOut size={16} /> Keluar
-            </button>
+            </Button>
           </div>
         </div>
       </aside>
