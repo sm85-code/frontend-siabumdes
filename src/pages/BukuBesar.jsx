@@ -209,7 +209,7 @@ export default function BukuBesar() {
               <p style={{ color: "var(--text-muted)" }}>Pilih akun di sebelah kiri untuk melihat buku besar <b>{group}</b>.</p>
             </Card>
           ) : loading ? (
-            <Card className="text-center py-10"><Spinner className="justify-center" /></Card>
+            <Card className="text-center py-10"><Spinner column size={40} className="justify-center" /></Card>
           ) : ledger ? (
             <Card className="p-0 overflow-hidden">
               <div className="p-5" style={{ borderBottom: "1px solid var(--legacy-border)" }}>

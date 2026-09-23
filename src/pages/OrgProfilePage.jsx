@@ -66,7 +66,7 @@ export default function OrgProfilePage() {
       .finally(() => setUploading(false));
   };
 
-  if (loading) return <div className="flex items-center justify-center min-h-[60vh]"><Spinner /></div>;
+  if (loading) return <div className="flex items-center justify-center min-h-[60vh]"><Spinner column size={48} /></div>;
 
   return (
     <div className="max-w-3xl space-y-6" data-testid="org-profile-page">

@@ -23,7 +23,7 @@ const OrgProfilePage = lazy(() => import("@/pages/OrgProfilePage"));
 function PageFallback() {
   return (
     <div className="page-loader">
-      <Spinner label="Menyiapkan dasbor keuangan..." />
+      <Spinner column size={56} label="Menyiapkan dasbor keuangan..." />
     </div>
   );
 }
