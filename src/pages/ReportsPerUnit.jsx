@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import api, { fmtRp, API } from "@/lib/api";
 import { FilePdf, FileXls } from "@phosphor-icons/react";
+import TableShell from "@/components/TableShell";
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 
 const today = new Date().toISOString().slice(0, 10);
 const startOfYear = today.slice(0, 4) + "-01-01";
@@ -45,30 +47,32 @@ export default function ReportsPerUnit() {
         </div>
       </div>
       {data && (
-        <div className="card p-0 overflow-hidden overflow-x-auto">
-          <table className="tbl" data-testid="per-unit-table">
-            <thead>
-              <tr>
-                <th>Kode</th><th>Unit Usaha</th>
-                <th className="num">Pendapatan</th><th className="num">Beban</th>
-                <th className="num">Laba Bersih</th>
-                <th className="num">30% Pengelola</th><th className="num">70% BUMDES</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.units.map(u => (
-                <tr key={u.id}>
-                  <td><span className="badge">{u.code}</span></td>
-                  <td className="font-medium">{u.name}</td>
-                  <td className="num">{fmtRp(u.pendapatan)}</td>
-                  <td className="num">{fmtRp(u.beban)}</td>
-                  <td className="num font-semibold" style={{ color: u.laba_bersih >= 0 ? "var(--primary-dark)" : "var(--status-error)" }}>{fmtRp(u.laba_bersih)}</td>
-                  <td className="num" style={{ color: "var(--primary-dark)" }}>{fmtRp(u.share_pengelola_30)}</td>
-                  <td className="num" style={{ color: "var(--primary-dark)" }}>{fmtRp(u.share_bumdes_70)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="card p-0 overflow-hidden">
+          <TableShell minWidth={720}>
+            <Table data-testid="per-unit-table">
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Kode</TableHead><TableHead>Unit Usaha</TableHead>
+                  <TableHead className="num">Pendapatan</TableHead><TableHead className="num">Beban</TableHead>
+                  <TableHead className="num">Laba Bersih</TableHead>
+                  <TableHead className="num">30% Pengelola</TableHead><TableHead className="num">70% BUMDES</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {data.units.map(u => (
+                  <TableRow key={u.id}>
+                    <TableCell><span className="badge">{u.code}</span></TableCell>
+                    <TableCell className="font-medium">{u.name}</TableCell>
+                    <TableCell className="num">{fmtRp(u.pendapatan)}</TableCell>
+                    <TableCell className="num">{fmtRp(u.beban)}</TableCell>
+                    <TableCell className="num font-semibold" style={{ color: u.laba_bersih >= 0 ? "var(--primary-dark)" : "var(--status-error)" }}>{fmtRp(u.laba_bersih)}</TableCell>
+                    <TableCell className="num" style={{ color: "var(--primary-dark)" }}>{fmtRp(u.share_pengelola_30)}</TableCell>
+                    <TableCell className="num" style={{ color: "var(--primary-dark)" }}>{fmtRp(u.share_bumdes_70)}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableShell>
         </div>
       )}
     </div>
