@@ -57,8 +57,8 @@ select option { background: #fff; color: var(--text-primary); }
 [color="#C4A35A"], [color="#E8A07A"], [color="#8E88A5"],
 [color="#1A2E1E"], [color="#1F4E3D"], [color="#3BA8C4"], [color="#1E4A5A"] { color: #14353A !important; }
 
-.hover\\:bg-yellow-50:hover { background: #E7F4F3 !important; }
-.hover\\:bg-red-50:hover { background: #F8EEF0 !important; }
+.hover\:bg-yellow-50:hover { background: #E7F4F3 !important; }
+.hover\:bg-red-50:hover { background: #F8EEF0 !important; }
 .text-emerald-700, .text-green-700, .text-teal-700 { color: #14353A !important; }
 .bg-emerald-50, .bg-green-50, .bg-amber-50, .bg-orange-50, .bg-pink-50, .bg-blue-50 {
   background: #E7F4F3 !important;
