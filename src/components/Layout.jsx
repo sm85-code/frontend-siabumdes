@@ -59,6 +59,7 @@ export default function Layout({ children }) {
           <span className="font-heading font-semibold text-sm">BUMDES Karya Raharja</span>
         </div>
         <button data-testid="mobile-menu-btn" onClick={() => setOpen(!open)} className="p-2 rounded-xl"
+                aria-label={open ? "Tutup menu" : "Buka menu"}
                 style={{ color: INK }}>
           {open ? <X size={22} /> : <List size={22} />}
         </button>
