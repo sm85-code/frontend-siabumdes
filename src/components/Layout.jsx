@@ -121,7 +121,7 @@ export default function Layout({ children }) {
             </div>
             <div className="flex items-center gap-3 mb-3">
               <div className="w-9 h-9 rounded-full flex items-center justify-center font-heading font-semibold text-sm"
-                   style={{ background: "var(--primary)", color: "#fff" }}>
+                   style={{ background: "hsl(var(--primary))", color: "#fff" }}>
                 {user.name?.[0]?.toUpperCase()}
               </div>
               <div className="min-w-0">
