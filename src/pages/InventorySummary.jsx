@@ -1,6 +1,8 @@
 import { useMemo } from "react";
 import { fmtRp, fmtDate } from "@/lib/api";
 import TableShell from "@/components/TableShell";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend, CartesianGrid,
@@ -10,11 +12,13 @@ const COLORS = ["var(--chart-1)", "var(--chart-5)", "var(--chart-3)", "var(--cha
 const TOOLTIP_STYLE = { background: "var(--surface)", border: "1px solid var(--legacy-border)", borderRadius: 8 };
 function Stat({ label, value, hint }) {
   return (
-    <div className="card p-4">
-      <p className="label mb-1">{label}</p>
-      <p className="font-heading text-2xl font-bold">{value}</p>
-      {hint ? <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>{hint}</p> : null}
-    </div>
+    <Card>
+      <CardContent className="p-4">
+        <p className="label mb-1">{label}</p>
+        <p className="font-heading text-2xl font-bold">{value}</p>
+        {hint ? <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>{hint}</p> : null}
+      </CardContent>
+    </Card>
   );
 }
 
@@ -101,24 +105,29 @@ export default function InventorySummary({ products = [], movements = [], valuat
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="card p-4">
-          <p className="label mb-1">Stock in (periode laporan)</p>
-          <p className="font-heading text-xl font-bold">{inQty} unit</p>
-          <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-            {fmtRp(Number(movementReport?.stock_in?.value || 0))} · {movementReport?.stock_in?.count ?? 0} transaksi
-          </p>
-        </div>
-        <div className="card p-4">
-          <p className="label mb-1">Stock out (periode laporan)</p>
-          <p className="font-heading text-xl font-bold">{outQty} unit</p>
-          <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-            {fmtRp(Number(movementReport?.stock_out?.value || 0))} · {movementReport?.stock_out?.count ?? 0} transaksi
-          </p>
-        </div>
+        <Card>
+          <CardContent className="p-4">
+            <p className="label mb-1">Stock in (periode laporan)</p>
+            <p className="font-heading text-xl font-bold">{inQty} unit</p>
+            <p className="text-sm" style={{ color: "var(--text-muted)" }}>
+              {fmtRp(Number(movementReport?.stock_in?.value || 0))} · {movementReport?.stock_in?.count ?? 0} transaksi
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <p className="label mb-1">Stock out (periode laporan)</p>
+            <p className="font-heading text-xl font-bold">{outQty} unit</p>
+            <p className="text-sm" style={{ color: "var(--text-muted)" }}>
+              {fmtRp(Number(movementReport?.stock_out?.value || 0))} · {movementReport?.stock_out?.count ?? 0} transaksi
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="card">
+        <Card>
+          <CardContent className="pt-6">
           <h3 className="font-heading text-lg font-semibold mb-1">Produk terlaris (stock out)</h3>
           <p className="text-xs mb-4" style={{ color: "var(--text-muted)" }}>
             Agregasi qty keluar dari mutasi terbaru (bukan dibatalkan).
@@ -141,9 +150,11 @@ export default function InventorySummary({ products = [], movements = [], valuat
               Belum ada stock out untuk ditampilkan.
             </p>
           )}
-        </div>
+          </CardContent>
+        </Card>
 
-        <div className="card">
+        <Card>
+          <CardContent className="pt-6">
           <h3 className="font-heading text-lg font-semibold mb-1">Nilai stok per kategori</h3>
           <p className="text-xs mb-4" style={{ color: "var(--text-muted)" }}>
             Berdasarkan valuasi persediaan saat ini.
@@ -173,11 +184,12 @@ export default function InventorySummary({ products = [], movements = [], valuat
               Belum ada data valuasi kategori.
             </p>
           )}
-        </div>
+          </CardContent>
+        </Card>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="card p-0 overflow-hidden">
+        <Card className="p-0 overflow-hidden">
           <div className="p-4 pb-2">
             <h3 className="font-heading text-lg font-semibold">Top nilai persediaan</h3>
             <p className="text-xs" style={{ color: "var(--text-muted)" }}>10 SKU dengan nilai stok tertinggi</p>
@@ -203,9 +215,9 @@ export default function InventorySummary({ products = [], movements = [], valuat
             </tbody>
           </table>
           </TableShell>
-        </div>
+        </Card>
 
-        <div className="card p-0 overflow-hidden">
+        <Card className="p-0 overflow-hidden">
           <div className="p-4 pb-2">
             <h3 className="font-heading text-lg font-semibold">Peringatan stok tipis</h3>
             <p className="text-xs" style={{ color: "var(--text-muted)" }}>SKU dengan qty on hand ≤ 5</p>
@@ -224,8 +236,8 @@ export default function InventorySummary({ products = [], movements = [], valuat
                 <tr key={p.id}>
                   <td className="font-medium">{p.sku}</td>
                   <td>{p.name}</td>
-                  <td><span className="badge">{p.category_name || "-"}</span></td>
-                  <td className="num" style={{ color: Number(p.qty_on_hand) === 0 ? "var(--status-error-strong)" : undefined }}>
+                  <td><Badge variant="secondary">{p.category_name || "-"}</Badge></td>
+                  <td className={`num ${Number(p.qty_on_hand) === 0 ? "text-destructive font-semibold" : ""}`}>
                     {p.qty_on_hand}
                   </td>
                 </tr>
@@ -233,10 +245,10 @@ export default function InventorySummary({ products = [], movements = [], valuat
             </tbody>
           </table>
           </TableShell>
-        </div>
+        </Card>
       </div>
 
-      <div className="card p-0 overflow-hidden">
+      <Card className="p-0 overflow-hidden">
         <div className="p-4 pb-2">
           <h3 className="font-heading text-lg font-semibold">Stock out terbaru</h3>
           <p className="text-xs" style={{ color: "var(--text-muted)" }}>Mutasi keluar terakhir</p>
@@ -263,7 +275,7 @@ export default function InventorySummary({ products = [], movements = [], valuat
           </tbody>
         </table>
         </TableShell>
-      </div>
+      </Card>
     </div>
   );
 }
