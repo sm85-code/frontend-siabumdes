@@ -23,7 +23,6 @@ const OrgProfilePage = lazy(() => import("@/pages/OrgProfilePage"));
 function PageFallback() {
   return (
     <div className="page-loader">
-      <div className="font-heading text-lg mb-2" style={{ color: "var(--primary-dark)" }}>BUMDes Karya Raharja</div>
       <Spinner label="Menyiapkan dasbor keuangan..." />
     </div>
   );
