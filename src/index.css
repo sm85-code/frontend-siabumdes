@@ -49,6 +49,28 @@
   --primary-hover: #167878;
   --focus-ring: rgba(28, 138, 138, 0.12);
   --zebra-tint: rgba(28, 138, 138, 0.025);
+
+  /* shadcn/ui tokens, derived from this theme's own palette above */
+  --radius: var(--radius-card);
+  --background: 160 16% 96%;
+  --foreground: 198 26% 15%;
+  --card: 0 0% 100%;
+  --card-foreground: 198 26% 15%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 198 26% 15%;
+  --primary: 180 66% 33%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 175 37% 93%;
+  --secondary-foreground: 188 49% 15%;
+  --muted: 175 37% 93%;
+  --muted-foreground: 194 11% 40%;
+  --accent: 175 37% 93%;
+  --accent-foreground: 188 49% 15%;
+  --destructive: 352 47% 56%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 156 10% 90%;
+  --input: 156 10% 90%;
+  --ring: 180 66% 33%;
 }
 
 /* Classic: navy + gold, ikon solid, sudut lebih tegas -- kesan formal/korporat */
@@ -79,6 +101,28 @@
   --font-heading: Georgia, 'Times New Roman', serif;
   --focus-ring: rgba(31, 58, 95, 0.16);
   --zebra-tint: rgba(31, 58, 95, 0.03);
+
+  /* shadcn/ui tokens, derived from this theme's own palette above */
+  --radius: var(--radius-card);
+  --background: 45 31% 95%;
+  --foreground: 216 26% 15%;
+  --card: 0 0% 100%;
+  --card-foreground: 216 26% 15%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 216 26% 15%;
+  --primary: 215 51% 25%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 46 55% 86%;
+  --secondary-foreground: 215 53% 15%;
+  --muted: 46 55% 86%;
+  --muted-foreground: 217 11% 40%;
+  --accent: 46 55% 86%;
+  --accent-foreground: 215 53% 15%;
+  --destructive: 0 47% 43%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 44 26% 80%;
+  --input: 44 26% 80%;
+  --ring: 215 51% 25%;
 }
 
 /* Playful: warna cerah, sudut membulat penuh, ikon duotone berwarna */
@@ -109,6 +153,28 @@
   --font-heading: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
   --focus-ring: rgba(124, 77, 255, 0.18);
   --zebra-tint: rgba(124, 77, 255, 0.05);
+
+  /* shadcn/ui tokens, derived from this theme's own palette above */
+  --radius: var(--radius-card);
+  --background: 270 100% 98%;
+  --foreground: 257 32% 19%;
+  --card: 0 0% 100%;
+  --card-foreground: 257 32% 19%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 257 32% 19%;
+  --primary: 256 100% 65%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 266 100% 95%;
+  --secondary-foreground: 260 55% 36%;
+  --muted: 266 100% 95%;
+  --muted-foreground: 259 17% 45%;
+  --accent: 266 100% 95%;
+  --accent-foreground: 260 55% 36%;
+  --destructive: 346 86% 64%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 270 60% 92%;
+  --input: 270 60% 92%;
+  --ring: 256 100% 65%;
 }
 
 /* Minimalis: grayscale, sudut tajam, ikon tipis -- serba polos */
@@ -139,6 +205,28 @@
   --font-heading: 'Inter', system-ui, sans-serif;
   --focus-ring: rgba(23, 23, 23, 0.12);
   --zebra-tint: rgba(0, 0, 0, 0.02);
+
+  /* shadcn/ui tokens, derived from this theme's own palette above */
+  --radius: var(--radius-card);
+  --background: 0 0% 98%;
+  --foreground: 0 0% 9%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 9%;
+  --primary: 0 0% 9%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 94%;
+  --secondary-foreground: 0 0% 0%;
+  --muted: 0 0% 94%;
+  --muted-foreground: 0 0% 35%;
+  --accent: 0 0% 94%;
+  --accent-foreground: 0 0% 0%;
+  --destructive: 3 71% 41%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 0 0% 89%;
+  --input: 0 0% 89%;
+  --ring: 0 0% 9%;
 }
 
 /* Elegant: burgundy-emas di atas krem, sudut lembut, ikon tebal */
@@ -169,6 +257,28 @@
   --font-heading: 'Playfair Display', Georgia, serif;
   --focus-ring: rgba(122, 31, 61, 0.16);
   --zebra-tint: rgba(122, 31, 61, 0.035);
+
+  /* shadcn/ui tokens, derived from this theme's own palette above */
+  --radius: var(--radius-card);
+  --background: 33 53% 97%;
+  --foreground: 342 18% 14%;
+  --card: 0 0% 100%;
+  --card-foreground: 342 18% 14%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 342 18% 14%;
+  --primary: 340 59% 30%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 39 64% 87%;
+  --secondary-foreground: 339 61% 18%;
+  --muted: 39 64% 87%;
+  --muted-foreground: 14 11% 38%;
+  --accent: 39 64% 87%;
+  --accent-foreground: 339 61% 18%;
+  --destructive: 0 47% 43%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 35 41% 84%;
+  --input: 35 41% 84%;
+  --ring: 340 59% 30%;
 }
 
 /* Pilihan font: independen dari tema, ditumpangkan lewat data-font di <html>.

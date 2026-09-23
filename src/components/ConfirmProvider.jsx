@@ -7,6 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 const ConfirmContext = createContext(null);
 
@@ -41,16 +42,16 @@ export function ConfirmProvider({ children }) {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <button type="button" className="btn btn-outline" onClick={() => close(false)}>
+            <Button type="button" variant="outline" onClick={() => close(false)}>
               {request?.cancelLabel}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
-              className={`btn ${request?.destructive ? "btn-danger" : "btn-primary"}`}
+              variant={request?.destructive ? "destructive" : "default"}
               onClick={() => close(true)}
             >
               {request?.confirmLabel}
-            </button>
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
