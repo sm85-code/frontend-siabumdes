@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const MONTHS = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
 const pad = (n) => String(n).padStart(2, "0");
@@ -46,15 +47,21 @@ export default function MonthScrollDate({ value, onChange, mode = "date", testId
         <div className="month-scroll-label">{label}</div>
         <div className="month-scroll-hint">gulir untuk ganti bulan</div>
         {mode === "date" && (
-          <select className="month-scroll-day" value={d} onChange={(e) => onChange?.(emit(y, m, Number(e.target.value), mode))}>
-            {Array.from({ length: new Date(y, m, 0).getDate() }, (_, i) => i + 1).map((n) => (
-              <option key={n} value={n}>{n}</option>
-            ))}
-          </select>
+          <Select value={String(d)} onValueChange={(v) => onChange?.(emit(y, m, Number(v), mode))}>
+            <SelectTrigger className="month-scroll-day"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              {Array.from({ length: new Date(y, m, 0).getDate() }, (_, i) => i + 1).map((n) => (
+                <SelectItem key={n} value={String(n)}>{n}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         )}
-        <select className="month-scroll-year" value={y} onChange={(e) => onChange?.(emit(Number(e.target.value), m, d, mode))}>
-          {years.map((yr) => <option key={yr} value={yr}>{yr}</option>)}
-        </select>
+        <Select value={String(y)} onValueChange={(v) => onChange?.(emit(Number(v), m, d, mode))}>
+          <SelectTrigger className="month-scroll-year"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            {years.map((yr) => <SelectItem key={yr} value={String(yr)}>{yr}</SelectItem>)}
+          </SelectContent>
+        </Select>
       </div>
       <button type="button" className="month-scroll-btn" onClick={() => shift(1)} aria-label="Bulan berikutnya">›</button>
     </div>
