@@ -11,7 +11,7 @@ select.select, select {
   background: #fff;
   color: var(--text-primary);
   border: 1px solid var(--legacy-border);
-  accent-color: var(--primary);
+  accent-color: hsl(var(--primary));
 }
 select option { background: #fff; color: var(--text-primary); }
 

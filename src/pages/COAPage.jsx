@@ -443,7 +443,7 @@ export default function COAPage() {
                     <div className="flex gap-1">
                       <button data-testid={`edit-acc-${a.code}`} onClick={() => openEditAcc(a)}
                               className="p-1.5 rounded-md hover:bg-yellow-50" title="Edit">
-                        <Pencil size={16} color="var(--primary)" />
+                        <Pencil size={16} color="hsl(var(--primary))" />
                       </button>
                       <button data-testid={`del-acc-${a.code}`} onClick={() => delAcc(a.code)}
                               className="p-1.5 rounded-md hover:bg-red-50" title="Hapus">
@@ -580,7 +580,7 @@ export default function COAPage() {
                     <div className="flex gap-1">
                       <button data-testid={`edit-tt-${t.code}`} onClick={() => openEditTT(t)}
                               className="p-1.5 rounded-md hover:bg-yellow-50" title="Edit">
-                        <Pencil size={16} color="var(--primary)" />
+                        <Pencil size={16} color="hsl(var(--primary))" />
                       </button>
                       <button data-testid={`del-tt-${t.code}`} onClick={() => delTT(t.code)}
                               className="p-1.5 rounded-md hover:bg-red-50" title="Hapus">
