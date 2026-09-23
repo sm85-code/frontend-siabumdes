@@ -18,6 +18,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 
 function formatApiError(err, fallback = "Terjadi kesalahan") {
   const detail = err?.response?.data?.detail;
@@ -471,11 +473,11 @@ export default function Inventory() {
       </div>
 
       {error && (
-        <div className="card p-3 text-sm" style={{ borderColor: "var(--status-error)", color: "var(--status-error-strong)", background: "var(--status-error-bg)" }} role="alert" data-testid="inventory-error">
+        <Card className="p-3 text-sm" style={{ borderColor: "var(--status-error)", color: "var(--status-error-strong)", background: "var(--status-error-bg)" }} role="alert" data-testid="inventory-error">
           <strong className="block mb-1">Validasi / API</strong>
           <span>{typeof error === "string" ? error : JSON.stringify(error)}</span>
           <button type="button" className="ml-3 underline" onClick={() => setError("")}>tutup</button>
-        </div>
+        </Card>
       )}
 
       <div className="flex gap-2 flex-wrap" role="tablist" aria-label="Tab inventory">
@@ -510,10 +512,10 @@ export default function Inventory() {
 
       {tab === "katalog" && (
         <div className="space-y-4">
-          <div className="card p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Card className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4">
             <div>
               <label className="label">Cari SKU / nama</label>
-              <input className="input" value={q} onChange={(e) => setQ(e.target.value)} placeholder="contoh: KIPAS" />
+              <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="contoh: KIPAS" />
             </div>
             <div>
               <label className="label">Kategori</label>
@@ -525,17 +527,18 @@ export default function Inventory() {
                 </SelectContent>
               </Select>
             </div>
-          </div>
+          </Card>
 
           {showForm && canWrite && (
-            <div className="card fade-in">
+            <Card className="fade-in">
+            <CardContent className="pt-6">
               <p className="label mb-3">{editingId ? "Edit produk" : "Tambah produk"}</p>
               <form onSubmit={submitProduct} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="label">SKU</label>
-                  <input required className="input" value={productForm.sku} disabled={!!editingId} onChange={(e) => setProductForm({ ...productForm, sku: e.target.value })} />
+                  <Input required value={productForm.sku} disabled={!!editingId} onChange={(e) => setProductForm({ ...productForm, sku: e.target.value })} />
                 </div>
-                <div><label className="label">Nama produk</label><input required className="input" value={productForm.name} onChange={(e) => setProductForm({ ...productForm, name: e.target.value })} /></div>
+                <div><label className="label">Nama produk</label><Input required value={productForm.name} onChange={(e) => setProductForm({ ...productForm, name: e.target.value })} /></div>
                 <div>
                   <label className="label">Kategori</label>
                   <Select required value={productForm.category_id || "__none__"} onValueChange={(v) => setProductForm({ ...productForm, category_id: v === "__none__" ? "" : v })}>
@@ -546,21 +549,22 @@ export default function Inventory() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div><label className="label">Satuan</label><input className="input" value={productForm.unit_of_measure} onChange={(e) => setProductForm({ ...productForm, unit_of_measure: e.target.value })} /></div>
-                <div><label className="label">Harga pokok (Rp)</label><input type="number" min="0" className="input" value={productForm.cost_price} onChange={(e) => setProductForm({ ...productForm, cost_price: e.target.value })} /></div>
-                <div><label className="label">Harga jual (Rp)</label><input type="number" min="0" className="input" value={productForm.sell_price} onChange={(e) => setProductForm({ ...productForm, sell_price: e.target.value })} /></div>
+                <div><label className="label">Satuan</label><Input value={productForm.unit_of_measure} onChange={(e) => setProductForm({ ...productForm, unit_of_measure: e.target.value })} /></div>
+                <div><label className="label">Harga pokok (Rp)</label><Input type="number" min="0" value={productForm.cost_price} onChange={(e) => setProductForm({ ...productForm, cost_price: e.target.value })} /></div>
+                <div><label className="label">Harga jual (Rp)</label><Input type="number" min="0" value={productForm.sell_price} onChange={(e) => setProductForm({ ...productForm, sell_price: e.target.value })} /></div>
                 {!editingId && (
-                  <div><label className="label">Qty awal</label><input type="number" min="0" className="input" value={productForm.opening_qty} onChange={(e) => setProductForm({ ...productForm, opening_qty: e.target.value })} /></div>
+                  <div><label className="label">Qty awal</label><Input type="number" min="0" value={productForm.opening_qty} onChange={(e) => setProductForm({ ...productForm, opening_qty: e.target.value })} /></div>
                 )}
                 <div className="sm:col-span-2 flex justify-end gap-2">
                   <Button type="button" variant="outline" onClick={closeProductForm}>Batal</Button>
                   <Button type="submit">{editingId ? "Simpan perubahan" : "Simpan produk"}</Button>
                 </div>
               </form>
-            </div>
+            </CardContent>
+            </Card>
           )}
 
-          <div className="card p-0 overflow-hidden">
+          <Card className="p-0 overflow-hidden">
             <TableShell minWidth={720}>
             <Table>
               <TableHeader>
@@ -599,13 +603,14 @@ export default function Inventory() {
               </TableBody>
             </Table>
             </TableShell>
-          </div>
+          </Card>
         </div>
       )}
 
       {tab === "stock-in" && (
         <div className="space-y-4">
-          <div className="card">
+          <Card>
+          <CardContent className="pt-6">
             <p className="label mb-2">Penerimaan barang (Stock In / Pembelian)</p>
             <p className="text-sm mb-4" style={{ color: "var(--text-muted)" }}>Stock in menghasilkan transaksi stok masuk sekaligus transaksi Pembelian (tunai atau kredit/utang).</p>
             {canWrite ? (
@@ -637,10 +642,10 @@ export default function Inventory() {
                     <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>Belum ada mitra pemasok — tambahkan di tab Mitra Pemasok.</p>
                   )}
                 </div>
-                <div><label className="label">Tanggal</label><input type="date" required className="input" value={stockIn.movement_date} onChange={(e) => setStockIn({ ...stockIn, movement_date: e.target.value })} /></div>
-                <div><label className="label">No. Invoice</label><input className="input" value={stockIn.invoice_number} onChange={(e) => setStockIn({ ...stockIn, invoice_number: e.target.value })} /></div>
-                <div><label className="label">Qty masuk</label><input type="number" min="1" required className="input" value={stockIn.quantity} onChange={(e) => setStockIn({ ...stockIn, quantity: e.target.value })} /></div>
-                <div><label className="label">HPP / unit (Rp)</label><input type="number" min="0" required className="input" value={stockIn.unit_cost} onChange={(e) => setStockIn({ ...stockIn, unit_cost: e.target.value })} /></div>
+                <div><label className="label">Tanggal</label><Input type="date" required value={stockIn.movement_date} onChange={(e) => setStockIn({ ...stockIn, movement_date: e.target.value })} /></div>
+                <div><label className="label">No. Invoice</label><Input value={stockIn.invoice_number} onChange={(e) => setStockIn({ ...stockIn, invoice_number: e.target.value })} /></div>
+                <div><label className="label">Qty masuk</label><Input type="number" min="1" required value={stockIn.quantity} onChange={(e) => setStockIn({ ...stockIn, quantity: e.target.value })} /></div>
+                <div><label className="label">HPP / unit (Rp)</label><Input type="number" min="0" required value={stockIn.unit_cost} onChange={(e) => setStockIn({ ...stockIn, unit_cost: e.target.value })} /></div>
                 <div>
                   <label className="label">Metode bayar</label>
                   <Select value={stockIn.payment_method} onValueChange={(method) => {
@@ -657,7 +662,7 @@ export default function Inventory() {
                   </Select>
                 </div>
                 {stockIn.payment_method === "credit" && (
-                  <div><label className="label">Jatuh tempo</label><input type="date" required className="input" value={stockIn.due_date} onChange={(e) => setStockIn({ ...stockIn, due_date: e.target.value })} /></div>
+                  <div><label className="label">Jatuh tempo</label><Input type="date" required value={stockIn.due_date} onChange={(e) => setStockIn({ ...stockIn, due_date: e.target.value })} /></div>
                 )}
                 <div>
                   <label className="label">Akun debit (Persediaan)</label>
@@ -670,14 +675,16 @@ export default function Inventory() {
                 <div className="sm:col-span-2 flex justify-end"><Button type="submit" disabled={submitting}>{submitting ? "Menyimpan…" : "Catat stock in"}</Button></div>
               </form>
             ) : <p className="text-sm">Role Anda read-only.</p>}
-          </div>
+          </CardContent>
+          </Card>
           <MovementTable rows={movements.filter((m) => m.direction === "in" && m.finance_status !== "cancelled")} onCancel={canWrite ? cancelMovement : null} />
         </div>
       )}
 
       {tab === "stock-out" && (
         <div className="space-y-4">
-          <div className="card">
+          <Card>
+          <CardContent className="pt-6">
             <p className="label mb-2">Pengeluaran barang (Stock Out / Penjualan)</p>
             <p className="text-sm mb-4" style={{ color: "var(--text-muted)" }}>Stock out menghasilkan transaksi stok keluar + jurnal HPP, sekaligus transaksi Penjualan (jurnal pendapatan) tunai atau piutang.</p>
             {canWrite ? (
@@ -709,10 +716,10 @@ export default function Inventory() {
                     <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>Belum ada customer — tambahkan di tab Customer.</p>
                   )}
                 </div>
-                <div><label className="label">Tanggal</label><input type="date" required className="input" value={stockOut.movement_date} onChange={(e) => setStockOut({ ...stockOut, movement_date: e.target.value })} /></div>
-                <div><label className="label">No. Invoice</label><input className="input" value={stockOut.invoice_number} onChange={(e) => setStockOut({ ...stockOut, invoice_number: e.target.value })} /></div>
-                <div><label className="label">Qty keluar</label><input type="number" min="1" required className="input" value={stockOut.quantity} onChange={(e) => setStockOut({ ...stockOut, quantity: e.target.value })} /></div>
-                <div><label className="label">Harga jual / unit (Rp)</label><input type="number" min="0" required className="input" value={stockOut.sell_price} onChange={(e) => setStockOut({ ...stockOut, sell_price: e.target.value })} /></div>
+                <div><label className="label">Tanggal</label><Input type="date" required value={stockOut.movement_date} onChange={(e) => setStockOut({ ...stockOut, movement_date: e.target.value })} /></div>
+                <div><label className="label">No. Invoice</label><Input value={stockOut.invoice_number} onChange={(e) => setStockOut({ ...stockOut, invoice_number: e.target.value })} /></div>
+                <div><label className="label">Qty keluar</label><Input type="number" min="1" required value={stockOut.quantity} onChange={(e) => setStockOut({ ...stockOut, quantity: e.target.value })} /></div>
+                <div><label className="label">Harga jual / unit (Rp)</label><Input type="number" min="0" required value={stockOut.sell_price} onChange={(e) => setStockOut({ ...stockOut, sell_price: e.target.value })} /></div>
                 <div>
                   <label className="label">Metode bayar</label>
                   <Select value={stockOut.payment_method} onValueChange={(method) => {
@@ -729,7 +736,7 @@ export default function Inventory() {
                   </Select>
                 </div>
                 {stockOut.payment_method === "piutang" && (
-                  <div><label className="label">Jatuh tempo</label><input type="date" required className="input" value={stockOut.due_date} onChange={(e) => setStockOut({ ...stockOut, due_date: e.target.value })} /></div>
+                  <div><label className="label">Jatuh tempo</label><Input type="date" required value={stockOut.due_date} onChange={(e) => setStockOut({ ...stockOut, due_date: e.target.value })} /></div>
                 )}
                 <div>
                   <label className="label">Akun debit (HPP)</label>
@@ -747,21 +754,23 @@ export default function Inventory() {
                   <label className="label">Akun kredit (Pendapatan)</label>
                   <CoaSelect value={stockOut.revenue_credit_account_code} onChange={(e) => setStockOut({ ...stockOut, revenue_credit_account_code: e.target.value })} />
                 </div>
-                <div className="sm:col-span-2 card p-3 text-sm" style={{ background: "var(--surface-alt)" }}>
+                <Card className="sm:col-span-2 p-3 text-sm" style={{ background: "var(--surface-alt)" }}>
                   <p>Preview jurnal HPP: <strong>{fmtRp(Number(stockOut.quantity || 0) * Number(products.find((p) => p.id === stockOut.product_id)?.cost_price || 0))}</strong></p>
                   <p>Preview jurnal Penjualan: <strong>{fmtRp(Number(stockOut.quantity || 0) * Number(stockOut.sell_price || 0))}</strong></p>
-                </div>
+                </Card>
                 <div className="sm:col-span-2 flex justify-end"><Button type="submit" disabled={submitting}>{submitting ? "Menyimpan…" : "Catat stock out"}</Button></div>
               </form>
             ) : <p className="text-sm">Role Anda read-only.</p>}
-          </div>
+          </CardContent>
+          </Card>
           <MovementTable rows={movements.filter((m) => m.direction === "out" && m.finance_status !== "cancelled")} onCancel={canWrite ? cancelMovement : null} />
         </div>
       )}
 
       {tab === "kelola" && (
         <div className="space-y-4">
-          <div className="card">
+          <Card>
+          <CardContent className="pt-6">
             <p className="label mb-2">Penyesuaian Stok</p>
             <p className="text-sm mb-4" style={{ color: "var(--text-muted)" }}>
               Pengurangan stok (delta negatif) menghasilkan 2 transaksi: pengurangan fisik nilai persediaan, lalu pengakuan beban kerugian.
@@ -779,8 +788,8 @@ export default function Inventory() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div><label className="label">Tanggal</label><input type="date" required className="input" value={adjust.adjustment_date} onChange={(e) => setAdjust({ ...adjust, adjustment_date: e.target.value })} /></div>
-                <div><label className="label">Delta qty (+/-)</label><input type="number" required className="input" value={adjust.quantity_delta} onChange={(e) => setAdjust({ ...adjust, quantity_delta: e.target.value })} /></div>
+                <div><label className="label">Tanggal</label><Input type="date" required value={adjust.adjustment_date} onChange={(e) => setAdjust({ ...adjust, adjustment_date: e.target.value })} /></div>
+                <div><label className="label">Delta qty (+/-)</label><Input type="number" required value={adjust.quantity_delta} onChange={(e) => setAdjust({ ...adjust, quantity_delta: e.target.value })} /></div>
                 <div>
                   <label className="label">Alasan</label>
                   <Select value={adjust.reason} onValueChange={(v) => setAdjust({ ...adjust, reason: v })}>
@@ -794,7 +803,7 @@ export default function Inventory() {
                 </div>
 
                 {Number(adjust.quantity_delta) < 0 ? (
-                  <div className="sm:col-span-2 card p-3 text-sm space-y-3" style={{ background: "var(--surface-alt)" }}>
+                  <Card className="sm:col-span-2 p-3 text-sm space-y-3" style={{ background: "var(--surface-alt)" }}>
                     <div>
                       <p className="font-medium mb-1">Jurnal 1 — Pengurangan fisik nilai persediaan</p>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -809,7 +818,7 @@ export default function Inventory() {
                         <CoaSelect value={PENYESUAIAN_NILAI_PERSEDIAAN_ACCOUNT_CODE} onChange={() => {}} disabled id="adj-loss-credit-2" />
                       </div>
                     </div>
-                  </div>
+                  </Card>
                 ) : (
                   <>
                     <div>
@@ -823,13 +832,14 @@ export default function Inventory() {
                   </>
                 )}
 
-                <div className="sm:col-span-2"><label className="label">Catatan</label><input className="input" value={adjust.notes} onChange={(e) => setAdjust({ ...adjust, notes: e.target.value })} /></div>
+                <div className="sm:col-span-2"><label className="label">Catatan</label><Input value={adjust.notes} onChange={(e) => setAdjust({ ...adjust, notes: e.target.value })} /></div>
                 <div className="sm:col-span-2 flex justify-end"><Button type="submit" disabled={submitting}>{submitting ? "Menyimpan…" : "Simpan penyesuaian"}</Button></div>
               </form>
             ) : <p className="text-sm">Role Anda read-only.</p>}
-          </div>
+          </CardContent>
+          </Card>
 
-          <div className="card p-0 overflow-hidden">
+          <Card className="p-0 overflow-hidden">
             <TableShell minWidth={720}>
             <Table>
               <TableHeader><TableRow><TableHead>Tanggal</TableHead><TableHead>SKU</TableHead><TableHead>Produk</TableHead><TableHead className="num">Delta</TableHead><TableHead>Alasan</TableHead><TableHead>Catatan</TableHead><TableHead>Ref</TableHead>{canWrite && <TableHead />}</TableRow></TableHeader>
@@ -865,27 +875,29 @@ export default function Inventory() {
               </TableBody>
             </Table>
             </TableShell>
-          </div>
+          </Card>
         </div>
       )}
 
       {tab === "vendor" && (
         <div className="space-y-4">
           {canWrite && (
-            <div className="card">
+            <Card>
+            <CardContent className="pt-6">
               <p className="label mb-3">{vendorForm.id ? "Edit mitra pemasok" : "Tambah mitra pemasok"}</p>
               <form onSubmit={submitVendor} className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div><label className="label">Nama</label><input required className="input" value={vendorForm.name} onChange={(e) => setVendorForm({ ...vendorForm, name: e.target.value })} /></div>
-                <div><label className="label">Kontak</label><input className="input" value={vendorForm.contact} onChange={(e) => setVendorForm({ ...vendorForm, contact: e.target.value })} /></div>
-                <div><label className="label">Alamat</label><input className="input" value={vendorForm.address} onChange={(e) => setVendorForm({ ...vendorForm, address: e.target.value })} /></div>
+                <div><label className="label">Nama</label><Input required value={vendorForm.name} onChange={(e) => setVendorForm({ ...vendorForm, name: e.target.value })} /></div>
+                <div><label className="label">Kontak</label><Input value={vendorForm.contact} onChange={(e) => setVendorForm({ ...vendorForm, contact: e.target.value })} /></div>
+                <div><label className="label">Alamat</label><Input value={vendorForm.address} onChange={(e) => setVendorForm({ ...vendorForm, address: e.target.value })} /></div>
                 <div className="sm:col-span-3 flex justify-end gap-2">
                   {vendorForm.id && <Button type="button" variant="outline" onClick={() => setVendorForm(emptyPartnerForm())}>Batal</Button>}
                   <Button type="submit">{vendorForm.id ? "Simpan perubahan" : "Simpan mitra pemasok"}</Button>
                 </div>
               </form>
-            </div>
+            </CardContent>
+            </Card>
           )}
-          <div className="card p-0 overflow-hidden">
+          <Card className="p-0 overflow-hidden">
             <TableShell minWidth={640}>
               <Table>
                 <TableHeader><TableRow><TableHead>Nama</TableHead><TableHead>Kontak</TableHead><TableHead>Alamat</TableHead><TableHead>Status</TableHead>{canWrite && <TableHead />}</TableRow></TableHeader>
@@ -909,27 +921,29 @@ export default function Inventory() {
                 </TableBody>
               </Table>
             </TableShell>
-          </div>
+          </Card>
         </div>
       )}
 
       {tab === "customer" && (
         <div className="space-y-4">
           {canWrite && (
-            <div className="card">
+            <Card>
+            <CardContent className="pt-6">
               <p className="label mb-3">{customerForm.id ? "Edit customer" : "Tambah customer"}</p>
               <form onSubmit={submitCustomer} className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div><label className="label">Nama</label><input required className="input" value={customerForm.name} onChange={(e) => setCustomerForm({ ...customerForm, name: e.target.value })} /></div>
-                <div><label className="label">Kontak</label><input className="input" value={customerForm.contact} onChange={(e) => setCustomerForm({ ...customerForm, contact: e.target.value })} /></div>
-                <div><label className="label">Alamat</label><input className="input" value={customerForm.address} onChange={(e) => setCustomerForm({ ...customerForm, address: e.target.value })} /></div>
+                <div><label className="label">Nama</label><Input required value={customerForm.name} onChange={(e) => setCustomerForm({ ...customerForm, name: e.target.value })} /></div>
+                <div><label className="label">Kontak</label><Input value={customerForm.contact} onChange={(e) => setCustomerForm({ ...customerForm, contact: e.target.value })} /></div>
+                <div><label className="label">Alamat</label><Input value={customerForm.address} onChange={(e) => setCustomerForm({ ...customerForm, address: e.target.value })} /></div>
                 <div className="sm:col-span-3 flex justify-end gap-2">
                   {customerForm.id && <Button type="button" variant="outline" onClick={() => setCustomerForm(emptyPartnerForm())}>Batal</Button>}
                   <Button type="submit">{customerForm.id ? "Simpan perubahan" : "Simpan customer"}</Button>
                 </div>
               </form>
-            </div>
+            </CardContent>
+            </Card>
           )}
-          <div className="card p-0 overflow-hidden">
+          <Card className="p-0 overflow-hidden">
             <TableShell minWidth={640}>
               <Table>
                 <TableHeader><TableRow><TableHead>Nama</TableHead><TableHead>Kontak</TableHead><TableHead>Alamat</TableHead><TableHead>Status</TableHead>{canWrite && <TableHead />}</TableRow></TableHeader>
@@ -953,12 +967,12 @@ export default function Inventory() {
                 </TableBody>
               </Table>
             </TableShell>
-          </div>
+          </Card>
         </div>
       )}
 
       {tab === "utang" && (
-        <div className="card p-0 overflow-hidden">
+        <Card className="p-0 overflow-hidden">
           <TableShell minWidth={800}>
             <Table>
               <TableHeader><TableRow><TableHead>Invoice</TableHead><TableHead>Mitra Pemasok</TableHead><TableHead>Metode</TableHead><TableHead className="num">Total</TableHead><TableHead className="num">Terbayar</TableHead><TableHead className="num">Sisa</TableHead><TableHead>Jatuh tempo</TableHead><TableHead>Status</TableHead>{canWrite && <TableHead />}</TableRow></TableHeader>
@@ -987,11 +1001,11 @@ export default function Inventory() {
               </TableBody>
             </Table>
           </TableShell>
-        </div>
+        </Card>
       )}
 
       {tab === "piutang" && (
-        <div className="card p-0 overflow-hidden">
+        <Card className="p-0 overflow-hidden">
           <TableShell minWidth={800}>
             <Table>
               <TableHeader><TableRow><TableHead>Invoice</TableHead><TableHead>Customer</TableHead><TableHead>Metode</TableHead><TableHead className="num">Total</TableHead><TableHead className="num">Terbayar</TableHead><TableHead className="num">Sisa</TableHead><TableHead>Jatuh tempo</TableHead><TableHead>Status</TableHead>{canWrite && <TableHead />}</TableRow></TableHeader>
@@ -1020,16 +1034,16 @@ export default function Inventory() {
               </TableBody>
             </Table>
           </TableShell>
-        </div>
+        </Card>
       )}
 
       {tab === "laporan" && (
         <div className="space-y-4">
-          <div className="card p-4 flex flex-wrap gap-4 items-end">
-            <div><label className="label">Dari</label><input type="date" className="input" value={reportRange.date_from} onChange={(e) => setReportRange({ ...reportRange, date_from: e.target.value })} /></div>
-            <div><label className="label">Sampai</label><input type="date" className="input" value={reportRange.date_to} onChange={(e) => setReportRange({ ...reportRange, date_to: e.target.value })} /></div>
+          <Card className="p-4 flex flex-wrap gap-4 items-end">
+            <div><label className="label">Dari</label><Input type="date" value={reportRange.date_from} onChange={(e) => setReportRange({ ...reportRange, date_from: e.target.value })} /></div>
+            <div><label className="label">Sampai</label><Input type="date" value={reportRange.date_to} onChange={(e) => setReportRange({ ...reportRange, date_to: e.target.value })} /></div>
             <Button type="button" variant="outline" onClick={loadReports}>Muat ulang</Button>
-          </div>
+          </Card>
 
           {valuation && (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -1040,7 +1054,7 @@ export default function Inventory() {
           )}
 
           {movementReport && (
-            <div className="card p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Card className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <p className="label mb-1">Stock in</p>
                 <p className="font-heading text-xl font-bold">{movementReport.stock_in?.qty ?? 0} unit</p>
@@ -1051,11 +1065,11 @@ export default function Inventory() {
                 <p className="font-heading text-xl font-bold">{movementReport.stock_out?.qty ?? 0} unit</p>
                 <p className="text-sm" style={{ color: "var(--text-muted)" }}>{fmtRp(Number(movementReport.stock_out?.value || 0))} · {movementReport.stock_out?.count ?? 0} transaksi</p>
               </div>
-            </div>
+            </Card>
           )}
 
           {valuation?.by_category?.length > 0 && (
-            <div className="card p-0 overflow-hidden">
+            <Card className="p-0 overflow-hidden">
               <TableShell minWidth={720}>
               <Table>
                 <TableHeader><TableRow><TableHead>Kategori</TableHead><TableHead className="num">SKU</TableHead><TableHead className="num">Qty</TableHead><TableHead className="num">Nilai</TableHead></TableRow></TableHeader>
@@ -1071,7 +1085,7 @@ export default function Inventory() {
                 </TableBody>
               </Table>
               </TableShell>
-            </div>
+            </Card>
           )}
         </div>
       )}
@@ -1081,16 +1095,16 @@ export default function Inventory() {
 
 function Stat({ label, value }) {
   return (
-    <div className="card p-4">
+    <Card className="p-4">
       <p className="label mb-1">{label}</p>
       <p className="font-heading text-2xl font-bold">{value}</p>
-    </div>
+    </Card>
   );
 }
 
 function MovementTable({ rows, onCancel }) {
   return (
-    <div className="card p-0 overflow-hidden">
+    <Card className="p-0 overflow-hidden">
       <TableShell minWidth={720}>
       <Table>
         <TableHeader>
@@ -1135,6 +1149,6 @@ function MovementTable({ rows, onCancel }) {
         </TableBody>
       </Table>
       </TableShell>
-    </div>
+    </Card>
   );
 }

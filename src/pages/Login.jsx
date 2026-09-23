@@ -3,6 +3,9 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import { Eye, EyeSlash, SignIn, ArrowLeft } from "@phosphor-icons/react";
 import Spinner from "@/components/Spinner";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 
 export default function Login() {
   const { login } = useAuth();
@@ -26,9 +29,11 @@ export default function Login() {
 
   return (
     <div className="auth-bg flex items-center justify-center p-4 relative min-h-screen">
-      <Link to="/" data-testid="login-back" className="absolute top-4 left-4 sm:top-6 sm:left-6 btn btn-outline text-xs sm:text-sm">
-        <ArrowLeft size={14} /> Kembali
-      </Link>
+      <Button asChild variant="outline" className="absolute top-4 left-4 sm:top-6 sm:left-6 text-xs sm:text-sm">
+        <Link to="/" data-testid="login-back">
+          <ArrowLeft size={14} /> Kembali
+        </Link>
+      </Button>
       <div className="w-full max-w-md fade-in">
         <div className="text-center mb-6">
           <img src="/logo-transparent.png" alt="Logo BUMDES Karya Raharja" data-testid="bumdes-logo"
@@ -36,19 +41,20 @@ export default function Login() {
           <h1 className="font-heading text-2xl sm:text-3xl mt-1">BUMDes Karya Raharja</h1>
           <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>Sistem Informasi Akuntansi</p>
         </div>
-        <div className="card">
+        <Card>
+        <CardContent className="pt-6">
           <h2 className="font-heading text-xl mb-1">Masuk ke Akun</h2>
           <p className="text-sm mb-5" style={{ color: "var(--text-secondary)" }}>Silakan gunakan username & password Anda.</p>
           <form onSubmit={submit} className="space-y-4">
             <div>
               <label className="label">Username / Email</label>
-              <input data-testid="login-username" className="input" value={username}
+              <Input data-testid="login-username" value={username}
                 onChange={(e) => setUsername(e.target.value)} placeholder="mis. admin" autoFocus required />
             </div>
             <div>
               <label className="label">Password</label>
               <div className="relative">
-                <input data-testid="login-password" className="input pr-10" type={showPw ? "text" : "password"}
+                <Input data-testid="login-password" className="pr-10" type={showPw ? "text" : "password"}
                   value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required />
                 <button type="button" data-testid="toggle-password" onClick={() => setShowPw(!showPw)}
                         aria-label={showPw ? "Sembunyikan password" : "Tampilkan password"}
@@ -60,11 +66,12 @@ export default function Login() {
             {err && (
               <div data-testid="login-error" className="text-sm p-3 rounded-xl" style={{ color: "#C45C5C" }}>{err}</div>
             )}
-            <button data-testid="login-submit" disabled={loading} className="btn btn-primary w-full">
+            <Button data-testid="login-submit" disabled={loading} className="w-full">
               {loading ? <Spinner size={18} label="Memproses..." /> : <><SignIn size={18} />Masuk</>}
-            </button>
+            </Button>
           </form>
-        </div>
+        </CardContent>
+        </Card>
         <p className="text-center text-xs mt-5" style={{ color: "var(--text-secondary)" }}>
           Aplikasi SIA BUMDes ini dikembangkan dengan berpedoman pada Kepmendesa PDTT No. 136 Tahun 2022.
         </p>

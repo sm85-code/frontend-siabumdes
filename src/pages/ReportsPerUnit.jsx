@@ -3,6 +3,10 @@ import api, { fmtRp, API } from "@/lib/api";
 import { FilePdf, FileXls } from "@phosphor-icons/react";
 import TableShell from "@/components/TableShell";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 const today = new Date().toISOString().slice(0, 10);
 const startOfYear = today.slice(0, 4) + "-01-01";
@@ -37,17 +41,19 @@ export default function ReportsPerUnit() {
         <p className="label mb-1">Laporan</p>
         <h1 className="font-heading text-3xl font-bold">Kinerja Per Unit Usaha</h1>
       </div>
-      <div className="card grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
-        <div><label className="label">Dari</label><input type="date" className="input" value={start} onChange={(e) => setStart(e.target.value)} /></div>
-        <div><label className="label">Sampai</label><input type="date" className="input" value={end} onChange={(e) => setEnd(e.target.value)} /></div>
+      <Card>
+      <CardContent className="pt-6 grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
+        <div><label className="label">Dari</label><Input type="date" value={start} onChange={(e) => setStart(e.target.value)} /></div>
+        <div><label className="label">Sampai</label><Input type="date" value={end} onChange={(e) => setEnd(e.target.value)} /></div>
         <div className="flex gap-2">
-          <button onClick={load} className="btn btn-primary flex-1">Terapkan</button>
-          <button data-testid="btn-per-unit-pdf" onClick={() => download("pdf")} className="btn btn-outline"><FilePdf size={16} color="var(--status-error)" /> PDF</button>
-          <button data-testid="btn-per-unit-excel" onClick={() => download("excel")} className="btn btn-outline"><FileXls size={16} color="var(--primary-dark)" /> Excel</button>
+          <Button onClick={load} className="flex-1">Terapkan</Button>
+          <Button variant="outline" data-testid="btn-per-unit-pdf" onClick={() => download("pdf")}><FilePdf size={16} color="var(--status-error)" /> PDF</Button>
+          <Button variant="outline" data-testid="btn-per-unit-excel" onClick={() => download("excel")}><FileXls size={16} color="var(--primary-dark)" /> Excel</Button>
         </div>
-      </div>
+      </CardContent>
+      </Card>
       {data && (
-        <div className="card p-0 overflow-hidden">
+        <Card className="p-0 overflow-hidden">
           <TableShell minWidth={720}>
             <Table data-testid="per-unit-table">
               <TableHeader>
@@ -61,7 +67,7 @@ export default function ReportsPerUnit() {
               <TableBody>
                 {data.units.map(u => (
                   <TableRow key={u.id}>
-                    <TableCell><span className="badge">{u.code}</span></TableCell>
+                    <TableCell><Badge>{u.code}</Badge></TableCell>
                     <TableCell className="font-medium">{u.name}</TableCell>
                     <TableCell className="num">{fmtRp(u.pendapatan)}</TableCell>
                     <TableCell className="num">{fmtRp(u.beban)}</TableCell>
@@ -73,7 +79,7 @@ export default function ReportsPerUnit() {
               </TableBody>
             </Table>
           </TableShell>
-        </div>
+        </Card>
       )}
     </div>
   );

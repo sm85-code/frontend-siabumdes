@@ -1,3 +1,5 @@
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 /** COA UU05 untuk transaksi inventory (Kas, Persediaan, Utang, Piutang, HPP, Pendapatan, Penyesuaian). */
 export const UU05_INVENTORY_COA = [
   { code: "1.1.01.15", name: "Kas/Bank - UU05" },
@@ -21,13 +23,23 @@ export const BEBAN_KERUGIAN_BARANG_ACCOUNT_CODE = "6.2.99.52";
 
 export function CoaSelect({ value, onChange, required = true, id, disabled = false }) {
   return (
-    <select id={id} required={required} disabled={disabled} className="input" value={value} onChange={onChange}>
-      <option value="">— pilih akun —</option>
-      {UU05_INVENTORY_COA.map((a) => (
-        <option key={a.code} value={a.code}>
-          {a.code} — {a.name}
-        </option>
-      ))}
-    </select>
+    <Select
+      required={required}
+      disabled={disabled}
+      value={value || "__none__"}
+      onValueChange={(v) => onChange({ target: { value: v === "__none__" ? "" : v } })}
+    >
+      <SelectTrigger id={id}>
+        <SelectValue placeholder="— pilih akun —" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="__none__">— pilih akun —</SelectItem>
+        {UU05_INVENTORY_COA.map((a) => (
+          <SelectItem key={a.code} value={a.code}>
+            {a.code} — {a.name}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 }

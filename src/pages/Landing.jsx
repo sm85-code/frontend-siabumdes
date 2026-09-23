@@ -8,6 +8,8 @@ import {
   CartesianGrid, ResponsiveContainer, Legend,
 } from "recharts";
 import { ArrowRight, Buildings, HandHeart, ChartLineUp } from "@phosphor-icons/react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 
 const MONTH_LABELS = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Ags","Sep","Okt","Nov","Des"];
 
@@ -37,7 +39,9 @@ export default function Landing() {
             <div className="text-[11px]" style={{ color: "var(--text-muted)" }}>Desa Wonoharjo</div>
           </div>
         </div>
-        <Link to="/login" data-testid="landing-login-top" className="btn btn-outline text-sm">Masuk <ArrowRight size={14} /></Link>
+        <Button asChild variant="outline" className="text-sm">
+          <Link to="/login" data-testid="landing-login-top">Masuk <ArrowRight size={14} /></Link>
+        </Button>
       </header>
 
       <section className="max-w-3xl mx-auto px-5 pt-10 pb-6 text-center">
@@ -69,7 +73,8 @@ export default function Landing() {
 
       {data && trend.length > 0 && (
         <section className="max-w-5xl mx-auto px-5 pb-8">
-          <div className="card">
+          <Card>
+          <CardContent className="pt-6">
             <h3 className="font-heading text-lg mb-1">Tren Pendapatan & Beban {year}</h3>
             <p className="text-xs mb-4" style={{ color: "var(--text-muted)" }}>Diperbarui langsung dari transaksi resmi.</p>
             <ResponsiveContainer width="99%" height={220}>
@@ -84,12 +89,14 @@ export default function Landing() {
                 <Line type="monotone" dataKey="beban" name="Beban" stroke="#1C8A8A" strokeWidth={2} dot={{ r: 3, fill: "#1C8A8A" }} />
               </LineChart>
             </ResponsiveContainer>
-          </div>
+          </CardContent>
+          </Card>
         </section>
       )}
 
       <section className="max-w-5xl mx-auto px-5 pb-12">
-        <div className="card">
+        <Card>
+        <CardContent className="pt-6">
           <h3 className="font-heading text-2xl mb-4">Akuntabilitas Real-Time Melalui Inovasi Digital</h3>
           <blockquote data-testid="narasi-komitmen" className="mb-6">
             <div className="font-body text-sm leading-relaxed text-justify space-y-3" style={{ color: "var(--text-secondary)" }}>
@@ -98,8 +105,11 @@ export default function Landing() {
               <p>Kehadiran platform ini memastikan setiap rupiah pendapatan dioptimalkan untuk meminimalkan beban, memaksimalkan laba bersih, dan memperbesar kontribusi PADes demi pembangunan desa yang berkelanjutan.</p>
             </div>
           </blockquote>
-          <Link to="/login" data-testid="landing-login-bottom" className="btn btn-primary">Masuk ke Dasbor <ArrowRight size={16} /></Link>
-        </div>
+          <Button asChild>
+            <Link to="/login" data-testid="landing-login-bottom">Masuk ke Dasbor <ArrowRight size={16} /></Link>
+          </Button>
+        </CardContent>
+        </Card>
       </section>
 
       <footer className="max-w-5xl mx-auto px-5 pb-8 text-center text-xs" style={{ color: "var(--text-muted)" }}>
@@ -111,12 +121,14 @@ export default function Landing() {
 
 function StatCard({ icon: Icon, label, value, testId }) {
   return (
-    <div data-testid={testId} className="card">
-      <div className="w-9 h-9 rounded-xl flex items-center justify-center mb-3" style={{ background: "var(--primary-light)" }}>
-        <Icon size={18} color="#14353A" />
-      </div>
-      <div className="text-[10px] tracking-[0.14em] font-semibold uppercase" style={{ color: "var(--text-muted)" }}>{label}</div>
-      <div className="font-heading tabular-nums text-xl sm:text-2xl mt-1">{value}</div>
-    </div>
+    <Card data-testid={testId}>
+      <CardContent className="pt-6">
+        <div className="w-9 h-9 rounded-xl flex items-center justify-center mb-3" style={{ background: "var(--primary-light)" }}>
+          <Icon size={18} color="#14353A" />
+        </div>
+        <div className="text-[10px] tracking-[0.14em] font-semibold uppercase" style={{ color: "var(--text-muted)" }}>{label}</div>
+        <div className="font-heading tabular-nums text-xl sm:text-2xl mt-1">{value}</div>
+      </CardContent>
+    </Card>
   );
 }

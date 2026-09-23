@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
 const MONTHS = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
@@ -160,7 +161,7 @@ export default function BukuBesar() {
                 <SelectItem value="dates">Pilih tanggal</SelectItem>
               </SelectContent>
             </Select>
-            {customPreset === "dates" && <div className="grid grid-cols-2 gap-2 mt-2"><input className="input" type="date" value={customStart} onChange={(e) => setCustomStart(e.target.value)} /><input className="input" type="date" value={customEnd} onChange={(e) => setCustomEnd(e.target.value)} /></div>}
+            {customPreset === "dates" && <div className="grid grid-cols-2 gap-2 mt-2"><Input type="date" value={customStart} onChange={(e) => setCustomStart(e.target.value)} /><Input type="date" value={customEnd} onChange={(e) => setCustomEnd(e.target.value)} /></div>}
           </>}
         </div>
         {periodMode === "monthly" && <div>
@@ -189,7 +190,7 @@ export default function BukuBesar() {
           <label className="label" htmlFor="ledger-search">Cari Akun</label>
           <div className="relative">
             <MagnifyingGlass size={16} aria-hidden="true" className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" color="var(--text-muted)" />
-            <input id="ledger-search" data-testid="ledger-search" className="input pl-10"
+            <Input id="ledger-search" data-testid="ledger-search" className="pl-10"
                    placeholder="Cari berdasarkan kode atau nama akun"
                    value={search} onChange={(e) => setSearch(e.target.value)} />
           </div>
