@@ -6,6 +6,7 @@ import { useConfirm } from "@/components/ConfirmProvider";
 import { useSort } from "@/lib/useSort";
 import { Plus, Pencil, Trash, DownloadSimple, UploadSimple, Warning } from "@phosphor-icons/react";
 import TableShell from "@/components/TableShell";
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 
 const CAT_LABELS = {
   aset: "Aset", kewajiban: "Kewajiban", ekuitas: "Ekuitas",
@@ -393,34 +394,34 @@ export default function COAPage() {
             </button>
           </div>
         )}
-        <table className="tbl" data-testid="coa-table">
-          <thead>
-            <tr>
+        <Table data-testid="coa-table">
+          <TableHeader>
+            <TableRow>
               {isAdmin && (
-                <th style={{ width: 32 }}>
+                <TableHead style={{ width: 32 }}>
                   <input type="checkbox" data-testid="coa-select-all"
                          checked={accSort.sorted.length > 0 && accSort.sorted.every(a => selAcc.has(a.code))}
                          onChange={(e) => setSelAcc(e.target.checked ? new Set(accSort.sorted.map(a => a.code)) : new Set())} />
-                </th>
+                </TableHead>
               )}
-              <th {...accSort.headerProps("code")}>Kode{accSort.sortIndicator("code")}</th>
-              <th {...accSort.headerProps("name")}>Nama Akun{accSort.sortIndicator("name")}</th>
-              <th {...accSort.headerProps("category")}>Kategori{accSort.sortIndicator("category")}</th>
-              <th {...accSort.headerProps("subcategory")}>Sub{accSort.sortIndicator("subcategory")}</th>
-              <th {...accSort.headerProps("normal_balance")}>Saldo Normal{accSort.sortIndicator("normal_balance")}</th>
-              {isAdmin && <th></th>}
-            </tr>
-          </thead>
-          <tbody>
+              <TableHead {...accSort.headerProps("code")}>Kode{accSort.sortIndicator("code")}</TableHead>
+              <TableHead {...accSort.headerProps("name")}>Nama Akun{accSort.sortIndicator("name")}</TableHead>
+              <TableHead {...accSort.headerProps("category")}>Kategori{accSort.sortIndicator("category")}</TableHead>
+              <TableHead {...accSort.headerProps("subcategory")}>Sub{accSort.sortIndicator("subcategory")}</TableHead>
+              <TableHead {...accSort.headerProps("normal_balance")}>Saldo Normal{accSort.sortIndicator("normal_balance")}</TableHead>
+              {isAdmin && <TableHead></TableHead>}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {accSort.sorted.length === 0 ? (
-              <tr><td colSpan={isAdmin ? 7 : 5} className="text-center py-8"
+              <TableRow><TableCell colSpan={isAdmin ? 7 : 5} className="text-center py-8"
                       style={{ color: "var(--text-muted)" }}>
                 Belum ada kode akun pada kelompok <b>{group}</b>.
-              </td></tr>
+              </TableCell></TableRow>
             ) : accSort.sorted.map(a => (
-              <tr key={a.code}>
+              <TableRow key={a.code}>
                 {isAdmin && (
-                  <td>
+                  <TableCell>
                     <input type="checkbox" data-testid={`sel-acc-${a.code}`}
                            checked={selAcc.has(a.code)}
                            onChange={() => setSelAcc(prev => {
@@ -428,17 +429,17 @@ export default function COAPage() {
                              n.has(a.code) ? n.delete(a.code) : n.add(a.code);
                              return n;
                            })} />
-                  </td>
+                  </TableCell>
                 )}
-                <td className="font-mono font-semibold">{a.code}</td>
-                <td>{a.name}</td>
-                <td>{CAT_LABELS[a.category] ? <span className="badge">{CAT_LABELS[a.category]}</span> : <span className="badge badge-purple">{a.category}</span>}</td>
-                <td className="text-xs">{a.subcategory}</td>
-                <td>{a.normal_balance === "debit"
+                <TableCell className="font-mono font-semibold">{a.code}</TableCell>
+                <TableCell>{a.name}</TableCell>
+                <TableCell>{CAT_LABELS[a.category] ? <span className="badge">{CAT_LABELS[a.category]}</span> : <span className="badge badge-purple">{a.category}</span>}</TableCell>
+                <TableCell className="text-xs">{a.subcategory}</TableCell>
+                <TableCell>{a.normal_balance === "debit"
                   ? <span className="badge badge-blue">Debit</span>
-                  : <span className="badge badge-purple">Kredit</span>}</td>
+                  : <span className="badge badge-purple">Kredit</span>}</TableCell>
                 {isAdmin && (
-                  <td>
+                  <TableCell>
                     <div className="flex gap-1">
                       <button data-testid={`edit-acc-${a.code}`} onClick={() => openEditAcc(a)}
                               className="p-1.5 rounded-md hover:bg-yellow-50" title="Edit">
@@ -449,12 +450,12 @@ export default function COAPage() {
                         <Trash size={16} color="var(--status-error)" />
                       </button>
                     </div>
-                  </td>
+                  </TableCell>
                 )}
-              </tr>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
         </TableShell>
       </div>
 
@@ -533,30 +534,30 @@ export default function COAPage() {
             </button>
           </div>
         )}
-        <table className="tbl" data-testid="tt-table">
-          <thead>
-            <tr>
+        <Table data-testid="tt-table">
+          <TableHeader>
+            <TableRow>
               {isAdmin && (
-                <th style={{ width: 32 }}>
+                <TableHead style={{ width: 32 }}>
                   <input type="checkbox" data-testid="tt-select-all"
                          checked={ttSort.sorted.length > 0 && ttSort.sorted.every(t => selTT.has(t.code))}
                          onChange={(e) => setSelTT(e.target.checked ? new Set(ttSort.sorted.map(t => t.code)) : new Set())} />
-                </th>
+                </TableHead>
               )}
-              <th {...ttSort.headerProps("name")}>Nama Transaksi{ttSort.sortIndicator("name")}</th>
-              <th {...ttSort.headerProps("debit")}>Debit / Kredit{ttSort.sortIndicator("debit")}</th>
-              {isAdmin && <th></th>}
-            </tr>
-          </thead>
-          <tbody>
+              <TableHead {...ttSort.headerProps("name")}>Nama Transaksi{ttSort.sortIndicator("name")}</TableHead>
+              <TableHead {...ttSort.headerProps("debit")}>Debit / Kredit{ttSort.sortIndicator("debit")}</TableHead>
+              {isAdmin && <TableHead></TableHead>}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {ttSort.sorted.length === 0 ? (
-              <tr><td colSpan={isAdmin ? 4 : 2} className="text-center py-6" style={{ color: "var(--text-muted)" }}>
+              <TableRow><TableCell colSpan={isAdmin ? 4 : 2} className="text-center py-6" style={{ color: "var(--text-muted)" }}>
                 Belum ada jenis transaksi pada kelompok <b>{group}</b>.
-              </td></tr>
+              </TableCell></TableRow>
             ) : ttSort.sorted.map(t => (
-              <tr key={t.code}>
+              <TableRow key={t.code}>
                 {isAdmin && (
-                  <td>
+                  <TableCell>
                     <input type="checkbox" data-testid={`sel-tt-${t.code}`}
                            checked={selTT.has(t.code)}
                            onChange={() => setSelTT(prev => {
@@ -564,18 +565,18 @@ export default function COAPage() {
                              n.has(t.code) ? n.delete(t.code) : n.add(t.code);
                              return n;
                            })} />
-                  </td>
+                  </TableCell>
                 )}
-                <td>
+                <TableCell>
                   <div className="font-medium">{t.name}</div>
                   <div className="text-xs font-mono" style={{ color: "var(--text-muted)" }}>{t.code}</div>
-                </td>
-                <td className="text-xs">
+                </TableCell>
+                <TableCell className="text-xs">
                   <div>D: {t.debit}</div>
                   <div>K: {t.credit}</div>
-                </td>
+                </TableCell>
                 {isAdmin && (
-                  <td>
+                  <TableCell>
                     <div className="flex gap-1">
                       <button data-testid={`edit-tt-${t.code}`} onClick={() => openEditTT(t)}
                               className="p-1.5 rounded-md hover:bg-yellow-50" title="Edit">
@@ -586,12 +587,12 @@ export default function COAPage() {
                         <Trash size={16} color="var(--status-error)" />
                       </button>
                     </div>
-                  </td>
+                  </TableCell>
                 )}
-              </tr>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
         </TableShell>
       </div>
       </>}
