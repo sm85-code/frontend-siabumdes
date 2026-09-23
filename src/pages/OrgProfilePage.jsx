@@ -66,7 +66,7 @@ export default function OrgProfilePage() {
       .finally(() => setUploading(false));
   };
 
-  if (loading) return <div className="flex justify-center py-10"><Spinner /></div>;
+  if (loading) return <div className="flex items-center justify-center min-h-[60vh]"><Spinner /></div>;
 
   return (
     <div className="max-w-3xl space-y-6" data-testid="org-profile-page">

@@ -3,6 +3,7 @@ import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/lib/auth";
 import Layout from "@/components/Layout";
+import Spinner from "@/components/Spinner";
 const Landing = lazy(() => import("@/pages/Landing"));
 const Login = lazy(() => import("@/pages/Login"));
 const ChangePassword = lazy(() => import("@/pages/ChangePassword"));
@@ -21,10 +22,9 @@ const OrgProfilePage = lazy(() => import("@/pages/OrgProfilePage"));
 
 function PageFallback() {
   return (
-    <div className="page-loader" role="status" aria-live="polite">
-      <div className="font-heading text-lg" style={{ color: "var(--primary-dark)" }}>BUMDes Karya Raharja</div>
-      <div className="page-loader-bar"><i /></div>
-      <div className="text-sm">Menyiapkan dasbor keuangan...</div>
+    <div className="page-loader">
+      <div className="font-heading text-lg mb-2" style={{ color: "var(--primary-dark)" }}>BUMDes Karya Raharja</div>
+      <Spinner label="Menyiapkan dasbor keuangan..." />
     </div>
   );
 }
