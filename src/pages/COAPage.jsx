@@ -7,6 +7,7 @@ import { useSort } from "@/lib/useSort";
 import { Plus, Pencil, Trash, DownloadSimple, UploadSimple, Warning } from "@phosphor-icons/react";
 import TableShell from "@/components/TableShell";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const CAT_LABELS = {
   aset: "Aset", kewajiban: "Kewajiban", ekuitas: "Ekuitas",
@@ -269,9 +270,12 @@ export default function COAPage() {
         <div className="space-y-3" data-testid="master-data-controls">
           <div className="card card-sm">
             <label className="label mb-2" htmlFor="master-group-select">Kelompok</label>
-            <select id="master-group-select" data-testid="master-group-select" className="select" value={group} onChange={(e) => { setGroup(e.target.value); setFilter(""); }}>
-              {groupTabs.map(g => <option key={g.key} value={g.key}>{g.key === "BUMDES" ? "BUMDES - Pusat" : `${g.label} - ${g.sub}`}</option>)}
-            </select>
+            <Select value={group} onValueChange={(v) => { setGroup(v); setFilter(""); }}>
+              <SelectTrigger id="master-group-select" data-testid="master-group-select"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {groupTabs.map(g => <SelectItem key={g.key} value={g.key}>{g.key === "BUMDES" ? "BUMDES - Pusat" : `${g.label} - ${g.sub}`}</SelectItem>)}
+              </SelectContent>
+            </Select>
           </div>
           <div className="card card-sm flex flex-wrap gap-2" data-testid="master-type-tabs">
             <button data-testid="tab-accounts" onClick={() => setActiveSection("accounts")} className={`btn ${activeSection === "accounts" ? "btn-primary" : "btn-outline"}`}>Kode Akun</button>
@@ -317,19 +321,22 @@ export default function COAPage() {
               <input data-testid="acc-name" required className="input"
                      value={accForm.name} onChange={(e) => setAccForm({ ...accForm, name: e.target.value })} /></div>
             <div><label className="label">Kategori</label>
-              <select data-testid="acc-category" className="select" value={
+              <Select value={
                 Object.keys(CAT_LABELS).includes(accForm.category) ? accForm.category : "__custom__"
               }
-                      onChange={(e) => {
-                        if (e.target.value === "__custom__") {
+                      onValueChange={(v) => {
+                        if (v === "__custom__") {
                           setAccForm(f => ({ ...f, category: "", subcategory: "" }));
                         } else {
-                          onCatChange(e.target.value);
+                          onCatChange(v);
                         }
                       }}>
-                {Object.entries(CAT_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-                <option value="__custom__">+ Kategori Baru (custom)</option>
-              </select>
+                <SelectTrigger data-testid="acc-category"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {Object.entries(CAT_LABELS).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
+                  <SelectItem value="__custom__">+ Kategori Baru (custom)</SelectItem>
+                </SelectContent>
+              </Select>
               {!Object.keys(CAT_LABELS).includes(accForm.category) && (
                 <input data-testid="acc-category-custom" className="input mt-2"
                        placeholder="Ketik nama kategori baru..."
@@ -338,18 +345,21 @@ export default function COAPage() {
               )}
             </div>
             <div><label className="label">Sub-Kategori</label>
-              <select data-testid="acc-subcategory" className="select" value={
+              <Select value={
                 (SUBCATEGORIES[accForm.category] || []).includes(accForm.subcategory)
                   ? accForm.subcategory
-                  : accForm.subcategory ? "__custom__" : ""
+                  : accForm.subcategory ? "__custom__" : "__none__"
               }
-                      onChange={(e) => {
-                        if (e.target.value === "__custom__") setAccForm(f => ({ ...f, subcategory: "" }));
-                        else setAccForm(f => ({ ...f, subcategory: e.target.value }));
+                      onValueChange={(v) => {
+                        if (v === "__custom__" || v === "__none__") setAccForm(f => ({ ...f, subcategory: "" }));
+                        else setAccForm(f => ({ ...f, subcategory: v }));
                       }}>
-                {(SUBCATEGORIES[accForm.category] || []).map(s => <option key={s} value={s}>{s.replace(/_/g, " ")}</option>)}
-                <option value="__custom__">+ Sub-Kategori Baru (custom)</option>
-              </select>
+                <SelectTrigger data-testid="acc-subcategory"><SelectValue placeholder="— pilih —" /></SelectTrigger>
+                <SelectContent>
+                  {(SUBCATEGORIES[accForm.category] || []).map(s => <SelectItem key={s} value={s}>{s.replace(/_/g, " ")}</SelectItem>)}
+                  <SelectItem value="__custom__">+ Sub-Kategori Baru (custom)</SelectItem>
+                </SelectContent>
+              </Select>
               {(!SUBCATEGORIES[accForm.category] || !SUBCATEGORIES[accForm.category].includes(accForm.subcategory)) && (
                 <input data-testid="acc-subcategory-custom" className="input mt-2"
                        placeholder="Ketik nama sub-kategori baru..."
@@ -358,10 +368,13 @@ export default function COAPage() {
               )}
             </div>
             <div><label className="label">Saldo Normal</label>
-              <select data-testid="acc-normal-balance" className="select" value={accForm.normal_balance}
-                      onChange={(e) => setAccForm({ ...accForm, normal_balance: e.target.value })}>
-                <option value="debit">Debit</option><option value="kredit">Kredit</option>
-              </select></div>
+              <Select value={accForm.normal_balance} onValueChange={(v) => setAccForm({ ...accForm, normal_balance: v })}>
+                <SelectTrigger data-testid="acc-normal-balance"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="debit">Debit</SelectItem>
+                  <SelectItem value="kredit">Kredit</SelectItem>
+                </SelectContent>
+              </Select></div>
             <p className="sm:col-span-2 text-xs" style={{ color: "var(--text-muted)" }}>
               Akun ini akan disimpan pada kelompok <b>{group}</b>.
             </p>
@@ -499,17 +512,21 @@ export default function COAPage() {
               <input data-testid="tt-name" required className="input"
                      value={ttForm.name} onChange={(e) => setTtForm({ ...ttForm, name: e.target.value })} /></div>
             <div><label className="label">Akun Debit (default)</label>
-              <select data-testid="tt-debit" required className="select" value={ttForm.debit}
-                      onChange={(e) => setTtForm({ ...ttForm, debit: e.target.value })}>
-                <option value="">— pilih akun {group} —</option>
-                {groupAccounts.map(a => <option key={a.code} value={a.code}>{a.code} - {a.name}</option>)}
-              </select></div>
+              <Select required value={ttForm.debit || "__none__"} onValueChange={(v) => setTtForm({ ...ttForm, debit: v === "__none__" ? "" : v })}>
+                <SelectTrigger data-testid="tt-debit"><SelectValue placeholder={`— pilih akun ${group} —`} /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none__">— pilih akun {group} —</SelectItem>
+                  {groupAccounts.map(a => <SelectItem key={a.code} value={a.code}>{a.code} - {a.name}</SelectItem>)}
+                </SelectContent>
+              </Select></div>
             <div><label className="label">Akun Kredit (default)</label>
-              <select data-testid="tt-credit" required className="select" value={ttForm.credit}
-                      onChange={(e) => setTtForm({ ...ttForm, credit: e.target.value })}>
-                <option value="">— pilih akun {group} —</option>
-                {groupAccounts.map(a => <option key={a.code} value={a.code}>{a.code} - {a.name}</option>)}
-              </select></div>
+              <Select required value={ttForm.credit || "__none__"} onValueChange={(v) => setTtForm({ ...ttForm, credit: v === "__none__" ? "" : v })}>
+                <SelectTrigger data-testid="tt-credit"><SelectValue placeholder={`— pilih akun ${group} —`} /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none__">— pilih akun {group} —</SelectItem>
+                  {groupAccounts.map(a => <SelectItem key={a.code} value={a.code}>{a.code} - {a.name}</SelectItem>)}
+                </SelectContent>
+              </Select></div>
             <p className="sm:col-span-2 text-xs" style={{ color: "var(--text-muted)" }}>
               Jenis transaksi ini akan disimpan pada kelompok <b>{group}</b>.
             </p>
