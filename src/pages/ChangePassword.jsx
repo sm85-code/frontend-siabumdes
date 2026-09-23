@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 
 export default function ChangePassword() {
   const { changePassword, logout } = useAuth();
@@ -39,7 +42,8 @@ export default function ChangePassword() {
 
   return (
     <div className="auth-bg flex items-center justify-center p-4">
-      <div className="card w-full max-w-md fade-in">
+      <Card className="w-full max-w-md fade-in">
+        <CardContent className="pt-6">
         <p className="label mb-1">Keamanan Akun</p>
         <h1 className="font-heading text-2xl font-bold">Ganti Password</h1>
         <p className="text-sm mt-2 mb-6" style={{ color: "var(--text-secondary)" }}>
@@ -48,26 +52,27 @@ export default function ChangePassword() {
         <form onSubmit={submit} className="space-y-4">
           <div>
             <label className="label" htmlFor="current-password">Password sementara</label>
-            <input id="current-password" className="input" type="password" required
+            <Input id="current-password" type="password" required
               value={currentPassword} onChange={(event) => setCurrentPassword(event.target.value)} />
           </div>
           <div>
             <label className="label" htmlFor="new-password">Password baru</label>
-            <input id="new-password" className="input" type="password" minLength={8} required
+            <Input id="new-password" type="password" minLength={8} required
               value={newPassword} onChange={(event) => setNewPassword(event.target.value)} />
           </div>
           <div>
             <label className="label" htmlFor="confirm-password">Konfirmasi password baru</label>
-            <input id="confirm-password" className="input" type="password" minLength={8} required
+            <Input id="confirm-password" type="password" minLength={8} required
               value={confirmation} onChange={(event) => setConfirmation(event.target.value)} />
           </div>
           {error && <div className="text-sm p-3 rounded-lg" style={{ background: "var(--status-error-bg)", color: "var(--status-error)" }}>{error}</div>}
-          <button className="btn btn-primary w-full" disabled={saving}>
+          <Button className="w-full" disabled={saving}>
             {saving ? "Menyimpan..." : "Simpan Password Baru"}
-          </button>
-          <button type="button" className="btn btn-outline w-full" onClick={logout}>Keluar</button>
+          </Button>
+          <Button type="button" variant="outline" className="w-full" onClick={logout}>Keluar</Button>
         </form>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
