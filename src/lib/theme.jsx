@@ -1,13 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
-export const THEMES = [
-  { id: "modern", label: "Modern" },
-  { id: "classic", label: "Classic" },
-  { id: "playful", label: "Playful" },
-  { id: "minimalis", label: "Minimalis" },
-  { id: "elegant", label: "Elegant" },
-];
-
 export const FONTS = [
   { id: "jakarta", label: "Jakarta" },
   { id: "inter", label: "Inter" },
@@ -16,9 +8,7 @@ export const FONTS = [
   { id: "rounded", label: "Rounded" },
 ];
 
-const THEME_KEY = "bumdes-theme";
 const FONT_KEY = "bumdes-font";
-const VALID_THEMES = THEMES.map((t) => t.id);
 const VALID_FONTS = FONTS.map((f) => f.id);
 
 function readStored(key, validIds, fallback) {
@@ -31,22 +21,18 @@ function readStored(key, validIds, fallback) {
 }
 
 const ThemeContext = createContext({
-  theme: "modern", setTheme: () => {},
+  theme: "modern",
   font: "jakarta", setFont: () => {},
 });
 
+/**
+ * "Modern" is now the app's only theme, so this provider is font-only: it
+ * still exposes `theme: "modern"` (constant, never changes) so any code
+ * reading it from context keeps working, but there is no more
+ * setTheme/localStorage persistence for it.
+ */
 export function ThemeProvider({ children }) {
-  const [theme, setTheme] = useState(() => readStored(THEME_KEY, VALID_THEMES, "modern"));
   const [font, setFont] = useState(() => readStored(FONT_KEY, VALID_FONTS, "jakarta"));
-
-  useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-    try {
-      localStorage.setItem(THEME_KEY, theme);
-    } catch {
-      // ignore (private mode / storage blocked)
-    }
-  }, [theme]);
 
   useEffect(() => {
     document.documentElement.setAttribute("data-font", font);
@@ -58,7 +44,7 @@ export function ThemeProvider({ children }) {
   }, [font]);
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme, font, setFont }}>
+    <ThemeContext.Provider value={{ theme: "modern", font, setFont }}>
       {children}
     </ThemeContext.Provider>
   );
