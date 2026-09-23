@@ -3,6 +3,7 @@ import { fmtRp, fmtDate } from "@/lib/api";
 import TableShell from "@/components/TableShell";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend, CartesianGrid,
@@ -195,25 +196,25 @@ export default function InventorySummary({ products = [], movements = [], valuat
             <p className="text-xs" style={{ color: "var(--text-muted)" }}>10 SKU dengan nilai stok tertinggi</p>
           </div>
           <TableShell minWidth={640}>
-          <table className="tbl">
-            <thead>
-              <tr>
-                <th>SKU</th><th>Nama</th><th className="num">Qty</th><th className="num">Nilai</th>
-              </tr>
-            </thead>
-            <tbody>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>SKU</TableHead><TableHead>Nama</TableHead><TableHead className="num">Qty</TableHead><TableHead className="num">Nilai</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {topByValue.length === 0 ? (
-                <tr><td colSpan={4} className="text-center py-8" style={{ color: "var(--text-muted)" }}>Belum ada produk.</td></tr>
+                <TableRow><TableCell colSpan={4} className="text-center py-8" style={{ color: "var(--text-muted)" }}>Belum ada produk.</TableCell></TableRow>
               ) : topByValue.map((p) => (
-                <tr key={p.id}>
-                  <td className="font-medium">{p.sku}</td>
-                  <td>{p.name}</td>
-                  <td className="num">{p.qty_on_hand}</td>
-                  <td className="num">{fmtRp(Number(p.stock_value || 0))}</td>
-                </tr>
+                <TableRow key={p.id}>
+                  <TableCell className="font-medium">{p.sku}</TableCell>
+                  <TableCell>{p.name}</TableCell>
+                  <TableCell className="num">{p.qty_on_hand}</TableCell>
+                  <TableCell className="num">{fmtRp(Number(p.stock_value || 0))}</TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
           </TableShell>
         </Card>
 
@@ -223,27 +224,27 @@ export default function InventorySummary({ products = [], movements = [], valuat
             <p className="text-xs" style={{ color: "var(--text-muted)" }}>SKU dengan qty on hand ≤ 5</p>
           </div>
           <TableShell minWidth={640}>
-          <table className="tbl">
-            <thead>
-              <tr>
-                <th>SKU</th><th>Nama</th><th>Kategori</th><th className="num">Qty</th>
-              </tr>
-            </thead>
-            <tbody>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>SKU</TableHead><TableHead>Nama</TableHead><TableHead>Kategori</TableHead><TableHead className="num">Qty</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {lowStock.length === 0 ? (
-                <tr><td colSpan={4} className="text-center py-8" style={{ color: "var(--text-muted)" }}>Semua stok aman (&gt; 5).</td></tr>
+                <TableRow><TableCell colSpan={4} className="text-center py-8" style={{ color: "var(--text-muted)" }}>Semua stok aman (&gt; 5).</TableCell></TableRow>
               ) : lowStock.map((p) => (
-                <tr key={p.id}>
-                  <td className="font-medium">{p.sku}</td>
-                  <td>{p.name}</td>
-                  <td><Badge variant="secondary">{p.category_name || "-"}</Badge></td>
-                  <td className={`num ${Number(p.qty_on_hand) === 0 ? "text-destructive font-semibold" : ""}`}>
+                <TableRow key={p.id}>
+                  <TableCell className="font-medium">{p.sku}</TableCell>
+                  <TableCell>{p.name}</TableCell>
+                  <TableCell><Badge variant="secondary">{p.category_name || "-"}</Badge></TableCell>
+                  <TableCell className={`num ${Number(p.qty_on_hand) === 0 ? "text-destructive font-semibold" : ""}`}>
                     {p.qty_on_hand}
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
           </TableShell>
         </Card>
       </div>
@@ -254,26 +255,26 @@ export default function InventorySummary({ products = [], movements = [], valuat
           <p className="text-xs" style={{ color: "var(--text-muted)" }}>Mutasi keluar terakhir</p>
         </div>
         <TableShell minWidth={640}>
-        <table className="tbl">
-          <thead>
-            <tr>
-              <th>Tanggal</th><th>SKU</th><th>Produk</th><th className="num">Qty</th><th className="num">Nilai</th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Tanggal</TableHead><TableHead>SKU</TableHead><TableHead>Produk</TableHead><TableHead className="num">Qty</TableHead><TableHead className="num">Nilai</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {recentOut.length === 0 ? (
-              <tr><td colSpan={5} className="text-center py-8" style={{ color: "var(--text-muted)" }}>Belum ada stock out.</td></tr>
+              <TableRow><TableCell colSpan={5} className="text-center py-8" style={{ color: "var(--text-muted)" }}>Belum ada stock out.</TableCell></TableRow>
             ) : recentOut.map((m) => (
-              <tr key={m.id}>
-                <td>{fmtDate(m.movement_date)}</td>
-                <td>{m.sku}</td>
-                <td>{m.product_name}</td>
-                <td className="num">{m.quantity}</td>
-                <td className="num">{fmtRp(Number(m.total_value || 0))}</td>
-              </tr>
+              <TableRow key={m.id}>
+                <TableCell>{fmtDate(m.movement_date)}</TableCell>
+                <TableCell>{m.sku}</TableCell>
+                <TableCell>{m.product_name}</TableCell>
+                <TableCell className="num">{m.quantity}</TableCell>
+                <TableCell className="num">{fmtRp(Number(m.total_value || 0))}</TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
         </TableShell>
       </Card>
     </div>
