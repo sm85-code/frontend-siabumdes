@@ -106,7 +106,12 @@ function yearValueFromDate(dateStr) {
   return y || todayDate().getFullYear();
 }
 
-const DEFAULT_YEAR_RANGE = [2022, 2030];
+// Not a fixed cutoff: recomputed from today's date, so the year picker
+// never "runs out" and doesn't need a manual code change every few years.
+function defaultYearRange() {
+  const y = todayDate().getFullYear();
+  return [y - 15, y + 5];
+}
 
 const LEFT_OPTIONS = [
   { mode: "today", label: "Hari Ini" },
@@ -136,7 +141,7 @@ export default function PeriodFilter({
   value,
   onChange,
   defaultMode = "monthly",
-  yearRange = DEFAULT_YEAR_RANGE,
+  yearRange,
   className,
   align = "start",
   "data-testid": testId = "period-filter",
@@ -168,7 +173,7 @@ export default function PeriodFilter({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
-  const [minYear, maxYear] = yearRange;
+  const [minYear, maxYear] = yearRange || defaultYearRange();
   const years = Array.from({ length: maxYear - minYear + 1 }, (_, i) => minYear + i);
 
   const draftRange = resolveRange(draftMode, { monthValue, yearValue, customStart, customEnd });
