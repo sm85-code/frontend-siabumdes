@@ -4,8 +4,8 @@ import { useAuth } from "@/lib/auth";
 import Spinner from "@/components/Spinner";
 import {
   LineChart, Line, BarChart, Bar,
-  XAxis, YAxis, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, Legend, CartesianGrid,
+  XAxis, YAxis,
+  PieChart, Pie, Cell, CartesianGrid,
 } from "recharts";
 import { TrendUp, TrendDown, Coin, Storefront, ReceiptX, CalendarBlank, Lock } from "@phosphor-icons/react";
 import TableShell from "@/components/TableShell";
@@ -13,70 +13,21 @@ import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import PeriodFilter from "@/components/PeriodFilter";
+import {
+  ChartContainer, ChartTooltip, ChartTooltipContent,
+  ChartLegend, ChartLegendContent,
+} from "@/components/ui/chart";
+import { MONTHS, chartConfigForPeriod, bucketize } from "@/lib/dashboardBucketing";
 
 const INK = "#14353A"; // --primary-dark
 const TEAL = "#1C8A8A"; // --primary
-const GRID_STROKE = "#E3E8E6"; // --border
-const COLORS = ["#1C8A8A", "#14353A", "#C9A227", "#C45C6A", "#5AA9A3", "#8A969A"];
-const TOOLTIP_STYLE = { background: "#FFFFFF", border: "1px solid #E3E8E6", borderRadius: 12, boxShadow: "0 1px 2px rgba(20, 53, 58, 0.05), 0 8px 24px rgba(20, 53, 58, 0.04)" };
-const PIE_LEGEND_STYLE = { fontSize: 11 };
-const yTickFormatter = (v) => (v >= 1e6 ? `${(v/1e6).toFixed(1)}Jt` : v >= 1e3 ? `${(v/1e3).toFixed(0)}rb` : v);
-
-const MONTHS = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
-
-// Chart granularity/bucketing is driven by the selected PeriodFilter mode.
-const MODE_CHART_CONFIG = {
-  today: { granularity: "day", bucket: "day" },
-  week: { granularity: "day", bucket: "day" },
-  thisMonth: { granularity: "day", bucket: "week" },
-  monthly: { granularity: "day", bucket: "week" },
-  yearly: { granularity: "month", bucket: "month" },
-  custom: { granularity: "month", bucket: "month" },
+const GRID_STROKE = "var(--legacy-border, #E3E8E6)";
+const COLORS = ["var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)", "var(--chart-5)", "var(--chart-6)"];
+const TREND_CHART_CONFIG = {
+  pendapatan: { label: "Pendapatan", color: "var(--chart-2)" },
+  beban: { label: "Beban", color: "var(--chart-1)" },
 };
-
-function pad(n) { return String(n).padStart(2, "0"); }
-function iso(d) { return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; }
-
-function bucketize(list, targetBucket) {
-  if (!list || list.length === 0) return [];
-  if (targetBucket === "day" || targetBucket === "month") {
-    return list.map((r) => ({ ...r, month: labelize(r.month, targetBucket) }));
-  }
-  const map = new Map();
-  for (const r of list) {
-    const d = new Date(r.month);
-    if (isNaN(d.getTime())) continue;
-    const day = d.getDay() || 7;
-    const monday = new Date(d);
-    monday.setDate(d.getDate() - (day - 1));
-    const key = iso(monday);
-    const prev = map.get(key) || { pendapatan: 0, beban: 0 };
-    map.set(key, {
-      pendapatan: prev.pendapatan + (r.pendapatan || 0),
-      beban: prev.beban + (r.beban || 0),
-    });
-  }
-  return Array.from(map.entries())
-    .sort((a, b) => a[0].localeCompare(b[0]))
-    .map(([k, v]) => ({ month: `Minggu ${new Date(k).getDate()}/${new Date(k).getMonth() + 1}`, ...v }));
-}
-
-function labelize(key, bucket) {
-  if (bucket === "day") {
-    const parts = key.split("-");
-    if (parts.length === 3) return `${parts[2]}/${parts[1]}`;
-    return key;
-  }
-  if (bucket === "month") {
-    const parts = key.split("-");
-    if (parts.length >= 2) {
-      const m = Number(parts[1]);
-      return `${MONTHS[m - 1]?.slice(0, 3) || m} ${parts[0].slice(2)}`;
-    }
-    return key;
-  }
-  return key;
-}
+const yTickFormatter = (v) => (v >= 1e6 ? `${(v/1e6).toFixed(1)}Jt` : v >= 1e3 ? `${(v/1e3).toFixed(0)}rb` : v);
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -91,7 +42,7 @@ export default function Dashboard() {
     label: `Tahun ${now.getFullYear()}`,
   });
 
-  const chartConfig = MODE_CHART_CONFIG[period.mode] || MODE_CHART_CONFIG.yearly;
+  const chartConfig = useMemo(() => chartConfigForPeriod(period), [period]);
 
   useEffect(() => {
     setLoading(true);
@@ -191,29 +142,29 @@ export default function Dashboard() {
         <CardContent className="pt-6">
           <h3 className="font-heading text-lg font-semibold mb-4" data-testid="trend-title">Pendapatan & Beban ({pLabel})</h3>
           {chartData.length > 0 ? (
-            <ResponsiveContainer width="99%" height={280}>
+            <ChartContainer config={TREND_CHART_CONFIG} className="w-full aspect-auto" style={{ height: 280 }}>
               {useBar ? (
                 <BarChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE} vertical={false} />
                   <XAxis dataKey="month" tick={{ fontSize: 11 }} />
                   <YAxis tick={{ fontSize: 11 }} tickFormatter={yTickFormatter} />
-                  <Tooltip formatter={(v) => fmtRp(v)} contentStyle={TOOLTIP_STYLE} />
-                  <Legend />
-                  <Bar dataKey="pendapatan" name="Pendapatan" fill={INK} radius={[3,3,0,0]} />
-                  <Bar dataKey="beban" name="Beban" fill={TEAL} radius={[3,3,0,0]} />
+                  <ChartTooltip content={<ChartTooltipContent formatter={(v) => fmtRp(v)} />} />
+                  <ChartLegend content={<ChartLegendContent />} />
+                  <Bar dataKey="pendapatan" name="Pendapatan" fill="var(--color-pendapatan)" radius={[3,3,0,0]} />
+                  <Bar dataKey="beban" name="Beban" fill="var(--color-beban)" radius={[3,3,0,0]} />
                 </BarChart>
               ) : (
                 <LineChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE} vertical={false} />
                   <XAxis dataKey="month" tick={{ fontSize: 11 }} />
                   <YAxis tick={{ fontSize: 11 }} tickFormatter={yTickFormatter} />
-                  <Tooltip formatter={(v) => fmtRp(v)} contentStyle={TOOLTIP_STYLE} />
-                  <Legend />
-                  <Line type="monotone" dataKey="pendapatan" name="Pendapatan" stroke={INK} strokeWidth={2} dot={false} />
-                  <Line type="monotone" dataKey="beban" name="Beban" stroke={TEAL} strokeWidth={2} dot={false} />
+                  <ChartTooltip content={<ChartTooltipContent formatter={(v) => fmtRp(v)} />} />
+                  <ChartLegend content={<ChartLegendContent />} />
+                  <Line type="monotone" dataKey="pendapatan" name="Pendapatan" stroke="var(--color-pendapatan)" strokeWidth={2} dot={false} />
+                  <Line type="monotone" dataKey="beban" name="Beban" stroke="var(--color-beban)" strokeWidth={2} dot={false} />
                 </LineChart>
               )}
-            </ResponsiveContainer>
+            </ChartContainer>
           ) : (
             <p className="text-sm py-16 text-center" style={{ color: "var(--text-muted)" }}>Belum ada transaksi pada periode ini.</p>
           )}
@@ -224,17 +175,17 @@ export default function Dashboard() {
           <h3 className="font-heading text-lg font-semibold mb-4">Kontribusi Per Unit</h3>
           <p className="text-[11px] -mt-3 mb-3" style={{ color: "var(--text-muted)" }}>Berdasarkan laba bersih per unit (unit dengan laba positif).</p>
           {data.unit_summaries?.some(u => (u.laba || 0) > 0) ? (
-            <ResponsiveContainer width="99%" height={240}>
+            <ChartContainer config={{}} className="w-full aspect-auto" style={{ height: 240 }}>
               <PieChart>
                 <Pie data={data.unit_summaries.filter(u => (u.laba || 0) > 0)} dataKey="laba" nameKey="code" cx="50%" cy="50%" outerRadius={80} innerRadius={40}>
                   {data.unit_summaries.filter(u => (u.laba || 0) > 0).map((u, i) => (
                     <Cell key={u.id} fill={COLORS[i % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip formatter={(v) => fmtRp(v)} />
-                <Legend wrapperStyle={PIE_LEGEND_STYLE} />
+                <ChartTooltip content={<ChartTooltipContent formatter={(v) => fmtRp(v)} />} />
+                <ChartLegend content={<ChartLegendContent />} />
               </PieChart>
-            </ResponsiveContainer>
+            </ChartContainer>
           ) : (
             <p className="text-sm py-16 text-center" style={{ color: "var(--text-muted)" }}>Belum ada unit dengan laba positif pada periode ini.</p>
           )}

@@ -5,12 +5,16 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, Legend, CartesianGrid,
+  BarChart, Bar, XAxis, YAxis,
+  PieChart, Pie, Cell, CartesianGrid,
 } from "recharts";
+import {
+  ChartContainer, ChartTooltip, ChartTooltipContent,
+  ChartLegend, ChartLegendContent,
+} from "@/components/ui/chart";
 
 const COLORS = ["var(--chart-1)", "var(--chart-5)", "var(--chart-3)", "var(--chart-4)", "var(--chart-2)", "var(--chart-6)"];
-const TOOLTIP_STYLE = { background: "var(--surface)", border: "1px solid var(--legacy-border)", borderRadius: 8 };
+const TOP_OUT_CHART_CONFIG = { qty: { label: "Qty keluar", color: "var(--chart-1)" } };
 function Stat({ label, value, hint }) {
   return (
     <Card>
@@ -134,18 +138,21 @@ export default function InventorySummary({ products = [], movements = [], valuat
             Agregasi qty keluar dari mutasi terbaru (bukan dibatalkan).
           </p>
           {topOut.length > 0 ? (
-            <ResponsiveContainer width="99%" height={280}>
+            <ChartContainer config={TOP_OUT_CHART_CONFIG} className="w-full aspect-auto" style={{ height: 280 }}>
               <BarChart data={topOut} layout="vertical" margin={{ top: 4, right: 16, left: 8, bottom: 4 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--legacy-border)" horizontal={false} />
                 <XAxis type="number" tick={{ fontSize: 11 }} />
                 <YAxis type="category" dataKey="name" width={110} tick={{ fontSize: 11 }} />
-                <Tooltip
-                  formatter={(v, name) => (name === "qty" ? [`${v} unit`, "Qty keluar"] : [fmtRp(v), "Nilai"])}
-                  contentStyle={TOOLTIP_STYLE}
+                <ChartTooltip
+                  content={
+                    <ChartTooltipContent
+                      formatter={(v, name) => (name === "qty" ? `${v} unit` : fmtRp(v))}
+                    />
+                  }
                 />
-                <Bar dataKey="qty" name="qty" fill="var(--chart-1)" radius={[0, 4, 4, 0]} />
+                <Bar dataKey="qty" name="qty" fill="var(--color-qty)" radius={[0, 4, 4, 0]} />
               </BarChart>
-            </ResponsiveContainer>
+            </ChartContainer>
           ) : (
             <p className="text-sm py-16 text-center" style={{ color: "var(--text-muted)" }}>
               Belum ada stock out untuk ditampilkan.
@@ -161,7 +168,7 @@ export default function InventorySummary({ products = [], movements = [], valuat
             Berdasarkan valuasi persediaan saat ini.
           </p>
           {categoryChart.length > 0 ? (
-            <ResponsiveContainer width="99%" height={280}>
+            <ChartContainer config={{}} className="w-full aspect-auto" style={{ height: 280 }}>
               <PieChart>
                 <Pie
                   data={categoryChart}
@@ -176,10 +183,10 @@ export default function InventorySummary({ products = [], movements = [], valuat
                     <Cell key={c.name} fill={COLORS[i % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip formatter={(v) => fmtRp(v)} contentStyle={TOOLTIP_STYLE} />
-                <Legend wrapperStyle={{ fontSize: 11 }} />
+                <ChartTooltip content={<ChartTooltipContent formatter={(v) => fmtRp(v)} />} />
+                <ChartLegend content={<ChartLegendContent />} />
               </PieChart>
-            </ResponsiveContainer>
+            </ChartContainer>
           ) : (
             <p className="text-sm py-16 text-center" style={{ color: "var(--text-muted)" }}>
               Belum ada data valuasi kategori.
