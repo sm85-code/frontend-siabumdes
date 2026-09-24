@@ -12,18 +12,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import PeriodFilter from "@/components/PeriodFilter";
 
-const MONTHS = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-const YEAR_MIN = 2022, YEAR_MAX = 2030;
-const YEARS = Array.from({ length: YEAR_MAX - YEAR_MIN + 1 }, (_, i) => YEAR_MIN + i);
 const pad = (n) => String(n).padStart(2, "0");
 const today = new Date();
 const currentYear = today.getFullYear();
 const currentMonth = today.getMonth() + 1;
-const monthRange = (year, month) => {
-  const lastDay = new Date(year, month, 0).getDate();
-  return { start: `${year}-${pad(month)}-01`, end: `${year}-${pad(month)}-${pad(lastDay)}` };
-};
 
 // Sub-tabs report: keys sama untuk BUMDES dan Unit — backend pakai unit_usaha_id untuk scoping.
 const REPORTS = [
@@ -40,16 +34,14 @@ export default function Reports() {
   const isPengelola = user?.role === "pengelola";
   const isAdmin = user?.role === "admin";
 
-  const [year, setYear] = useState(currentYear);
-  const [month, setMonth] = useState(currentMonth);
-  const [periodMode, setPeriodMode] = useState("monthly");
-  const [customPreset, setCustomPreset] = useState("ytd");
-  const [customStart, setCustomStart] = useState(`${currentYear}-01-01`);
-  const [customEnd, setCustomEnd] = useState(new Date().toISOString().slice(0, 10));
-  const { start: monthlyStart, end: monthlyEnd } = monthRange(year, month);
-  const customRange = customPreset === "ytd" ? [`${year}-01-01`, new Date().toISOString().slice(0, 10)] : customPreset === "qtd" ? [`${year}-${String(Math.floor((month - 1) / 3) * 3 + 1).padStart(2, "0")}-01`, new Date().toISOString().slice(0, 10)] : customPreset === "mtd" ? [`${year}-${String(month).padStart(2, "0")}-01`, new Date().toISOString().slice(0, 10)] : [customStart, customEnd];
-  const start = periodMode === "yearly" ? `${year}-01-01` : periodMode === "custom" ? customRange[0] : monthlyStart;
-  const end = periodMode === "yearly" ? `${year}-12-31` : periodMode === "custom" ? customRange[1] : monthlyEnd;
+  const [period, setPeriod] = useState({
+    mode: "monthly",
+    startDate: `${currentYear}-${pad(currentMonth)}-01`,
+    endDate: `${currentYear}-${pad(currentMonth)}-${pad(new Date(currentYear, currentMonth, 0).getDate())}`,
+    label: `Bulan ${currentMonth}/${currentYear}`,
+  });
+  const start = period.startDate;
+  const end = period.endDate;
   // tab: laporan | tutup-buku
   const [tab, setTab] = useState("laporan");
   const [active, setActive] = useState("laba-rugi");
@@ -202,45 +194,14 @@ export default function Reports() {
                 </Select>
               </div>
               <div>
-                <label className="label" htmlFor="report-period-mode">Periode</label>
-                <Select value={periodMode} onValueChange={(v) => { setPeriodMode(v); setData(null); }}>
-                  <SelectTrigger id="report-period-mode" data-testid="report-period-mode"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="monthly">Bulanan</SelectItem>
-                    <SelectItem value="yearly">Tahunan</SelectItem>
-                    <SelectItem value="custom">Custom</SelectItem>
-                  </SelectContent>
-                </Select>
-                {periodMode === "custom" && <>
-                  <Select value={customPreset} onValueChange={(v) => setCustomPreset(v)}>
-                    <SelectTrigger className="mt-2"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="ytd">Year to Date</SelectItem>
-                      <SelectItem value="qtd">Quarter to Date</SelectItem>
-                      <SelectItem value="mtd">Month to Date</SelectItem>
-                      <SelectItem value="dates">Pilih tanggal</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  {customPreset === "dates" && <div className="grid grid-cols-2 gap-2 mt-2"><Input type="date" value={customStart} onChange={(e) => setCustomStart(e.target.value)} /><Input type="date" value={customEnd} onChange={(e) => setCustomEnd(e.target.value)} /></div>}
-                </>}
-              </div>
-              {periodMode === "monthly" && <div>
-                <label className="label" htmlFor="report-month">Bulan</label>
-                <Select value={String(month)} onValueChange={(v) => { setMonth(Number(v)); setData(null); }}>
-                  <SelectTrigger id="report-month" data-testid="report-month"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {MONTHS.map((m, i) => <SelectItem key={m} value={String(i + 1)}>{m}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>}
-              <div>
-                <label className="label" htmlFor="report-year">Tahun</label>
-                <Select value={String(year)} onValueChange={(v) => { setYear(Number(v)); setData(null); }}>
-                  <SelectTrigger id="report-year" data-testid="report-year"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {YEARS.map(y => <SelectItem key={y} value={String(y)}>{y}</SelectItem>)}
-                  </SelectContent>
-                </Select>
+                <label className="label" htmlFor="report-period-filter">Periode</label>
+                <PeriodFilter
+                  value={period}
+                  onChange={(next) => { setPeriod(next); setData(null); }}
+                  defaultMode="monthly"
+                  data-testid="report-period-filter"
+                  className="w-full"
+                />
               </div>
               <Button data-testid="btn-load-report" onClick={load}>
                 {loading ? <Spinner size={18} label="Memuat..." /> : "Tampilkan Laporan"}
