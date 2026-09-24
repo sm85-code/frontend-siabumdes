@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-route
 import { AuthProvider, useAuth } from "@/lib/auth";
 import Layout from "@/components/Layout";
 import Spinner from "@/components/Spinner";
+import ErrorBoundary from "@/components/ErrorBoundary";
 const Landing = lazy(() => import("@/pages/Landing"));
 const Login = lazy(() => import("@/pages/Login"));
 const ChangePassword = lazy(() => import("@/pages/ChangePassword"));
@@ -29,7 +30,11 @@ function PageFallback() {
 }
 
 function LazyPage({ children }) {
-  return <Suspense fallback={<PageFallback />}>{children}</Suspense>;
+  return (
+    <ErrorBoundary context="page">
+      <Suspense fallback={<PageFallback />}>{children}</Suspense>
+    </ErrorBoundary>
+  );
 }
 
 const ROLES_REPORTS = ["admin", "direktur", "bendahara", "pengelola", "pengawas", "penasihat"];
@@ -54,28 +59,30 @@ function Protected({ children, roles }) {
 function App() {
   return (
     <div className="App">
-      <BrowserRouter>
-        <AuthProvider>
-          <Routes>
-            <Route path="/" element={<LazyPage><Landing /></LazyPage>} />
-            <Route path="/login" element={<LazyPage><Login /></LazyPage>} />
-            <Route path="/change-password" element={<Protected><LazyPage><ChangePassword /></LazyPage></Protected>} />
-            <Route path="/profile" element={<Protected><LazyPage><ProfilePage /></LazyPage></Protected>} />
-            <Route path="/dashboard" element={<Protected><LazyPage><Dashboard /></LazyPage></Protected>} />
-            <Route path="/transactions" element={<Protected><LazyPage><Transactions /></LazyPage></Protected>} />
-            <Route path="/reports" element={<Protected roles={ROLES_REPORTS}><LazyPage><Reports /></LazyPage></Protected>} />
-            <Route path="/reports/per-unit" element={<Protected><LazyPage><ReportsPerUnit /></LazyPage></Protected>} />
-            <Route path="/ledger" element={<Protected roles={ROLES_LEDGER}><LazyPage><BukuBesar /></LazyPage></Protected>} />
-            <Route path="/unit-usaha" element={<Protected><LazyPage><UnitUsahaPage /></LazyPage></Protected>} />
-            <Route path="/mitra" element={<Protected><LazyPage><MitraPage /></LazyPage></Protected>} />
-            <Route path="/accounts" element={<Protected roles={ROLES_COA}><LazyPage><COAPage /></LazyPage></Protected>} />
-            <Route path="/inventory" element={<Protected roles={ROLES_INVENTORY}><LazyPage><Inventory /></LazyPage></Protected>} />
-            <Route path="/users" element={<Protected roles={ROLES_USERS}><LazyPage><UsersPage /></LazyPage></Protected>} />
-            <Route path="/profil-bumdes" element={<Protected roles={ROLES_ORG_PROFILE}><LazyPage><OrgProfilePage /></LazyPage></Protected>} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </AuthProvider>
-      </BrowserRouter>
+      <ErrorBoundary context="app">
+        <BrowserRouter>
+          <AuthProvider>
+            <Routes>
+              <Route path="/" element={<LazyPage><Landing /></LazyPage>} />
+              <Route path="/login" element={<LazyPage><Login /></LazyPage>} />
+              <Route path="/change-password" element={<Protected><LazyPage><ChangePassword /></LazyPage></Protected>} />
+              <Route path="/profile" element={<Protected><LazyPage><ProfilePage /></LazyPage></Protected>} />
+              <Route path="/dashboard" element={<Protected><LazyPage><Dashboard /></LazyPage></Protected>} />
+              <Route path="/transactions" element={<Protected><LazyPage><Transactions /></LazyPage></Protected>} />
+              <Route path="/reports" element={<Protected roles={ROLES_REPORTS}><LazyPage><Reports /></LazyPage></Protected>} />
+              <Route path="/reports/per-unit" element={<Protected><LazyPage><ReportsPerUnit /></LazyPage></Protected>} />
+              <Route path="/ledger" element={<Protected roles={ROLES_LEDGER}><LazyPage><BukuBesar /></LazyPage></Protected>} />
+              <Route path="/unit-usaha" element={<Protected><LazyPage><UnitUsahaPage /></LazyPage></Protected>} />
+              <Route path="/mitra" element={<Protected><LazyPage><MitraPage /></LazyPage></Protected>} />
+              <Route path="/accounts" element={<Protected roles={ROLES_COA}><LazyPage><COAPage /></LazyPage></Protected>} />
+              <Route path="/inventory" element={<Protected roles={ROLES_INVENTORY}><LazyPage><Inventory /></LazyPage></Protected>} />
+              <Route path="/users" element={<Protected roles={ROLES_USERS}><LazyPage><UsersPage /></LazyPage></Protected>} />
+              <Route path="/profil-bumdes" element={<Protected roles={ROLES_ORG_PROFILE}><LazyPage><OrgProfilePage /></LazyPage></Protected>} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </AuthProvider>
+        </BrowserRouter>
+      </ErrorBoundary>
     </div>
   );
 }
