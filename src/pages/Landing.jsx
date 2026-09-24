@@ -4,14 +4,22 @@ import axios from "axios";
 import { fmtRp, API } from "@/lib/api";
 import Spinner from "@/components/Spinner";
 import {
-  LineChart, Line, XAxis, YAxis, Tooltip,
-  CartesianGrid, ResponsiveContainer, Legend,
+  LineChart, Line, XAxis, YAxis,
+  CartesianGrid,
 } from "recharts";
 import { ArrowRight, Buildings, HandHeart, ChartLineUp } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  ChartContainer, ChartTooltip, ChartTooltipContent,
+  ChartLegend, ChartLegendContent,
+} from "@/components/ui/chart";
 
 const MONTH_LABELS = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Ags","Sep","Okt","Nov","Des"];
+const TREND_CHART_CONFIG = {
+  pendapatan: { label: "Pendapatan", color: "var(--chart-2)" },
+  beban: { label: "Beban", color: "var(--chart-1)" },
+};
 
 export default function Landing() {
   const [data, setData] = useState(null);
@@ -50,7 +58,7 @@ export default function Landing() {
           Papan Kinerja · BUMDes · Tahun {year}
         </p>
         <h1 className="modern-brand-title text-3xl sm:text-5xl">
-          SIA BUMDes <span style={{ color: "#1C8A8A" }}>Karya Raharja</span>
+          SIA BUMDes <span style={{ color: "var(--chart-1)" }}>Karya Raharja</span>
         </h1>
         <p className="mt-4 text-sm sm:text-base" style={{ color: "var(--text-secondary)" }}>
           Sistem Informasi Akuntansi & Transparansi Keuangan Terintegrasi.<br />
@@ -77,18 +85,18 @@ export default function Landing() {
           <CardContent className="pt-6">
             <h3 className="font-heading text-lg mb-1">Tren Pendapatan & Beban {year}</h3>
             <p className="text-xs mb-4" style={{ color: "var(--text-muted)" }}>Diperbarui langsung dari transaksi resmi.</p>
-            <ResponsiveContainer width="99%" height={220}>
+            <ChartContainer config={TREND_CHART_CONFIG} className="w-full aspect-auto" style={{ height: 220 }}>
               <LineChart data={trend} margin={{ top: 8, right: 12, left: -4, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#E3E8E6" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--legacy-border, #E3E8E6)" vertical={false} />
                 <XAxis dataKey="label" tick={{ fontSize: 10, fill: "var(--text-muted)" }} tickLine={false} axisLine={false} />
                 <YAxis tick={{ fontSize: 10, fill: "var(--text-muted)" }} tickLine={false} axisLine={false}
                        tickFormatter={(v) => v >= 1000000 ? `${Math.round(v/1_000_000)}jt` : v >= 1000 ? `${Math.round(v/1000)}rb` : v} width={44} />
-                <Tooltip formatter={(v) => fmtRp(v)} contentStyle={{ background: "#fff", border: "1px solid #E3E8E6", borderRadius: 12, fontSize: 11 }} />
-                <Legend wrapperStyle={{ fontSize: 11 }} iconType="circle" iconSize={8} />
-                <Line type="monotone" dataKey="pendapatan" name="Pendapatan" stroke="#14353A" strokeWidth={2} dot={{ r: 3, fill: "#14353A" }} />
-                <Line type="monotone" dataKey="beban" name="Beban" stroke="#1C8A8A" strokeWidth={2} dot={{ r: 3, fill: "#1C8A8A" }} />
+                <ChartTooltip content={<ChartTooltipContent formatter={(v) => fmtRp(v)} />} />
+                <ChartLegend content={<ChartLegendContent />} />
+                <Line type="monotone" dataKey="pendapatan" name="Pendapatan" stroke="var(--color-pendapatan)" strokeWidth={2} dot={{ r: 3, fill: "var(--color-pendapatan)" }} />
+                <Line type="monotone" dataKey="beban" name="Beban" stroke="var(--color-beban)" strokeWidth={2} dot={{ r: 3, fill: "var(--color-beban)" }} />
               </LineChart>
-            </ResponsiveContainer>
+            </ChartContainer>
           </CardContent>
           </Card>
         </section>
