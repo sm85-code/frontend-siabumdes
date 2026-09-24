@@ -36,32 +36,32 @@ select option { background: #fff; color: var(--text-primary); }
 [style*="#5BA8A0"], [style*="#C45C2A"], [style*="#8B6A3F"], [style*="#B89A5A"],
 [style*="#C4A35A"], [style*="#E8A07A"], [style*="#B47536"], [style*="#E0B36A"],
 [style*="#1A2E1E"], [style*="#1F4E3D"], [style*="#3BA8C4"], [style*="#1E4A5A"] {
-  color: #4C0519 !important;
+  color: #172554 !important;
 }
 [style*="#DCE8FE"], [style*="#DCEFF7"], [style*="#E8EEF6"], [style*="#D6E4FA"],
 [style*="#EEF3F9"], [style*="#F6FAFE"], [style*="#E4F3F0"], [style*="#F3E0D2"],
 [style*="#EDE4D6"], [style*="#F8DCE3"], [style*="#F8E8D4"], [style*="#F3E9D4"],
 [style*="#F8E8C8"], [style*="#F3E6C8"], [style*="#EAF4F2"], [style*="#F4FAF8"],
 [style*="#E6EDF3"], [style*="#D7E6EE"] {
-  background: #FFF1F2 !important;
+  background: #EFF6FF !important;
 }
 [fill="#7BA7E1"], [fill="#4A9DC1"], [fill="#2E4F7C"], [fill="#4C86C4"],
 [fill="#C45C2A"], [fill="#1F2A24"], [fill="#3E8B86"], [fill="#8B6A3F"],
-[fill="#B89A5A"], [fill="#E8A07A"], [fill="#8E88A5"], [fill="#3BA8C4"] { fill: #E11D48 !important; }
+[fill="#B89A5A"], [fill="#E8A07A"], [fill="#8E88A5"], [fill="#3BA8C4"] { fill: #2563EB !important; }
 [stroke="#7BA7E1"], [stroke="#4A9DC1"], [stroke="#C45C2A"], [stroke="#1F2A24"],
 [stroke="#3E8B86"], [stroke="#8B6A3F"], [stroke="#B89A5A"], [stroke="#2E4F7C"],
-[stroke="#3BA8C4"] { stroke: #E11D48 !important; }
+[stroke="#3BA8C4"] { stroke: #2563EB !important; }
 
 [color="#2E4F7C"], [color="#4C86C4"], [color="#3A5A7D"],
 [color="#3E8B86"], [color="#3E8B77"], [color="#B47536"],
 [color="#C4A35A"], [color="#E8A07A"], [color="#8E88A5"],
-[color="#1A2E1E"], [color="#1F4E3D"], [color="#3BA8C4"], [color="#1E4A5A"] { color: #4C0519 !important; }
+[color="#1A2E1E"], [color="#1F4E3D"], [color="#3BA8C4"], [color="#1E4A5A"] { color: #172554 !important; }
 
-.hover\:bg-yellow-50:hover { background: #FFF1F2 !important; }
+.hover\:bg-yellow-50:hover { background: #EFF6FF !important; }
 .hover\:bg-red-50:hover { background: #FEF2F2 !important; }
-.text-emerald-700, .text-green-700, .text-teal-700 { color: #4C0519 !important; }
+.text-emerald-700, .text-green-700, .text-teal-700 { color: #172554 !important; }
 .bg-emerald-50, .bg-green-50, .bg-amber-50, .bg-orange-50, .bg-pink-50, .bg-blue-50 {
-  background: #FFF1F2 !important;
+  background: #EFF6FF !important;
 }
 
 .month-scroll {
