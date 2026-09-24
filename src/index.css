@@ -9,9 +9,9 @@
   --bg: #FAFAFA;
   --surface: #FFFFFF;
   --legacy-border: #E4E4E7;
-  --primary-light: #FFF1F2;
-  --legacy-primary: #E11D48;
-  --primary-dark: #4C0519;
+  --primary-light: #EFF6FF;
+  --legacy-primary: #2563EB;
+  --primary-dark: #172554;
   --text-primary: #18181B;
   --text-secondary: #52525B;
   --text-muted: #A1A1AA;
@@ -20,7 +20,7 @@
   --status-error: #DC2626;
   --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.05), 0 8px 24px rgba(0, 0, 0, 0.04);
   --shadow-inset: inset 0 0 0 1px #E4E4E7;
-  --total-row-bg: rgba(225, 29, 72, 0.14);
+  --total-row-bg: rgba(37, 99, 235, 0.14);
   --chart-1: #e76f51;
   --chart-2: #2a9d8b;
   --chart-3: #264653;
@@ -36,11 +36,11 @@
   --radius-input: 0.75rem;
   --font-heading: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
   --font-body: 'Inter', system-ui, sans-serif;
-  --primary-hover: #BE123C;
-  --focus-ring: rgba(225, 29, 72, 0.12);
-  --zebra-tint: rgba(225, 29, 72, 0.025);
+  --primary-hover: #1D4ED8;
+  --focus-ring: rgba(37, 99, 235, 0.12);
+  --zebra-tint: rgba(37, 99, 235, 0.025);
 
-  /* shadcn/ui tokens: official "Rose" theme preset, paired with the "neutral" base color */
+  /* shadcn/ui tokens: official "Blue" theme preset, paired with the "neutral" base color */
   --radius: var(--radius-card);
   --background: 0 0% 100%;
   --foreground: 240 10% 3.9%;
@@ -48,8 +48,8 @@
   --card-foreground: 240 10% 3.9%;
   --popover: 0 0% 100%;
   --popover-foreground: 240 10% 3.9%;
-  --primary: 346.8 77.2% 49.8%;
-  --primary-foreground: 355.7 100% 97.3%;
+  --primary: 221.2 83.2% 53.3%;
+  --primary-foreground: 210 40% 98%;
   --secondary: 240 4.8% 95.9%;
   --secondary-foreground: 240 5.9% 10%;
   --muted: 240 4.8% 95.9%;
@@ -60,7 +60,7 @@
   --destructive-foreground: 0 0% 98%;
   --border: 240 5.9% 90%;
   --input: 240 5.9% 90%;
-  --ring: 346.8 77.2% 49.8%;
+  --ring: 221.2 83.2% 53.3%;
 }
 
 /* Pilihan font: independen dari tema, ditumpangkan lewat data-font di <html>.
