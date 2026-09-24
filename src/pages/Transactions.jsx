@@ -8,6 +8,7 @@ import { useSort } from "@/lib/useSort";
 import { Plus, Trash, Pencil, Receipt, FileArrowUp, DownloadSimple, FileXls, Paperclip, LinkSimple, GoogleDriveLogo, X } from "@phosphor-icons/react";
 import TableShell from "@/components/TableShell";
 import Spinner from "@/components/Spinner";
+import PeriodFilter, { resolveRange, fmtRangeLabel } from "@/components/PeriodFilter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -21,9 +22,6 @@ import {
   Table, TableHeader, TableBody, TableRow, TableHead, TableCell,
 } from "@/components/ui/table";
 
-const MONTHS = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
-const YEAR_MIN = 2022, YEAR_MAX = 2030;
-const YEARS = Array.from({ length: YEAR_MAX - YEAR_MIN + 1 }, (_, i) => YEAR_MIN + i);
 const pad = (n) => String(n).padStart(2, "0");
 
 const emptyForm = {
@@ -133,14 +131,14 @@ export default function Transactions() {
     } catch (er) { notify("Gagal hapus: " + er.message); }
   };
 
-  // Unified tab + month filter
+  // Unified tab + period filter
   const [activeGroup, setActiveGroup] = useState("BUMDES"); // BUMDES | UU01..UU06
-  const [year, setYear] = useState(new Date().getFullYear());
-  const [month, setMonth] = useState(new Date().getMonth() + 1);
-  const [periodMode, setPeriodMode] = useState("monthly");
-  const [customPreset, setCustomPreset] = useState("ytd");
-  const [customStart, setCustomStart] = useState(`${new Date().getFullYear()}-01-01`);
-  const [customEnd, setCustomEnd] = useState(new Date().toISOString().slice(0, 10));
+  const [period, setPeriod] = useState(() => {
+    const now = new Date();
+    const range = resolveRange("monthly", { monthValue: `${now.getFullYear()}-${pad(now.getMonth() + 1)}` });
+    return { mode: "monthly", startDate: range.startDate, endDate: range.endDate };
+  });
+  const periodLabel = fmtRangeLabel(period.startDate, period.endDate);
   const [selected, setSelected] = useState(new Set());
 
   const load = useCallback(async () => {
@@ -334,16 +332,12 @@ export default function Transactions() {
       : tabs;
   }, [units, isPengelola, user]);
 
-  // Filter tx by activeGroup + month/year
+  // Filter tx by activeGroup + period
   const activeUnitId = useMemo(() => {
     if (activeGroup === "BUMDES") return null;
     return units.find(u => u.code === activeGroup)?.id || null;
   }, [activeGroup, units]);
 
-  const monthPrefix = `${year}-${pad(month)}`;
-  const customStartDate = customPreset === "ytd" ? `${year}-01-01` : customPreset === "qtd" ? `${year}-${pad(Math.floor((month - 1) / 3) * 3 + 1)}-01` : customPreset === "mtd" ? `${year}-${pad(month)}-01` : customStart;
-  const customEndDate = customPreset === "ytd" || customPreset === "qtd" || customPreset === "mtd" ? new Date().toISOString().slice(0, 10) : customEnd;
-  const yearPrefix = `${year}-`;
   const filteredTxs = useMemo(() => {
   // Deep-link dari Inventory (?reference=...): backend sudah filter persis
   // yang diminta, jangan disaring lagi oleh periode/unit yang sedang aktif
@@ -352,15 +346,15 @@ export default function Transactions() {
   if (refFilter) return txs;
   return txs.filter(t => {
   const inGroup = activeGroup === "BUMDES" ? !t.unit_usaha_id : t.unit_usaha_id === activeUnitId;
-  const inPeriod = periodMode === "yearly" ? (t.date || "").startsWith(yearPrefix) : periodMode === "custom" ? (t.date || "") >= customStartDate && (t.date || "") <= customEndDate : (t.date || "").startsWith(monthPrefix);
+  const inPeriod = (t.date || "") >= period.startDate && (t.date || "") <= period.endDate;
   return inGroup && inPeriod;
   });
-  }, [txs, activeGroup, activeUnitId, monthPrefix, yearPrefix, periodMode, customStartDate, customEndDate, refFilter]);
+  }, [txs, activeGroup, activeUnitId, period.startDate, period.endDate, refFilter]);
 
   const sortState = useSort(filteredTxs, "date", "desc");
 
-  // Reset selection when tab/month changes
-  useEffect(() => { setSelected(new Set()); }, [activeGroup, year, month]);
+  // Reset selection when tab/period changes
+  useEffect(() => { setSelected(new Set()); }, [activeGroup, period.startDate, period.endDate]);
 
   const toggleSel = (id) => setSelected(prev => {
     const n = new Set(prev);
@@ -372,16 +366,12 @@ export default function Transactions() {
     if (sortState.sorted.length === 0) {
 const proceed = await confirm({
   title: "Export tanpa transaksi",
-  description: `Tidak ada transaksi ${activeGroup} pada ${MONTHS[month - 1]} ${year}. Tetap unduh file kosong?`,
+  description: `Tidak ada transaksi ${activeGroup} pada ${periodLabel}. Tetap unduh file kosong?`,
   confirmLabel: "Unduh file",
   });
   if (!proceed) return;
     }
-  const first = periodMode === "yearly" ? `${year}-01-01` : periodMode === "custom" ? customStartDate : `${year}-${pad(month)}-01`;
-  // Use local-date components (avoid toISOString UTC-shift bug)
-  const jsLast = periodMode === "yearly" ? new Date(year, 12, 0) : periodMode === "custom" ? new Date(`${customEndDate}T00:00:00`) : new Date(year, month, 0);
-    const last = `${jsLast.getFullYear()}-${pad(jsLast.getMonth() + 1)}-${pad(jsLast.getDate())}`;
-    const params = new URLSearchParams({ start_date: first, end_date: last });
+    const params = new URLSearchParams({ start_date: period.startDate, end_date: period.endDate });
     if (activeGroup === "BUMDES") params.set("unit_usaha_id", "");
     else if (activeUnitId) params.set("unit_usaha_id", activeUnitId);
     const res = await fetch(`${API}/transactions/export?${params}`, { credentials: "include" });
@@ -390,7 +380,7 @@ const proceed = await confirm({
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `Transaksi_${activeGroup}_${first}_sd_${last}.xlsx`;
+    a.download = `Transaksi_${activeGroup}_${period.startDate}_sd_${period.endDate}.xlsx`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -605,10 +595,10 @@ if (!(await confirm({
         </Card>
       )}
 
-      {/* Unified group and monthly period filters */}
+      {/* Unified group and period filters */}
       <Card data-testid="tx-filters">
         <CardContent className="p-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-start">
+          <div className="flex flex-wrap gap-3 items-end">
             <div className="space-y-1.5">
               <Label htmlFor="tx-group-select">Kelompok</Label>
               <Select value={activeGroup} onValueChange={setActiveGroup} disabled={isPengelola}>
@@ -621,63 +611,11 @@ if (!(await confirm({
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="tx-period-mode">Periode</Label>
-              <Select value={periodMode} onValueChange={setPeriodMode}>
-                <SelectTrigger id="tx-period-mode" data-testid="tx-period-mode">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="monthly">Bulanan</SelectItem>
-                  <SelectItem value="yearly">Tahunan</SelectItem>
-                  <SelectItem value="custom">Custom</SelectItem>
-                </SelectContent>
-              </Select>
-              {periodMode === "custom" && <>
-                <Select value={customPreset} onValueChange={setCustomPreset}>
-                  <SelectTrigger className="mt-2">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="ytd">Year to Date</SelectItem>
-                    <SelectItem value="qtd">Quarter to Date</SelectItem>
-                    <SelectItem value="mtd">Month to Date</SelectItem>
-                    <SelectItem value="dates">Pilih tanggal</SelectItem>
-                  </SelectContent>
-                </Select>
-                {customPreset === "dates" && (
-                  <div className="grid grid-cols-2 gap-2 mt-2">
-                    <Input type="date" value={customStart} onChange={(e) => setCustomStart(e.target.value)} />
-                    <Input type="date" value={customEnd} onChange={(e) => setCustomEnd(e.target.value)} />
-                  </div>
-                )}
-              </>}
-            </div>
-            {periodMode === "monthly" && (
-              <div className="space-y-1.5">
-                <Label htmlFor="tx-month">Bulan</Label>
-                <Select value={String(month)} onValueChange={(v) => setMonth(Number(v))}>
-                  <SelectTrigger id="tx-month" data-testid="tx-month">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {MONTHS.map((m, i) => <SelectItem key={m} value={String(i + 1)}>{m}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-            <div className="space-y-1.5">
-              <Label htmlFor="tx-year">Tahun</Label>
-              <Select value={String(year)} onValueChange={(v) => setYear(Number(v))}>
-                <SelectTrigger id="tx-year" data-testid="tx-year">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {YEARS.map(y => <SelectItem key={y} value={String(y)}>{y}</SelectItem>)}
-                </SelectContent>
-              </Select>
+              <Label>Periode</Label>
+              <PeriodFilter value={period} onChange={setPeriod} defaultMode="monthly" data-testid="tx-period-filter" />
             </div>
             <div className="text-xs px-3 py-2 rounded-lg bg-primary/10 text-primary font-semibold">
-              Tampilkan: {MONTHS[month - 1]} {year} · {activeGroup}
+              Tampilkan: {periodLabel} · {activeGroup}
             </div>
             {canBulkDelete && selected.size > 0 && (
               <Button data-testid="btn-bulk-delete" onClick={bulkDelete}
@@ -693,7 +631,7 @@ if (!(await confirm({
       <Card className="p-0 overflow-hidden">
         <CardHeader className="p-4 border-b bg-primary/10 space-y-0.5">
           <CardTitle className="font-heading font-semibold text-base" data-testid="tx-table-title">
-            Transaksi {activeGroup} — {MONTHS[month - 1]} {year}
+            Transaksi {activeGroup} — {periodLabel}
           </CardTitle>
           <p className="text-xs text-muted-foreground">
             {sortState.sorted.length} transaksi ditemukan.
@@ -733,7 +671,7 @@ if (!(await confirm({
                 <TableRow><TableCell colSpan={99} className="text-center py-10">
                   <Receipt size={32} weight="duotone" className="text-muted-foreground mx-auto mb-2" />
                   <div className="text-muted-foreground">
-                    Belum ada transaksi <b>{activeGroup}</b> pada <b>{MONTHS[month - 1]} {year}</b>.
+                    Belum ada transaksi <b>{activeGroup}</b> pada <b>{periodLabel}</b>.
                   </div>
                 </TableCell></TableRow>
               ) : sortState.sorted.map((t) => (
