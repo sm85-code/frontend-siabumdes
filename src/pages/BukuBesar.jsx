@@ -1,14 +1,15 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import api, { fmtRp, fmtDate, API } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { notify } from "@/lib/feedback";
-import { Books, MagnifyingGlass, FilePdf, FileXls, FileDoc } from "@phosphor-icons/react";
+import { Books, MagnifyingGlass, FilePdf, FileXls, FileDoc, CaretUpDown, Check } from "@phosphor-icons/react";
 import TableShell from "@/components/TableShell";
 import Spinner from "@/components/Spinner";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
@@ -123,7 +124,7 @@ export default function BukuBesar() {
           <Books size={26} weight="duotone" color="var(--primary-dark)" /> Buku Besar per Akun
         </h1>
         <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
-          Tiap kelompok punya buku besar sendiri. Pilih tab kelompok terlebih dahulu, lalu klik akun untuk melihat riwayat transaksinya.
+          Tiap kelompok punya buku besar sendiri. Pilih kelompok terlebih dahulu, lalu pilih akun dari dropdown untuk melihat riwayat transaksinya.
         </p>
       </div>
 
@@ -186,54 +187,25 @@ export default function BukuBesar() {
             </SelectContent>
           </Select>
         </div>
-        <div className="sm:col-span-3">
-          <label className="label" htmlFor="ledger-search">Cari Akun</label>
-          <div className="relative">
-            <MagnifyingGlass size={16} aria-hidden="true" className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" color="var(--text-muted)" />
-            <Input id="ledger-search" data-testid="ledger-search" className="pl-10"
-                   placeholder="Cari berdasarkan kode atau nama akun"
-                   value={search} onChange={(e) => setSearch(e.target.value)} />
-          </div>
+        <div className="sm:col-span-2 lg:col-span-3">
+          <label className="label" htmlFor="ledger-account-select">Akun</label>
+          <AccountCombobox
+            accounts={filteredAccounts}
+            group={group}
+            selected={selected}
+            onSelect={setSelected}
+            search={search}
+            onSearchChange={setSearch}
+          />
         </div>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Left: list akun */}
-        <Card className="p-0 overflow-hidden lg:col-span-1" style={{ maxHeight: 600, overflowY: "auto" }}>
-          <div className="p-4" style={{ borderBottom: "1px solid var(--legacy-border)", background: "var(--primary-light)" }}>
-            <p className="label mb-0">Akun {group} ({filteredAccounts.length})</p>
-          </div>
-          <ul data-testid="ledger-account-list">
-            {filteredAccounts.length === 0 ? (
-              <li className="p-4 text-sm text-center" style={{ color: "var(--text-muted)" }}>
-                Belum ada akun pada kelompok <b>{group}</b>.
-              </li>
-            ) : filteredAccounts.map(a => {
-              const active = a.code === selected;
-              return (
-                <li key={a.code}>
-                  <button data-testid={`ledger-acc-${a.code}`}
-                          onClick={() => setSelected(a.code)}
-                          className={cn(
-                            "w-full text-left px-4 py-2.5 border-b transition-colors",
-                            active ? "bg-primary/10" : "bg-transparent hover:bg-muted/50",
-                          )}
-                          style={{ borderColor: "var(--legacy-border)" }}>
-                    <div className={cn("font-mono text-xs font-semibold", active ? "text-primary" : "text-muted-foreground")}>{a.code}</div>
-                    <div className={cn("text-sm", active ? "text-primary" : "text-foreground")}>{a.name}</div>
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        </Card>
-
-        {/* Right: ledger detail */}
-        <div className="lg:col-span-3">
+      <div className="grid grid-cols-1 gap-6">
+        <div>
           {!selected ? (
             <Card className="text-center py-16">
               <Books size={40} weight="duotone" color="var(--text-muted)" style={{ margin: "0 auto 12px" }} />
-              <p style={{ color: "var(--text-muted)" }}>Pilih akun di sebelah kiri untuk melihat buku besar <b>{group}</b>.</p>
+              <p style={{ color: "var(--text-muted)" }}>Pilih akun dari dropdown di atas untuk melihat buku besar <b>{group}</b>.</p>
             </Card>
           ) : loading ? (
             <Card className="text-center py-10"><Spinner column size={40} className="justify-center" /></Card>
@@ -322,5 +294,83 @@ export default function BukuBesar() {
         </div>
       </div>
     </div>
+  );
+}
+
+function AccountCombobox({ accounts, group, selected, onSelect, search, onSearchChange }) {
+  const [open, setOpen] = useState(false);
+  const inputRef = useRef(null);
+  const selectedAccount = accounts.find(a => a.code === selected)
+    || (selected ? { code: selected, name: "" } : null);
+
+  return (
+    <Popover open={open} onOpenChange={(o) => { setOpen(o); if (o) setTimeout(() => inputRef.current?.focus(), 0); }}>
+      <PopoverTrigger asChild>
+        <Button
+          type="button"
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          id="ledger-account-select"
+          data-testid="ledger-account-select"
+          className="w-full justify-between font-normal"
+        >
+          {selectedAccount ? (
+            <span className="truncate text-left">
+              <span className="font-mono text-xs font-semibold mr-2">{selectedAccount.code}</span>
+              <span>{selectedAccount.name}</span>
+            </span>
+          ) : (
+            <span style={{ color: "var(--text-muted)" }}>Pilih akun {group}...</span>
+          )}
+          <CaretUpDown size={16} className="ml-2 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+        <div className="p-2" style={{ borderBottom: "1px solid var(--legacy-border)" }}>
+          <div className="relative">
+            <MagnifyingGlass size={16} aria-hidden="true" className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" color="var(--text-muted)" />
+            <Input
+              ref={inputRef}
+              id="ledger-search"
+              data-testid="ledger-search"
+              className="pl-10"
+              placeholder="Cari berdasarkan kode atau nama akun"
+              value={search}
+              onChange={(e) => onSearchChange(e.target.value)}
+            />
+          </div>
+        </div>
+        <ul data-testid="ledger-account-list" className="max-h-72 overflow-y-auto">
+          {accounts.length === 0 ? (
+            <li className="p-4 text-sm text-center" style={{ color: "var(--text-muted)" }}>
+              Belum ada akun pada kelompok <b>{group}</b>.
+            </li>
+          ) : accounts.map(a => {
+            const active = a.code === selected;
+            return (
+              <li key={a.code}>
+                <button
+                  type="button"
+                  data-testid={`ledger-acc-${a.code}`}
+                  onClick={() => { onSelect(a.code); setOpen(false); }}
+                  className={cn(
+                    "w-full text-left px-4 py-2.5 border-b transition-colors flex items-center justify-between gap-2",
+                    active ? "bg-primary/10" : "bg-transparent hover:bg-muted/50",
+                  )}
+                  style={{ borderColor: "var(--legacy-border)" }}
+                >
+                  <span>
+                    <span className={cn("block font-mono text-xs font-semibold", active ? "text-primary" : "text-muted-foreground")}>{a.code}</span>
+                    <span className={cn("block text-sm", active ? "text-primary" : "text-foreground")}>{a.name}</span>
+                  </span>
+                  {active && <Check size={16} className="text-primary shrink-0" />}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      </PopoverContent>
+    </Popover>
   );
 }

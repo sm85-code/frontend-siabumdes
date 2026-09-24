@@ -53,6 +53,8 @@ import {
   Wallet as LuWallet,
   HandCoins as LuHandCoins,
   FileType2 as LuFileType2,
+  ChevronsUpDown as LuChevronsUpDown,
+  Check as LuCheck,
 } from "lucide-react";
 
 /**
@@ -129,3 +131,5 @@ export const Truck = wrap(LuTruck);
 export const Users = wrap(LuUsersFlat);
 export const Wallet = wrap(LuWallet);
 export const HandCoins = wrap(LuHandCoins);
+export const CaretUpDown = wrap(LuChevronsUpDown);
+export const Check = wrap(LuCheck);
