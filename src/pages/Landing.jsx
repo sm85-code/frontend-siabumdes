@@ -132,7 +132,7 @@ function StatCard({ icon: Icon, label, value, testId }) {
     <Card data-testid={testId}>
       <CardContent className="pt-6">
         <div className="w-9 h-9 rounded-xl flex items-center justify-center mb-3" style={{ background: "var(--primary-light)" }}>
-          <Icon size={18} color="#14353A" />
+          <Icon size={18} color="var(--primary-dark)" />
         </div>
         <div className="text-[10px] tracking-[0.14em] font-semibold uppercase" style={{ color: "var(--text-muted)" }}>{label}</div>
         <div className="font-heading tabular-nums text-xl sm:text-2xl mt-1">{value}</div>
