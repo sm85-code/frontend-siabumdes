@@ -169,7 +169,7 @@ input[type="date"], input[type="month"] { appearance: none; color-scheme: light;
 .fade-in, .fade-slow { animation: fadeInSoft .28s ease both; }
 
 .table-shell--sticky .tbl thead th:first-child,
-.table-shell--sticky .tbl tbody td:first-child { position: sticky; left: 0; background: var(--surface); }
+.table-shell--sticky .tbl tbody td:first-child:not([colspan]) { position: sticky; left: 0; background: var(--surface); }
 .tab-strip { display: flex; gap: 0.4rem; overflow-x: auto; scrollbar-width: none; }
 .h-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
