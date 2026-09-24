@@ -12,10 +12,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import PeriodFilter from "@/components/PeriodFilter";
 
-const MONTHS = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-const YEAR_MIN = 2022, YEAR_MAX = 2030;
-const YEARS = Array.from({ length: YEAR_MAX - YEAR_MIN + 1 }, (_, i) => YEAR_MIN + i);
 const pad = (n) => String(n).padStart(2, "0");
 
 export default function BukuBesar() {
@@ -27,17 +25,14 @@ export default function BukuBesar() {
   const [group, setGroup] = useState("BUMDES"); // active tab
   const [selected, setSelected] = useState("");
   const [search, setSearch] = useState("");
-  const [year, setYear] = useState(new Date().getFullYear());
-  const [month, setMonth] = useState(new Date().getMonth() + 1);
-  const [periodMode, setPeriodMode] = useState("monthly");
-  const [customPreset, setCustomPreset] = useState("ytd");
-  const [customStart, setCustomStart] = useState(`${new Date().getFullYear()}-01-01`);
-  const [customEnd, setCustomEnd] = useState(new Date().toISOString().slice(0, 10));
-  const customStartDate = customPreset === "ytd" ? `${year}-01-01` : customPreset === "qtd" ? `${year}-${pad(Math.floor((month - 1) / 3) * 3 + 1)}-01` : customPreset === "mtd" ? `${year}-${pad(month)}-01` : customStart;
-  const customEndDate = customPreset === "ytd" || customPreset === "qtd" || customPreset === "mtd" ? new Date().toISOString().slice(0, 10) : customEnd;
-  const startDate = periodMode === "yearly" ? `${year}-01-01` : periodMode === "custom" ? customStartDate : `${year}-${pad(month)}-01`;
-  const lastDay = new Date(year, month, 0).getDate();
-  const endDate = periodMode === "yearly" ? `${year}-12-31` : periodMode === "custom" ? customEndDate : `${year}-${pad(month)}-${pad(lastDay)}`;
+  const now = new Date();
+  const [period, setPeriod] = useState({
+    mode: "monthly",
+    startDate: `${now.getFullYear()}-${pad(now.getMonth() + 1)}-01`,
+    endDate: `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate())}`,
+  });
+  const startDate = period.startDate;
+  const endDate = period.endDate;
   const [ledger, setLedger] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -141,51 +136,14 @@ export default function BukuBesar() {
           </Select>
         </div>
         <div>
-          <label className="label" htmlFor="ledger-period-mode">Periode</label>
-          <Select value={periodMode} onValueChange={(v) => { setPeriodMode(v); setSelected(""); setLedger(null); }}>
-            <SelectTrigger id="ledger-period-mode" data-testid="ledger-period-mode">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="monthly">Bulanan</SelectItem>
-              <SelectItem value="yearly">Tahunan</SelectItem>
-              <SelectItem value="custom">Custom</SelectItem>
-            </SelectContent>
-          </Select>
-          {periodMode === "custom" && <>
-            <Select value={customPreset} onValueChange={(v) => setCustomPreset(v)}>
-              <SelectTrigger className="mt-2"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ytd">Year to Date</SelectItem>
-                <SelectItem value="qtd">Quarter to Date</SelectItem>
-                <SelectItem value="mtd">Month to Date</SelectItem>
-                <SelectItem value="dates">Pilih tanggal</SelectItem>
-              </SelectContent>
-            </Select>
-            {customPreset === "dates" && <div className="grid grid-cols-2 gap-2 mt-2"><Input type="date" value={customStart} onChange={(e) => setCustomStart(e.target.value)} /><Input type="date" value={customEnd} onChange={(e) => setCustomEnd(e.target.value)} /></div>}
-          </>}
-        </div>
-        {periodMode === "monthly" && <div>
-          <label className="label" htmlFor="ledger-month">Bulan</label>
-          <Select value={String(month)} onValueChange={(v) => { setMonth(Number(v)); setSelected(""); setLedger(null); }}>
-            <SelectTrigger id="ledger-month" data-testid="ledger-month">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {MONTHS.map((m, i) => <SelectItem key={m} value={String(i + 1)}>{m}</SelectItem>)}
-            </SelectContent>
-          </Select>
-        </div>}
-        <div>
-          <label className="label" htmlFor="ledger-year">Tahun</label>
-          <Select value={String(year)} onValueChange={(v) => { setYear(Number(v)); setSelected(""); setLedger(null); }}>
-            <SelectTrigger id="ledger-year" data-testid="ledger-year">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {YEARS.map(y => <SelectItem key={y} value={String(y)}>{y}</SelectItem>)}
-            </SelectContent>
-          </Select>
+          <label className="label" htmlFor="ledger-period-filter">Periode</label>
+          <PeriodFilter
+            value={period}
+            onChange={(next) => { setPeriod(next); setSelected(""); setLedger(null); }}
+            defaultMode="monthly"
+            data-testid="ledger-period-filter"
+            className="w-full"
+          />
         </div>
         <div className="sm:col-span-2 lg:col-span-3">
           <label className="label" htmlFor="ledger-account-select">Akun</label>

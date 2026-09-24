@@ -10,10 +10,9 @@ import {
 import { TrendUp, TrendDown, Coin, Storefront, ReceiptX, CalendarBlank, Lock } from "@phosphor-icons/react";
 import TableShell from "@/components/TableShell";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import PeriodFilter from "@/components/PeriodFilter";
 
 const INK = "#14353A"; // --primary-dark
 const TEAL = "#1C8A8A"; // --primary
@@ -24,61 +23,19 @@ const PIE_LEGEND_STYLE = { fontSize: 11 };
 const yTickFormatter = (v) => (v >= 1e6 ? `${(v/1e6).toFixed(1)}Jt` : v >= 1e3 ? `${(v/1e3).toFixed(0)}rb` : v);
 
 const MONTHS = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
-const YEAR_MIN = 2022, YEAR_MAX = 2030;
-const YEARS = Array.from({ length: YEAR_MAX - YEAR_MIN + 1 }, (_, i) => YEAR_MIN + i);
 
-const PERIOD_OPTIONS = [
-  { key: "hari_ini", label: "Hari ini", granularity: "day", bucket: "day" },
-  { key: "minggu_ini", label: "Minggu ini", granularity: "day", bucket: "day" },
-  { key: "bulan_ini", label: "Bulan ini", granularity: "day", bucket: "week" },
-  { key: "3bulan", label: "3 bulan terakhir", granularity: "month", bucket: "month" },
-  { key: "6bulan", label: "6 bulan terakhir", granularity: "month", bucket: "month" },
-  { key: "bulanan", label: "Bulanan (pilih bulan)", granularity: "day", bucket: "week" },
-  { key: "tahunan", label: "Tahunan (pilih tahun)", granularity: "month", bucket: "month" },
-  { key: "custom", label: "Custom (tanggal awal – akhir)", granularity: "month", bucket: "month" },
-];
+// Chart granularity/bucketing is driven by the selected PeriodFilter mode.
+const MODE_CHART_CONFIG = {
+  today: { granularity: "day", bucket: "day" },
+  week: { granularity: "day", bucket: "day" },
+  thisMonth: { granularity: "day", bucket: "week" },
+  monthly: { granularity: "day", bucket: "week" },
+  yearly: { granularity: "month", bucket: "month" },
+  custom: { granularity: "month", bucket: "month" },
+};
 
 function pad(n) { return String(n).padStart(2, "0"); }
 function iso(d) { return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; }
-
-function computeRange({ period, month, year, customStart, customEnd }) {
-  const now = new Date();
-  const endToday = iso(now);
-  switch (period) {
-    case "hari_ini":
-      return { start: endToday, end: endToday };
-    case "minggu_ini": {
-      const day = now.getDay() || 7;
-      const start = new Date(now); start.setDate(now.getDate() - (day - 1));
-      return { start: iso(start), end: endToday };
-    }
-    case "bulan_ini": {
-      const start = new Date(now.getFullYear(), now.getMonth(), 1);
-      return { start: iso(start), end: endToday };
-    }
-    case "3bulan": {
-      const start = new Date(now); start.setMonth(now.getMonth() - 2); start.setDate(1);
-      return { start: iso(start), end: endToday };
-    }
-    case "6bulan": {
-      const start = new Date(now); start.setMonth(now.getMonth() - 5); start.setDate(1);
-      return { start: iso(start), end: endToday };
-    }
-    case "bulanan": {
-      const y = now.getFullYear();
-      const start = new Date(y, month - 1, 1);
-      const end = new Date(y, month, 0);
-      return { start: iso(start), end: iso(end) };
-    }
-    case "tahunan": {
-      return { start: `${year}-01-01`, end: `${year}-12-31` };
-    }
-    case "custom":
-      return { start: customStart, end: customEnd };
-    default:
-      return { start: undefined, end: endToday };
-  }
-}
 
 function bucketize(list, targetBucket) {
   if (!list || list.length === 0) return [];
@@ -121,36 +78,27 @@ function labelize(key, bucket) {
   return key;
 }
 
-function periodLabel(state) {
-  const opt = PERIOD_OPTIONS.find(p => p.key === state.period);
-  if (state.period === "bulanan") return `${MONTHS[state.month - 1]} ${new Date().getFullYear()}`;
-  if (state.period === "tahunan") return `Tahun ${state.year}`;
-  if (state.period === "custom") return `${state.customStart} s.d. ${state.customEnd}`;
-  return opt?.label || "";
-}
-
 export default function Dashboard() {
   const { user } = useAuth();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const [state, setState] = useState({
-    period: "tahunan",
-    month: new Date().getMonth() + 1,
-    year: new Date().getFullYear(),
-    customStart: `${YEAR_MIN}-01-01`,
-    customEnd: iso(new Date()),
+  const now = new Date();
+  const [period, setPeriod] = useState({
+    mode: "yearly",
+    startDate: `${now.getFullYear()}-01-01`,
+    endDate: `${now.getFullYear()}-12-31`,
+    label: `Tahun ${now.getFullYear()}`,
   });
 
-  const currentOpt = PERIOD_OPTIONS.find(p => p.key === state.period) || PERIOD_OPTIONS[6];
+  const chartConfig = MODE_CHART_CONFIG[period.mode] || MODE_CHART_CONFIG.yearly;
 
   useEffect(() => {
     setLoading(true);
-    const { start, end } = computeRange(state);
     api.get("/reports/dashboard", {
-      params: { start_date: start, end_date: end, granularity: currentOpt.granularity },
+      params: { start_date: period.startDate, end_date: period.endDate, granularity: chartConfig.granularity },
     }).then((r) => setData(r.data)).finally(() => setLoading(false));
-  }, [state, currentOpt.granularity]);
+  }, [period, chartConfig.granularity]);
 
   const kpis = useMemo(() => data ? [
     { key: "pendapatan", label: "Total Pendapatan", value: data.total_pendapatan, icon: TrendUp },
@@ -161,16 +109,15 @@ export default function Dashboard() {
 
   const chartData = useMemo(() => {
     if (!data?.monthly) return [];
-    return bucketize(data.monthly, currentOpt.bucket);
-  }, [data, currentOpt.bucket]);
+    return bucketize(data.monthly, chartConfig.bucket);
+  }, [data, chartConfig.bucket]);
   const useBar = chartData.length <= 1;
 
   if (loading && !data) return <div className="flex items-center justify-center min-h-[60vh]"><Spinner column size={48} label="Memuat dashboard..." /></div>;
   if (!data) return <div className="text-sm" style={{ color: "var(--text-muted)" }}>Tidak ada data.</div>;
 
   const jabatan = ROLE_LABELS[user?.role] || "Pengguna";
-  const pLabel = periodLabel(state);
-  const chip = { background: "var(--bg)", color: INK, fontWeight: 600, boxShadow: "var(--shadow-inset)" };
+  const pLabel = period.label;
   const icoBox = { background: "var(--bg)", boxShadow: "var(--shadow-inset)" };
 
   return (
@@ -211,59 +158,11 @@ export default function Dashboard() {
 
       <Card data-testid="period-card">
         <CardContent className="p-4">
-        <div className="flex flex-wrap items-end gap-3">
-          <div className="flex-1 min-w-[220px]">
-            <label className="label flex items-center gap-1">
-              <CalendarBlank size={14} color={INK} /> Periode
-            </label>
-            <Select value={state.period} onValueChange={(v) => setState(s => ({ ...s, period: v }))}>
-              <SelectTrigger data-testid="period-select"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {PERIOD_OPTIONS.map(p => <SelectItem key={p.key} value={p.key}>{p.label}</SelectItem>)}
-              </SelectContent>
-            </Select>
-          </div>
-          {state.period === "bulanan" && (
-            <div className="min-w-[160px]">
-              <label className="label">Pilih Bulan</label>
-              <Select value={String(state.month)} onValueChange={(v) => setState(s => ({ ...s, month: Number(v) }))}>
-                <SelectTrigger data-testid="period-month"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {MONTHS.map((m, i) => <SelectItem key={m} value={String(i + 1)}>{m}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-          {state.period === "tahunan" && (
-            <div className="min-w-[140px]">
-              <label className="label">Pilih Tahun</label>
-              <Select value={String(state.year)} onValueChange={(v) => setState(s => ({ ...s, year: Number(v) }))}>
-                <SelectTrigger data-testid="period-year"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {YEARS.map(y => <SelectItem key={y} value={String(y)}>{y}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-          {state.period === "custom" && (
-            <>
-              <div className="min-w-[160px]">
-                <label className="label">Tanggal Awal</label>
-                <Input data-testid="period-custom-start" type="date"
-                       min={`${YEAR_MIN}-01-01`} max={`${YEAR_MAX}-12-31`}
-                       value={state.customStart}
-                       onChange={(e) => setState(s => ({ ...s, customStart: e.target.value }))} />
-              </div>
-              <div className="min-w-[160px]">
-                <label className="label">Tanggal Akhir</label>
-                <Input data-testid="period-custom-end" type="date"
-                       min={`${YEAR_MIN}-01-01`} max={`${YEAR_MAX}-12-31`}
-                       value={state.customEnd}
-                       onChange={(e) => setState(s => ({ ...s, customEnd: e.target.value }))} />
-              </div>
-            </>
-          )}
-          <div className="text-xs px-3 py-2 rounded-full" data-testid="period-label" style={chip}>{pLabel}</div>
+        <div className="flex flex-wrap items-center gap-3">
+          <label className="label flex items-center gap-1 mb-0">
+            <CalendarBlank size={14} color={INK} /> Periode
+          </label>
+          <PeriodFilter value={period} onChange={setPeriod} defaultMode="yearly" data-testid="dashboard-period-filter" />
         </div>
         </CardContent>
       </Card>
