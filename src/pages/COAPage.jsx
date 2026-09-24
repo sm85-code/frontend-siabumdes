@@ -19,14 +19,21 @@ const CAT_LABELS = {
   pendapatan: "Pendapatan", hpp: "Harga Pokok Penjualan", beban: "Beban",
 };
 
+// Harus persis sama dengan data/coa_taxonomy.xlsx di backend (sm85-arch) --
+// itu satu-satunya sumber kebenaran. Backend memvalidasi pasangan
+// kategori/subkategori terhadap file yang sama (lihat _validate_category_pair
+// di master_data_router.py), jadi daftar di sini wajib disamakan setiap kali
+// coa_taxonomy.xlsx berubah, supaya tidak ada pilihan di dropdown ini yang
+// ditolak backend.
 const SUBCATEGORIES = {
-  aset: ["aset_lancar", "kas_bank", "aset_tetap"],
-  kewajiban: ["kewajiban_jangka_pendek", "kewajiban_jangka_panjang"],
-  ekuitas: ["modal_desa", "modal_masyarakat", "saldo_laba",
-            "bagi_hasil_desa", "bagi_hasil_masyarakat", "ikhtisar_laba_rugi"],
-  pendapatan: ["pendapatan_operasional", "pendapatan_non_operasional"],
-  hpp: ["hpp_barang_jadi", "hpp_produksi", "biaya_angkut_barang"],
-  beban: ["beban_operasional", "beban_administrasi", "beban_lain_lain"],
+  aset: ["kas_bank", "aset_lancar", "aset_tetap", "aset_takberwujud", "aset_lain_lain"],
+  kewajiban: ["kewajiban_jangka_pendek", "kewajiban_jangka_panjang",
+              "utang_bagi_hasil_bumdes", "utang_bagi_hasil_unit"],
+  ekuitas: ["modal_desa", "modal_masyarakat", "bagi_hasil_desa", "bagi_hasil_masyarakat",
+            "ikhtisar_laba_rugi", "laba_dicadangkan", "saldo_laba"],
+  pendapatan: ["pendapatan_operasional", "pendapatan_lain_lain"],
+  hpp: ["hpp_barang_dagangan", "hpp_barang_jadi"],
+  beban: ["beban_administrasi", "beban_operasional", "beban_lain_lain"],
 };
 
 const DEFAULT_NB = {
