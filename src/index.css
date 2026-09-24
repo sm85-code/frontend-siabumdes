@@ -6,61 +6,61 @@
 @tailwind utilities;
 
 :root {
-  --bg: #F4F7F6;
+  --bg: #FAFAFA;
   --surface: #FFFFFF;
-  --legacy-border: #E3E8E6;
-  --primary-light: #E7F4F3;
-  --legacy-primary: #1C8A8A;
-  --primary-dark: #14353A;
-  --text-primary: #1C2A30;
-  --text-secondary: #5A6B70;
-  --text-muted: #8A969A;
-  --status-success: #1C8A8A;
+  --legacy-border: #E4E4E7;
+  --primary-light: #FFF1F2;
+  --legacy-primary: #E11D48;
+  --primary-dark: #4C0519;
+  --text-primary: #18181B;
+  --text-secondary: #52525B;
+  --text-muted: #A1A1AA;
+  --status-success: #16A34A;
   --status-warning: #C4A035;
-  --status-error: #C45C6A;
-  --shadow-soft: 0 1px 2px rgba(20, 53, 58, 0.05), 0 8px 24px rgba(20, 53, 58, 0.04);
-  --shadow-inset: inset 0 0 0 1px #E3E8E6;
-  --total-row-bg: rgba(28, 138, 138, 0.14);
-  --chart-1: #1C8A8A;
-  --chart-2: #14353A;
-  --chart-3: #C9A227;
-  --chart-4: #C45C6A;
-  --chart-5: #5AA9A3;
-  --chart-6: #8A969A;
-  --status-error-bg: #FDF2F2;
-  --status-error-border: #F5C6C1;
-  --status-error-strong: #9B3B3B;
-  --surface-alt: #F4F7F6;
+  --status-error: #DC2626;
+  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.05), 0 8px 24px rgba(0, 0, 0, 0.04);
+  --shadow-inset: inset 0 0 0 1px #E4E4E7;
+  --total-row-bg: rgba(225, 29, 72, 0.14);
+  --chart-1: #e76f51;
+  --chart-2: #2a9d8b;
+  --chart-3: #264653;
+  --chart-4: #e9c46a;
+  --chart-5: #f4a261;
+  --chart-6: #94a3b8;
+  --status-error-bg: #FEF2F2;
+  --status-error-border: #FECACA;
+  --status-error-strong: #991B1B;
+  --surface-alt: #F4F4F5;
   --radius-btn: 0.75rem;
   --radius-card: 1rem;
   --radius-input: 0.75rem;
   --font-heading: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
   --font-body: 'Inter', system-ui, sans-serif;
-  --primary-hover: #167878;
-  --focus-ring: rgba(28, 138, 138, 0.12);
-  --zebra-tint: rgba(28, 138, 138, 0.025);
+  --primary-hover: #BE123C;
+  --focus-ring: rgba(225, 29, 72, 0.12);
+  --zebra-tint: rgba(225, 29, 72, 0.025);
 
-  /* shadcn/ui tokens, derived from this theme's own palette above */
+  /* shadcn/ui tokens: official "Rose" theme preset, paired with the "neutral" base color */
   --radius: var(--radius-card);
-  --background: 160 16% 96%;
-  --foreground: 198 26% 15%;
+  --background: 0 0% 100%;
+  --foreground: 240 10% 3.9%;
   --card: 0 0% 100%;
-  --card-foreground: 198 26% 15%;
+  --card-foreground: 240 10% 3.9%;
   --popover: 0 0% 100%;
-  --popover-foreground: 198 26% 15%;
-  --primary: 180 66% 33%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 175 37% 93%;
-  --secondary-foreground: 188 49% 15%;
-  --muted: 175 37% 93%;
-  --muted-foreground: 194 11% 40%;
-  --accent: 175 37% 93%;
-  --accent-foreground: 188 49% 15%;
-  --destructive: 352 47% 56%;
-  --destructive-foreground: 0 0% 100%;
-  --border: 156 10% 90%;
-  --input: 156 10% 90%;
-  --ring: 180 66% 33%;
+  --popover-foreground: 240 10% 3.9%;
+  --primary: 346.8 77.2% 49.8%;
+  --primary-foreground: 355.7 100% 97.3%;
+  --secondary: 240 4.8% 95.9%;
+  --secondary-foreground: 240 5.9% 10%;
+  --muted: 240 4.8% 95.9%;
+  --muted-foreground: 240 3.8% 46.1%;
+  --accent: 240 4.8% 95.9%;
+  --accent-foreground: 240 5.9% 10%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 240 5.9% 90%;
+  --input: 240 5.9% 90%;
+  --ring: 346.8 77.2% 49.8%;
 }
 
 /* Pilihan font: independen dari tema, ditumpangkan lewat data-font di <html>.
@@ -163,7 +163,7 @@ input[type="date"], input[type="month"] { appearance: none; color-scheme: light;
 .auth-bg { min-height: 100vh; background: var(--bg); }
 
 ::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-thumb { background: #c9d4d2; border-radius: 8px; }
+::-webkit-scrollbar-thumb { background: #d4d4d8; border-radius: 8px; }
 
 @keyframes fadeInSoft { from { opacity: 0; } to { opacity: 1; } }
 .fade-in, .fade-slow { animation: fadeInSoft .28s ease both; }

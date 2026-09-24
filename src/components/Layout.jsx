@@ -123,7 +123,7 @@ export default function Layout({ children }) {
         </div>
       </aside>
 
-      {open && <div className="lg:hidden fixed inset-0 z-40 bg-[#14353A]/20" onClick={() => setOpen(false)} />}
+      {open && <div className="lg:hidden fixed inset-0 z-40 bg-black/20" onClick={() => setOpen(false)} />}
       <main className="flex-1 min-w-0 pt-20 lg:pt-0">
         <div className="p-4 sm:p-6 lg:p-8 max-w-[1400px] mx-auto fade-in">{children}</div>
       </main>
