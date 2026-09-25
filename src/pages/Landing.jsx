@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/chart";
 import WallpaperLayer from "@/components/WallpaperLayer";
 import AppearancePopover from "@/components/AppearancePopover";
+import { TypographyH3, TypographyP } from "@/components/ui/typography";
 
 const MONTH_LABELS = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Ags","Sep","Okt","Nov","Des"];
 const TREND_CHART_CONFIG = {
@@ -111,13 +112,11 @@ export default function Landing() {
       <section className="max-w-5xl mx-auto px-5 pb-12">
         <Card>
         <CardContent className="pt-6">
-          <h3 className="font-heading text-2xl mb-4">Akuntabilitas Real-Time Melalui Inovasi Digital</h3>
-          <blockquote data-testid="narasi-komitmen" className="mb-6">
-            <div className="font-body text-sm leading-relaxed text-justify space-y-3" style={{ color: "var(--text-secondary)" }}>
-              <p>SIA BUMDes Karya Raharja adalah wujud nyata komitmen BUMDes Karya Raharja Desa Wonoharjo dalam menerapkan tata kelola keuangan yang transparan, akuntable, dan profesional dengan berpedoman pada Kepmendesa PDTT No. 136 Tahun 2022.</p>
-              <p>Data yang ditampilkan di atas adalah data yang diperoleh secara <em>real-time</em> dari hasil pencatatan transaksi aktivitas usaha BUMDes.</p>
-              <p>Kehadiran platform ini memastikan setiap rupiah pendapatan dioptimalkan untuk meminimalkan beban, memaksimalkan laba bersih, dan memperbesar kontribusi PADes demi pembangunan desa yang berkelanjutan.</p>
-            </div>
+          <TypographyH3 className="mb-4 text-2xl">Akuntabilitas Real-Time Melalui Inovasi Digital</TypographyH3>
+          <blockquote data-testid="narasi-komitmen" className="mb-6 max-w-3xl text-justify" style={{ color: "var(--text-secondary)" }}>
+            <TypographyP className="mt-0">SIA BUMDes Karya Raharja adalah wujud nyata komitmen BUMDes Karya Raharja Desa Wonoharjo dalam menerapkan tata kelola keuangan yang transparan, akuntable, dan profesional dengan berpedoman pada Kepmendesa PDTT No. 136 Tahun 2022.</TypographyP>
+            <TypographyP>Data yang ditampilkan di atas adalah data yang diperoleh secara <em>real-time</em> dari hasil pencatatan transaksi aktivitas usaha BUMDes.</TypographyP>
+            <TypographyP>Kehadiran platform ini memastikan setiap rupiah pendapatan dioptimalkan untuk meminimalkan beban, memaksimalkan laba bersih, dan memperbesar kontribusi PADes demi pembangunan desa yang berkelanjutan.</TypographyP>
           </blockquote>
           <Button asChild>
             <Link to="/login" data-testid="landing-login-bottom">Masuk ke Dasbor <ArrowRight size={16} /></Link>
