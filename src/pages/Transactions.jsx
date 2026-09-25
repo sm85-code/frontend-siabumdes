@@ -78,7 +78,7 @@ export default function Transactions() {
           if (s.data?.connected) {
             setDriveStatus(s.data);
             clearInterval(iv);
-            notify(`Google Drive terhubung sebagai ${s.data.email}`);
+            notify("Google Drive terhubung");
           }
         } catch {}
       }, 3000);
