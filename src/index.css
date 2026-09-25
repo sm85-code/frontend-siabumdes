@@ -72,6 +72,62 @@
   --font-body: 'Inter', system-ui, sans-serif;
 }
 
+/* Preset warna ("Tema"): tiap preset cuma ganti --primary/--primary-foreground/
+   --ring -- semua variabel legacy (badge, hover, tombol, dst.) sudah diturunkan
+   dari --primary di :root di atas, jadi otomatis ikut tanpa disentuh lagi.
+   Nilai sesuai preset resmi shadcn/ui. "blue" sengaja disamakan dengan default
+   di :root supaya tampilan tidak berubah kalau belum pernah pilih tema. */
+:root[data-theme="zinc"]   { --primary: 240 5.9% 10%;      --primary-foreground: 0 0% 98%;      --ring: 240 5.9% 10%; }
+:root[data-theme="red"]    { --primary: 0 72.2% 50.6%;     --primary-foreground: 0 85.7% 97.3%; --ring: 0 72.2% 50.6%; }
+:root[data-theme="orange"] { --primary: 24.6 95% 53.1%;    --primary-foreground: 60 9.1% 97.8%; --ring: 24.6 95% 53.1%; }
+:root[data-theme="yellow"] { --primary: 47.9 95.8% 53.1%;  --primary-foreground: 26 83.3% 14.1%; --ring: 47.9 95.8% 53.1%; }
+:root[data-theme="green"]  { --primary: 142.1 76.2% 36.3%; --primary-foreground: 355.7 100% 97.3%; --ring: 142.1 76.2% 36.3%; }
+:root[data-theme="blue"]   { --primary: 221.2 83.2% 53.3%; --primary-foreground: 210 40% 98%;   --ring: 221.2 83.2% 53.3%; }
+:root[data-theme="violet"] { --primary: 262.1 83.3% 57.8%; --primary-foreground: 210 40% 98%;   --ring: 262.1 83.3% 57.8%; }
+:root[data-theme="rose"]   { --primary: 346.8 77.2% 49.8%; --primary-foreground: 355.7 100% 97.3%; --ring: 346.8 77.2% 49.8%; }
+
+/* Mode gelap ("Mode"): class .dark di <html> (konvensi Tailwind darkMode:"class").
+   Ganti token neutral shadcn + neutral legacy, dan arah campuran --primary-dark
+   (dipakai sebagai warna teks/heading) supaya tetap kontras di atas latar gelap. */
+:root.dark {
+  --background: 240 10% 3.9%;
+  --foreground: 0 0% 98%;
+  --card: 240 10% 3.9%;
+  --card-foreground: 0 0% 98%;
+  --popover: 240 10% 3.9%;
+  --popover-foreground: 0 0% 98%;
+  --secondary: 240 3.7% 15.9%;
+  --secondary-foreground: 0 0% 98%;
+  --muted: 240 3.7% 15.9%;
+  --muted-foreground: 240 5% 64.9%;
+  --accent: 240 3.7% 15.9%;
+  --accent-foreground: 0 0% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 240 3.7% 15.9%;
+  --input: 240 3.7% 15.9%;
+
+  --bg: #09090B;
+  --surface: #18181B;
+  --surface-alt: #1F1F23;
+  --legacy-border: #27272A;
+  --text-primary: #FAFAFA;
+  --text-secondary: #A1A1AA;
+  --text-muted: #71717A;
+  --status-error-bg: #450A0A;
+  --status-error-border: #7F1D1D;
+  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.3);
+  --shadow-inset: inset 0 0 0 1px #27272A;
+
+  /* --primary-dark dipakai sebagai warna TEKS (heading, ikon aktif) -- di mode
+     terang dicampur ke hitam supaya gelap di atas latar putih; di mode gelap
+     harus dicampur ke putih supaya tetap terbaca di atas latar gelap. */
+  --primary-dark: color-mix(in srgb, hsl(var(--primary)) 70%, white);
+}
+/* Preset "zinc" (monokrom): primary = warna teks itu sendiri, jadi di mode
+   gelap arahnya harus dibalik (putih di atas gelap), bukan ikut hue tetap. */
+:root.dark[data-theme="zinc"] { --primary: 0 0% 98%; --primary-foreground: 240 5.9% 10%; --ring: 0 0% 98%; }
+
 /* Pilihan font: independen dari tema, ditumpangkan lewat data-font di <html>.
    Diletakkan setelah blok data-theme supaya menang saat keduanya diset. */
 :root[data-font="jakarta"] { --font-heading: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif; --font-body: 'Inter', system-ui, sans-serif; }
@@ -105,10 +161,10 @@ h1, h2, h3, h4, .heading, .font-heading, .modern-brand-title {
   font-weight: 600; font-size: 0.9rem; cursor: pointer;
   border: 0; transition: background .15s, box-shadow .15s, color .15s;
 }
-.btn-primary { background: var(--legacy-primary); color: #fff; }
+.btn-primary { background: var(--legacy-primary); color: hsl(var(--primary-foreground)); }
 .btn-primary:hover { background: var(--primary-hover); }
-.btn-secondary { background: #fff; color: var(--primary-dark); border: 1px solid var(--legacy-border); }
-.btn-outline { background: #fff; color: var(--text-primary); border: 1px solid var(--legacy-border); }
+.btn-secondary { background: var(--surface); color: var(--primary-dark); border: 1px solid var(--legacy-border); }
+.btn-outline { background: var(--surface); color: var(--text-primary); border: 1px solid var(--legacy-border); }
 .btn-outline:hover { background: var(--primary-light); border-color: var(--legacy-primary); }
 .btn-danger { background: var(--status-error); color: #fff; }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -124,7 +180,7 @@ h1, h2, h3, h4, .heading, .font-heading, .modern-brand-title {
 .stat-card:hover { transform: none; }
 
 .input, .select {
-  width: 100%; background: #fff; border: 1px solid var(--legacy-border);
+  width: 100%; background: var(--surface); border: 1px solid var(--legacy-border);
   border-radius: var(--radius-input); padding: 0.65rem 1rem; font-size: 0.92rem;
   color: var(--text-primary); outline: none; font-family: inherit; min-height: 44px;
   box-shadow: none;
@@ -167,7 +223,7 @@ input[type="date"], input[type="month"] { appearance: none; color-scheme: light;
   color: var(--text-secondary); font-weight: 500; text-decoration: none;
 }
 .side-link:hover { background: var(--primary-light); color: var(--primary-dark); }
-.side-link.active { background: var(--legacy-primary); color: #fff; font-weight: 600; }
+.side-link.active { background: var(--legacy-primary); color: hsl(var(--primary-foreground)); font-weight: 600; }
 
 .auth-bg { min-height: 100vh; background: var(--bg); }
 

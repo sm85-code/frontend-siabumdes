@@ -2,7 +2,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuth, can } from "@/lib/auth";
 import api, { ROLE_LABELS } from "@/lib/api";
-import { useTheme, FONTS } from "@/lib/theme";
+import { useTheme, FONTS, THEMES, MODES } from "@/lib/theme";
 import {
   House, Receipt, ChartLine, Storefront, UsersThree,
   BookOpenText, SignOut, List, X, Books, UserCircle, Package, Buildings,
@@ -27,7 +27,7 @@ const NAV = [
 
 export default function Layout({ children }) {
   const { user, logout } = useAuth();
-  const { font, setFont } = useTheme();
+  const { font, setFont, colorTheme, setColorTheme, mode, setMode } = useTheme();
   const location = useLocation();
   const [open, setOpen] = useState(false);
   const [uu05Id, setUu05Id] = useState(null);
@@ -85,7 +85,7 @@ export default function Layout({ children }) {
                 <NavLink key={n.to} to={n.to} data-testid={`nav-${n.to.replace(/\//g, "-")}`}
                   onClick={() => setOpen(false)} className={`side-link ${active ? "active" : ""}`}>
                   <span className="nav-ico">
-                    <Icon size={18} weight={active ? "fill" : "regular"} color={active ? "#fff" : INK} />
+                    <Icon size={18} weight={active ? "fill" : "regular"} color={active ? "hsl(var(--primary-foreground))" : INK} />
                   </span>
                   <span>{n.label}</span>
                 </NavLink>
@@ -93,6 +93,34 @@ export default function Layout({ children }) {
             })}
           </nav>
           <div className="shrink-0 p-4">
+            <div className="grid grid-cols-2 gap-2 mb-3">
+              <div>
+                <label className="label" htmlFor="theme-switcher">Tema</label>
+                <Select value={colorTheme} onValueChange={(v) => setColorTheme(v)}>
+                  <SelectTrigger id="theme-switcher" data-testid="theme-switcher" className="text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {THEMES.map((t) => (
+                      <SelectItem key={t.id} value={t.id}>{t.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="label" htmlFor="mode-switcher">Mode</label>
+                <Select value={mode} onValueChange={(v) => setMode(v)}>
+                  <SelectTrigger id="mode-switcher" data-testid="mode-switcher" className="text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {MODES.map((m) => (
+                      <SelectItem key={m.id} value={m.id}>{m.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
             <div className="mb-3">
               <label className="label" htmlFor="font-switcher">Font</label>
               <Select value={font} onValueChange={(v) => setFont(v)}>
