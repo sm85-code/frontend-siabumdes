@@ -141,8 +141,8 @@ export default function InventorySummary({ products = [], movements = [], valuat
             <ChartContainer config={TOP_OUT_CHART_CONFIG} className="w-full aspect-auto" style={{ height: 280 }}>
               <BarChart data={topOut} layout="vertical" margin={{ top: 4, right: 16, left: 8, bottom: 4 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--legacy-border)" horizontal={false} />
-                <XAxis type="number" tick={{ fontSize: 11 }} />
-                <YAxis type="category" dataKey="name" width={110} tick={{ fontSize: 11 }} />
+                <XAxis type="number" tick={{ fontSize: 12 }} />
+                <YAxis type="category" dataKey="name" width={110} tick={{ fontSize: 12 }} />
                 <ChartTooltip
                   content={
                     <ChartTooltipContent

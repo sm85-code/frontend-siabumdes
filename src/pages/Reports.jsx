@@ -182,8 +182,8 @@ export default function Reports() {
       {tab === "laporan" && (
         <>
           <Card>
-          <CardContent className="pt-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-start">
+          <CardContent className="pt-6 space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-start">
               <div>
                 <label className="label" htmlFor="report-group-select">Kelompok</label>
                 <Select value={groupKey} disabled={isPengelola} onValueChange={(v) => { setGroupKey(v); setData(null); }}>
@@ -212,7 +212,9 @@ export default function Reports() {
                   </SelectContent>
                 </Select>
               </div>
-              <Button data-testid="btn-load-report" onClick={load}>
+            </div>
+            <div className="flex justify-end">
+              <Button data-testid="btn-load-report" onClick={load} className="w-full sm:w-auto">
                 {loading ? <Spinner size={18} label="Memuat..." /> : "Tampilkan Laporan"}
               </Button>
             </div>

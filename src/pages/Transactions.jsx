@@ -727,8 +727,8 @@ if (!(await confirm({
                           ))}
                           {editable && proofs.length < 3 && (
                             <button data-testid={`add-proof-${t.id}`} onClick={() => uploadProof(t)}
-                                    className="text-[11px] flex items-center gap-1 mt-0.5 text-muted-foreground">
-                              <Paperclip size={11} /> Tambah ({proofs.length}/3)
+                                    className="text-xs flex items-center gap-1 mt-0.5 text-muted-foreground">
+                              <Paperclip size={12} /> Tambah ({proofs.length}/3)
                             </button>
                           )}
                         </div>

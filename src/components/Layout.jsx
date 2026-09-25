@@ -2,15 +2,13 @@ import { NavLink, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuth, can } from "@/lib/auth";
 import api, { ROLE_LABELS } from "@/lib/api";
-import { useTheme, FONTS, THEMES, BASE_COLORS, WALLPAPERS, MODES } from "@/lib/theme";
 import {
   House, Receipt, ChartLine, Storefront, UsersThree,
-  BookOpenText, SignOut, List, X, Books, UserCircle, Package, Buildings, PaintBrush,
+  BookOpenText, SignOut, List, X, Books, UserCircle, Package, Buildings,
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import WallpaperLayer from "@/components/WallpaperLayer";
+import AppearancePopover from "@/components/AppearancePopover";
 
 const READ_MOST = ["admin", "direktur", "bendahara", "pengelola", "pengawas", "penasihat"];
 const INK = "var(--primary-dark)";
@@ -29,13 +27,6 @@ const NAV = [
 
 export default function Layout({ children }) {
   const { user, logout } = useAuth();
-  const {
-    font, setFont,
-    colorTheme, setColorTheme,
-    baseColor, setBaseColor,
-    wallpaper, setWallpaper,
-    mode, setMode,
-  } = useTheme();
   const location = useLocation();
   const [open, setOpen] = useState(false);
   const [uu05Id, setUu05Id] = useState(null);
@@ -102,80 +93,7 @@ export default function Layout({ children }) {
             })}
           </nav>
           <div className="shrink-0 p-4">
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button data-testid="appearance-trigger" variant="outline" size="sm" className="w-full mb-3 justify-start gap-2">
-                  <PaintBrush size={16} /> Tampilan
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent align="start" className="w-64 space-y-3" data-testid="appearance-popover">
-                <div>
-                  <label className="label" htmlFor="theme-switcher">Tema</label>
-                  <Select value={colorTheme} onValueChange={(v) => setColorTheme(v)}>
-                    <SelectTrigger id="theme-switcher" data-testid="theme-switcher" className="text-sm">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {THEMES.map((t) => (
-                        <SelectItem key={t.id} value={t.id}>{t.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <label className="label" htmlFor="base-color-switcher">Base Warna</label>
-                  <Select value={baseColor} onValueChange={(v) => setBaseColor(v)}>
-                    <SelectTrigger id="base-color-switcher" data-testid="base-color-switcher" className="text-sm">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {BASE_COLORS.map((b) => (
-                        <SelectItem key={b.id} value={b.id}>{b.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <label className="label" htmlFor="wallpaper-switcher">Wallpaper</label>
-                  <Select value={wallpaper} onValueChange={(v) => setWallpaper(v)}>
-                    <SelectTrigger id="wallpaper-switcher" data-testid="wallpaper-switcher" className="text-sm">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {WALLPAPERS.map((w) => (
-                        <SelectItem key={w.id} value={w.id}>{w.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <label className="label" htmlFor="mode-switcher">Mode</label>
-                  <Select value={mode} onValueChange={(v) => setMode(v)}>
-                    <SelectTrigger id="mode-switcher" data-testid="mode-switcher" className="text-sm">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {MODES.map((m) => (
-                        <SelectItem key={m.id} value={m.id}>{m.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <label className="label" htmlFor="font-switcher">Font</label>
-                  <Select value={font} onValueChange={(v) => setFont(v)}>
-                    <SelectTrigger id="font-switcher" data-testid="font-switcher" className="text-sm">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {FONTS.map((f) => (
-                        <SelectItem key={f.id} value={f.id}>{f.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </PopoverContent>
-            </Popover>
+            <AppearancePopover triggerClassName="w-full mb-3 justify-start gap-2" align="start" />
             <div className="flex items-center gap-3 mb-3">
               {user.photo_url ? (
                 <img src={user.photo_url} alt={user.name} className="w-9 h-9 rounded-full object-cover flex-shrink-0" />

@@ -15,6 +15,7 @@ import {
   ChartLegend, ChartLegendContent,
 } from "@/components/ui/chart";
 import WallpaperLayer from "@/components/WallpaperLayer";
+import AppearancePopover from "@/components/AppearancePopover";
 
 const MONTH_LABELS = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Ags","Sep","Okt","Nov","Des"];
 const TREND_CHART_CONFIG = {
@@ -46,16 +47,19 @@ export default function Landing() {
           <img src="/logo-transparent.png" alt="Logo BUMDES" data-testid="landing-logo" className="w-11 h-11 object-contain" />
           <div className="leading-tight">
             <div className="font-heading text-[1.05rem]">BUMDes Karya Raharja</div>
-            <div className="text-[11px]" style={{ color: "var(--text-muted)" }}>Desa Wonoharjo</div>
+            <div className="text-xs" style={{ color: "var(--text-muted)" }}>Desa Wonoharjo</div>
           </div>
         </div>
-        <Button asChild variant="outline" className="text-sm">
-          <Link to="/login" data-testid="landing-login-top">Masuk <ArrowRight size={14} /></Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          <AppearancePopover triggerClassName="text-sm gap-2" align="end" />
+          <Button asChild variant="outline" className="text-sm">
+            <Link to="/login" data-testid="landing-login-top">Masuk <ArrowRight size={14} /></Link>
+          </Button>
+        </div>
       </header>
 
       <section className="max-w-3xl mx-auto px-5 pt-10 pb-6 text-center">
-        <p className="inline-block text-[10px] tracking-[0.18em] uppercase px-4 py-1.5 rounded-full mb-5"
+        <p className="inline-block text-xs tracking-[0.14em] uppercase px-4 py-1.5 rounded-full mb-5"
            style={{ background: "var(--primary-light)", color: "var(--text-secondary)" }}>
           Papan Kinerja · BUMDes · Tahun {year}
         </p>
@@ -90,8 +94,8 @@ export default function Landing() {
             <ChartContainer config={TREND_CHART_CONFIG} className="w-full aspect-auto" style={{ height: 220 }}>
               <LineChart data={trend} margin={{ top: 8, right: 12, left: -4, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--legacy-border, #E3E8E6)" vertical={false} />
-                <XAxis dataKey="label" tick={{ fontSize: 10, fill: "var(--text-muted)" }} tickLine={false} axisLine={false} />
-                <YAxis tick={{ fontSize: 10, fill: "var(--text-muted)" }} tickLine={false} axisLine={false}
+                <XAxis dataKey="label" tick={{ fontSize: 12, fill: "var(--text-muted)" }} tickLine={false} axisLine={false} />
+                <YAxis tick={{ fontSize: 12, fill: "var(--text-muted)" }} tickLine={false} axisLine={false}
                        tickFormatter={(v) => v >= 1000000 ? `${Math.round(v/1_000_000)}jt` : v >= 1000 ? `${Math.round(v/1000)}rb` : v} width={44} />
                 <ChartTooltip content={<ChartTooltipContent formatter={(v) => fmtRp(v)} />} />
                 <ChartLegend content={<ChartLegendContent />} />
@@ -136,7 +140,7 @@ function StatCard({ icon: Icon, label, value, testId }) {
         <div className="w-9 h-9 rounded-xl flex items-center justify-center mb-3" style={{ background: "var(--primary-light)" }}>
           <Icon size={18} color="var(--primary-dark)" />
         </div>
-        <div className="text-[10px] tracking-[0.14em] font-semibold uppercase" style={{ color: "var(--text-muted)" }}>{label}</div>
+        <div className="text-xs tracking-[0.1em] font-semibold uppercase" style={{ color: "var(--text-muted)" }}>{label}</div>
         <div className="font-heading tabular-nums text-xl sm:text-2xl mt-1">{value}</div>
       </CardContent>
     </Card>
