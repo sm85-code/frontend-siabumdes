@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400..800;1,400..800&family=Inter:ital,opsz,wght@0,14..32,400..800;1,14..32,400..800&family=Merriweather:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400..800;1,400..800&family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Geist:ital,wght@0,100..900;1,100..900&family=Geist+Mono:ital,wght@0,100..900;1,100..900&family=Inter:ital,opsz,wght@0,14..32,400..800;1,14..32,400..800&display=swap');
 @import './theme-extras.css';
 
 @tailwind base;
@@ -68,8 +68,9 @@
   --radius-btn: 0.75rem;
   --radius-card: var(--radius);
   --radius-input: 0.75rem;
-  --font-heading: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
-  --font-body: 'Inter', system-ui, sans-serif;
+  --font-heading: 'Geist', 'Inter', system-ui, sans-serif;
+  --font-body: 'Geist', 'Inter', system-ui, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, monospace;
 }
 
 /* Preset warna ("Tema"): tiap preset ganti --primary/--primary-foreground/--ring
@@ -303,12 +304,14 @@
 .wallpaper-dots-svg { color: hsl(var(--foreground) / 0.35); }
 
 /* Pilihan font: independen dari tema, ditumpangkan lewat data-font di <html>.
-   Diletakkan setelah blok data-theme supaya menang saat keduanya diset. */
-:root[data-font="jakarta"] { --font-heading: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif; --font-body: 'Inter', system-ui, sans-serif; }
+   Diletakkan setelah blok data-theme supaya menang saat keduanya diset.
+   Disamakan dengan pilihan resmi shadcn/ui sendiri (Geist/Geist Mono adalah
+   font default ui.shadcn.com; Inter adalah alternatif resmi yang juga
+   didukung shadcn di versi-versi sebelumnya). "Mono" (Geist Mono) berguna
+   untuk aplikasi akuntansi ini karena angka tabular jadi rata lebar. */
+:root[data-font="geist"] { --font-heading: 'Geist', 'Inter', system-ui, sans-serif; --font-body: 'Geist', 'Inter', system-ui, sans-serif; }
 :root[data-font="inter"] { --font-heading: 'Inter', system-ui, sans-serif; --font-body: 'Inter', system-ui, sans-serif; }
-:root[data-font="serif"] { --font-heading: 'Merriweather', Georgia, serif; --font-body: Georgia, 'Times New Roman', serif; }
-:root[data-font="elegan"] { --font-heading: 'Playfair Display', Georgia, serif; --font-body: 'Inter', system-ui, sans-serif; }
-:root[data-font="rounded"] { --font-heading: 'Poppins', system-ui, sans-serif; --font-body: 'Poppins', system-ui, sans-serif; }
+:root[data-font="mono"] { --font-heading: 'Geist Mono', ui-monospace, monospace; --font-body: 'Geist Mono', ui-monospace, monospace; }
 
 body {
   margin: 0;
@@ -399,7 +402,8 @@ input[type="date"], input[type="month"] { appearance: none; color-scheme: light;
 .side-link:hover { background: var(--primary-light); color: var(--primary-dark); }
 .side-link.active { background: var(--legacy-primary); color: hsl(var(--primary-foreground)); font-weight: 600; }
 
-.auth-bg { min-height: 100vh; background: var(--bg); }
+.auth-bg { min-height: 100vh; background: var(--bg); position: relative; }
+.auth-bg > *:not(.wallpaper-layer) { position: relative; z-index: 1; }
 
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-thumb { background: #d4d4d8; border-radius: 8px; }

@@ -6,6 +6,7 @@ import Spinner from "@/components/Spinner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import WallpaperLayer from "@/components/WallpaperLayer";
 
 export default function Login() {
   const { login } = useAuth();
@@ -29,6 +30,7 @@ export default function Login() {
 
   return (
     <div className="auth-bg flex items-center justify-center p-4 relative min-h-screen">
+      <WallpaperLayer />
       <Button asChild variant="outline" className="absolute top-4 left-4 sm:top-6 sm:left-6 text-xs sm:text-sm">
         <Link to="/" data-testid="login-back">
           <ArrowLeft size={14} /> Kembali
