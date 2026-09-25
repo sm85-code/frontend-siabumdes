@@ -19,8 +19,7 @@ import {
 } from "@/components/ui/chart";
 import { MONTHS, chartConfigForPeriod, bucketize } from "@/lib/dashboardBucketing";
 
-const INK = "#172554"; // --primary-dark
-const TEAL = "#2563EB"; // --primary
+const INK = "var(--primary-dark)";
 const GRID_STROKE = "var(--legacy-border, #E4E4E7)";
 const COLORS = ["var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)", "var(--chart-5)", "var(--chart-6)"];
 const TREND_CHART_CONFIG = {
