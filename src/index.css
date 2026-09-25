@@ -39,7 +39,7 @@
   --primary-dark: color-mix(in srgb, hsl(var(--primary)) 55%, black);
   --primary-light: hsl(var(--primary) / 0.06);
   --focus-ring: hsl(var(--primary) / 0.12);
-  --zebra-tint: hsl(var(--primary) / 0.025);
+  --zebra-tint: hsl(var(--primary) / 0.035);
   --total-row-bg: hsl(var(--primary) / 0.14);
 
   /* Neutral & status -- tidak ikut berubah antar preset warna (sengaja lepas
@@ -307,7 +307,7 @@
 .wallpaper-aurora-blob {
   position: absolute;
   border-radius: 9999px;
-  filter: blur(64px);
+  filter: blur(90px);
   animation: wallpaper-aurora 14s ease-in-out infinite;
 }
 
@@ -388,15 +388,19 @@ select.select {
 
 input[type="date"], input[type="month"] { appearance: none; color-scheme: light; min-height: 44px; }
 
-.tbl { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.875rem; }
+/* Tabel data (dipakai lewat <TableShell>, jadi berlaku otomatis di Transaksi,
+   Laporan Keuangan, Buku Besar, dan seluruh halaman bertabel lain): baris
+   lebih lega, header lebih tegas dengan garis aksen warna tema, baris total
+   diberi latar supaya langsung terlihat beda dari baris data biasa. */
+.tbl { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.875rem; font-variant-numeric: tabular-nums; }
 .tbl thead th {
-  text-align: left; padding: 0.8rem 1rem; font-size: 0.75rem; text-transform: uppercase;
-  font-weight: 700; letter-spacing: 0.07em; color: var(--text-secondary);
-  border-bottom: 1.5px solid var(--legacy-border); background: var(--surface-alt); white-space: nowrap;
+  text-align: left; padding: 0.9rem 1.1rem; font-size: 0.75rem; text-transform: uppercase;
+  font-weight: 700; letter-spacing: 0.06em; color: var(--text-secondary);
+  border-bottom: 2px solid hsl(var(--primary) / 0.45); background: var(--surface-alt); white-space: nowrap;
 }
 .tbl tbody td {
-  padding: 0.75rem 1rem; border-bottom: 1px solid var(--legacy-border);
-  color: var(--text-primary); vertical-align: middle;
+  padding: 0.85rem 1.1rem; border-bottom: 1px solid var(--legacy-border);
+  color: var(--text-primary); vertical-align: middle; line-height: 1.4;
 }
 .tbl tbody tr { transition: background-color .12s ease; }
 .tbl tbody tr:nth-child(even) td { background: var(--zebra-tint); }
@@ -404,7 +408,8 @@ input[type="date"], input[type="month"] { appearance: none; color-scheme: light;
 .tbl tbody tr:last-child td { border-bottom: 0; }
 .tbl .num { text-align: right; font-variant-numeric: tabular-nums; }
 .tbl tfoot td, .tbl tbody tr.tbl-total td {
-  border-top: 1.5px solid var(--legacy-border); border-bottom: 0; font-weight: 700;
+  padding: 0.9rem 1.1rem; border-top: 2px solid hsl(var(--primary) / 0.45); border-bottom: 0;
+  font-weight: 700; background: var(--total-row-bg);
 }
 
 .badge { display: inline-flex; align-items: center; padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; background: var(--primary-light); color: var(--primary-dark); }

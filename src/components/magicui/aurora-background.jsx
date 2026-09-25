@@ -10,23 +10,23 @@ export function AuroraBackground() {
       <div
         className="wallpaper-aurora-blob"
         style={{
-          width: "42vw", height: "42vw", top: "-10%", left: "-8%",
-          background: "hsl(var(--primary) / 0.22)",
+          width: "30vw", height: "30vw", top: "-10%", left: "-8%",
+          background: "hsl(var(--primary) / 0.10)",
         }}
       />
       <div
         className="wallpaper-aurora-blob"
         style={{
-          width: "38vw", height: "38vw", top: "-6%", right: "-10%",
-          background: "hsl(var(--ring) / 0.18)",
+          width: "26vw", height: "26vw", top: "-6%", right: "-10%",
+          background: "hsl(var(--ring) / 0.08)",
           animationDelay: "-4s",
         }}
       />
       <div
         className="wallpaper-aurora-blob"
         style={{
-          width: "46vw", height: "46vw", bottom: "-18%", left: "20%",
-          background: "hsl(var(--primary) / 0.14)",
+          width: "34vw", height: "34vw", bottom: "-18%", left: "20%",
+          background: "hsl(var(--primary) / 0.06)",
           animationDelay: "-9s",
         }}
       />

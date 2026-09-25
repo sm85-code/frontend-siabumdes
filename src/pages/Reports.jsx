@@ -12,6 +12,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { TypographyH4, TypographyP, TypographyLead } from "@/components/ui/typography";
 import PeriodFilter from "@/components/PeriodFilter";
 
 const pad = (n) => String(n).padStart(2, "0");
@@ -449,9 +450,14 @@ function ReportBody({ active, data }) {
     const titleCase = (s) => s.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
     const fmtInfoValue = (k, v) => (k === "periode_awal" || k === "periode_akhir") ? fmtDate(v) : v;
     return (
-      <div className="space-y-6 text-sm leading-relaxed">
+      <div className="space-y-8">
+        <TypographyLead className="text-sm sm:text-base">
+          Catatan ini menjelaskan informasi umum entitas, ringkasan kinerja keuangan, dan kebijakan
+          akuntansi yang diterapkan pada penyusunan laporan keuangan periode berjalan.
+        </TypographyLead>
         <section>
-          <h4 className="font-heading font-semibold mb-2">1. Informasi Umum</h4>
+          <TypographyH4>1. Informasi Umum</TypographyH4>
+          <div className="mt-3">
           <TableShell minWidth={320}>
             <Table>
               <TableBody>
@@ -461,9 +467,11 @@ function ReportBody({ active, data }) {
               </TableBody>
             </Table>
           </TableShell>
+          </div>
         </section>
         <section>
-          <h4 className="font-heading font-semibold mb-2">2. Ringkasan Kinerja</h4>
+          <TypographyH4>2. Ringkasan Kinerja</TypographyH4>
+          <div className="mt-3">
           <TableShell minWidth={320}>
             <Table>
               <TableBody>
@@ -473,12 +481,13 @@ function ReportBody({ active, data }) {
               </TableBody>
             </Table>
           </TableShell>
+          </div>
         </section>
         <section>
-          <h4 className="font-heading font-semibold mb-2">3. Kebijakan Akuntansi</h4>
-          <div className="space-y-3">
+          <TypographyH4>3. Kebijakan Akuntansi</TypographyH4>
+          <div className="max-w-3xl">
             {data.kebijakan_akuntansi.map((k, i) => (
-              <p key={i} className="text-justify" style={{ color: "var(--text-primary)" }}>{k}</p>
+              <TypographyP key={i} className="text-justify" style={{ color: "var(--text-primary)" }}>{k}</TypographyP>
             ))}
           </div>
         </section>
