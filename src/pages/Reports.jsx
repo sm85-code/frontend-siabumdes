@@ -51,6 +51,18 @@ export default function Reports() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  // Proporsi bagi hasil: dulu hardcode di sini, sekarang dari Profil BUMDES
+  // (org-profile) supaya konsisten dengan yang sungguhan diposting saat tutup
+  // buku. Default di state cuma fallback selagi/kalau fetch belum/gagal.
+  const [bagiHasil, setBagiHasil] = useState({
+    share_pengurus: 35, share_penasihat: 7, share_pengawas: 5, share_dana_sosial: 5,
+    share_pades: 30, share_modal_bumdes: 18,
+    share_unit_pengelola: 30, share_unit_bumdes: 70,
+  });
+  useEffect(() => {
+    api.get("/org-profile").then(r => setBagiHasil((b) => ({ ...b, ...r.data }))).catch(() => {});
+  }, []);
+
   // Tutup Buku (admin only) -- BUMDES dan unit usaha sama-sama tutup buku bulanan.
   const [closeGroup, setCloseGroup] = useState("BUMDES");
   const [closeYear, setCloseYear] = useState(currentYear);
@@ -240,8 +252,8 @@ export default function Reports() {
                 Alokasi Bagi Hasil Unit Usaha {groupKey}:
               </h4>
               <ol className="text-sm space-y-1 ml-5" style={{ listStyleType: "decimal" }}>
-                <li>Pengelola Unit (30%) = <b style={{ color: "hsl(var(--primary))" }} data-testid="share-pengelola">{fmtRp(Math.round((data.laba_bersih || 0) * 0.30))}</b></li>
-                <li>BUMDES (70%) = <b style={{ color: "var(--primary-dark)" }} data-testid="share-bumdes">{fmtRp(Math.round((data.laba_bersih || 0) * 0.70))}</b></li>
+                <li>Pengelola Unit ({bagiHasil.share_unit_pengelola}%) = <b style={{ color: "hsl(var(--primary))" }} data-testid="share-pengelola">{fmtRp(Math.round((data.laba_bersih || 0) * bagiHasil.share_unit_pengelola / 100))}</b></li>
+                <li>BUMDES ({bagiHasil.share_unit_bumdes}%) = <b style={{ color: "var(--primary-dark)" }} data-testid="share-bumdes">{fmtRp(Math.round((data.laba_bersih || 0) * bagiHasil.share_unit_bumdes / 100))}</b></li>
               </ol>
             </div>
           )}
@@ -254,12 +266,12 @@ export default function Reports() {
               </h4>
               <ol className="text-sm space-y-1 ml-5" style={{ listStyleType: "decimal" }}>
                 {[
-                  ["PADes", 30, "var(--chart-1)"],
-                  ["Modal BUMDES", 18, "var(--chart-2)"],
-                  ["Penasihat", 7, "var(--chart-3)"],
-                  ["Pengawas", 5, "var(--chart-4)"],
-                  ["Pengurus", 35, "var(--text-primary)"],
-                  ["Dana Sosial", 5, "var(--text-muted)"],
+                  ["PADes", bagiHasil.share_pades, "var(--chart-1)"],
+                  ["Modal BUMDES", bagiHasil.share_modal_bumdes, "var(--chart-2)"],
+                  ["Penasihat", bagiHasil.share_penasihat, "var(--chart-3)"],
+                  ["Pengawas", bagiHasil.share_pengawas, "var(--chart-4)"],
+                  ["Pengurus", bagiHasil.share_pengurus, "var(--text-primary)"],
+                  ["Dana Sosial", bagiHasil.share_dana_sosial, "var(--text-muted)"],
                 ].map(([label, pct, color]) => (
                   <li key={label}>{label} ({pct}%) = <b style={{ color }} data-testid={`share-${label.toLowerCase().replace(/ /g, "-")}`}>{fmtRp(Math.round((data.laba_bersih || 0) * pct / 100))}</b></li>
                 ))}
