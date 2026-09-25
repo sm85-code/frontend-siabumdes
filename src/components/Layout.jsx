@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import WallpaperLayer from "@/components/WallpaperLayer";
 
 const READ_MOST = ["admin", "direktur", "bendahara", "pengelola", "pengawas", "penasihat"];
 const INK = "var(--primary-dark)";
@@ -60,6 +61,7 @@ export default function Layout({ children }) {
 
   return (
     <div className="app-shell min-h-screen flex">
+      <WallpaperLayer />
       <div className="lg:hidden fixed top-3 inset-x-3 z-40 flex items-center justify-between px-4 h-14 rounded-2xl"
            style={{ background: "var(--surface)", border: "1px solid var(--legacy-border)", boxShadow: "var(--shadow-soft)" }}>
         <div className="flex items-center gap-2">
