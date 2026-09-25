@@ -1,11 +1,12 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
+// Disamakan dengan pilihan font resmi shadcn/ui: Geist (default ui.shadcn.com),
+// Inter (alternatif resmi), dan Geist Mono (angka rata lebar, cocok untuk
+// tabel akuntansi) -- lihat blok :root[data-font="..."] di index.css.
 export const FONTS = [
-  { id: "jakarta", label: "Jakarta" },
+  { id: "geist", label: "Geist" },
   { id: "inter", label: "Inter" },
-  { id: "serif", label: "Serif Klasik" },
-  { id: "elegan", label: "Elegan" },
-  { id: "rounded", label: "Rounded" },
+  { id: "mono", label: "Geist Mono" },
 ];
 
 // Preset warna resmi shadcn/ui -- lihat blok :root[data-theme="..."] di index.css.
@@ -70,7 +71,7 @@ function readStored(key, validIds, fallback) {
 
 const ThemeContext = createContext({
   theme: "modern",
-  font: "jakarta", setFont: () => {},
+  font: "geist", setFont: () => {},
   colorTheme: "blue", setColorTheme: () => {},
   baseColor: "zinc", setBaseColor: () => {},
   wallpaper: "none", setWallpaper: () => {},
@@ -87,7 +88,7 @@ const ThemeContext = createContext({
  * - mode: light/dark (.dark class on <html>, per Tailwind's darkMode:"class")
  */
 export function ThemeProvider({ children }) {
-  const [font, setFont] = useState(() => readStored(FONT_KEY, VALID_FONTS, "jakarta"));
+  const [font, setFont] = useState(() => readStored(FONT_KEY, VALID_FONTS, "geist"));
   const [colorTheme, setColorTheme] = useState(() => readStored(THEME_KEY, VALID_THEMES, "blue"));
   const [baseColor, setBaseColor] = useState(() => readStored(BASE_KEY, VALID_BASE_COLORS, "zinc"));
   const [wallpaper, setWallpaper] = useState(() => readStored(WALLPAPER_KEY, VALID_WALLPAPERS, "none"));

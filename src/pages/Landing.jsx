@@ -14,6 +14,7 @@ import {
   ChartContainer, ChartTooltip, ChartTooltipContent,
   ChartLegend, ChartLegendContent,
 } from "@/components/ui/chart";
+import WallpaperLayer from "@/components/WallpaperLayer";
 
 const MONTH_LABELS = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Ags","Sep","Okt","Nov","Des"];
 const TREND_CHART_CONFIG = {
@@ -39,6 +40,7 @@ export default function Landing() {
 
   return (
     <div className="min-h-screen auth-bg" data-testid="landing-page">
+      <WallpaperLayer />
       <header className="max-w-5xl mx-auto px-5 pt-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <img src="/logo-transparent.png" alt="Logo BUMDES" data-testid="landing-logo" className="w-11 h-11 object-contain" />
