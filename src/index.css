@@ -6,42 +6,12 @@
 @tailwind utilities;
 
 :root {
-  --bg: #FAFAFA;
-  --surface: #FFFFFF;
-  --legacy-border: #E4E4E7;
-  --primary-light: #EFF6FF;
-  --legacy-primary: #2563EB;
-  --primary-dark: #172554;
-  --text-primary: #18181B;
-  --text-secondary: #52525B;
-  --text-muted: #A1A1AA;
-  --status-success: #16A34A;
-  --status-warning: #C4A035;
-  --status-error: #DC2626;
-  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.05), 0 8px 24px rgba(0, 0, 0, 0.04);
-  --shadow-inset: inset 0 0 0 1px #E4E4E7;
-  --total-row-bg: rgba(37, 99, 235, 0.14);
-  --chart-1: #e76f51;
-  --chart-2: #2a9d8b;
-  --chart-3: #264653;
-  --chart-4: #e9c46a;
-  --chart-5: #f4a261;
-  --chart-6: #94a3b8;
-  --status-error-bg: #FEF2F2;
-  --status-error-border: #FECACA;
-  --status-error-strong: #991B1B;
-  --surface-alt: #F4F4F5;
-  --radius-btn: 0.75rem;
-  --radius-card: 1rem;
-  --radius-input: 0.75rem;
-  --font-heading: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
-  --font-body: 'Inter', system-ui, sans-serif;
-  --primary-hover: #1D4ED8;
-  --focus-ring: rgba(37, 99, 235, 0.12);
-  --zebra-tint: rgba(37, 99, 235, 0.025);
-
-  /* shadcn/ui tokens: official "Blue" theme preset, paired with the "neutral" base color */
-  --radius: var(--radius-card);
+  /* shadcn/ui tokens -- single source of truth for the brand accent color.
+     Ganti tema = ganti nilai HSL --primary/--ring di sini (mis. tempel preset
+     resmi shadcn lain seperti "Green"/"Rose"/"Orange"); semua variabel
+     "legacy" di bawah diturunkan otomatis dari --primary, jadi tidak perlu
+     ubah file lain. */
+  --radius: 1rem;
   --background: 0 0% 100%;
   --foreground: 240 10% 3.9%;
   --card: 0 0% 100%;
@@ -61,6 +31,45 @@
   --border: 240 5.9% 90%;
   --input: 240 5.9% 90%;
   --ring: 221.2 83.2% 53.3%;
+
+  /* Variabel "legacy" dipakai class kustom (.btn, .tbl, .side-link, dst.) dan
+     theme-extras.css -- semuanya turunan dari --primary di atas. */
+  --legacy-primary: hsl(var(--primary));
+  --primary-hover: color-mix(in srgb, hsl(var(--primary)) 85%, black);
+  --primary-dark: color-mix(in srgb, hsl(var(--primary)) 55%, black);
+  --primary-light: hsl(var(--primary) / 0.06);
+  --focus-ring: hsl(var(--primary) / 0.12);
+  --zebra-tint: hsl(var(--primary) / 0.025);
+  --total-row-bg: hsl(var(--primary) / 0.14);
+
+  /* Neutral & status -- tidak ikut berubah antar preset warna (sengaja lepas
+     dari --primary, karena preset shadcn resmi juga tidak mengubah ini). */
+  --bg: #FAFAFA;
+  --surface: #FFFFFF;
+  --surface-alt: #F4F4F5;
+  --legacy-border: #E4E4E7;
+  --text-primary: #18181B;
+  --text-secondary: #52525B;
+  --text-muted: #A1A1AA;
+  --status-success: #16A34A;
+  --status-warning: #C4A035;
+  --status-error: #DC2626;
+  --status-error-bg: #FEF2F2;
+  --status-error-border: #FECACA;
+  --status-error-strong: #991B1B;
+  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.05), 0 8px 24px rgba(0, 0, 0, 0.04);
+  --shadow-inset: inset 0 0 0 1px #E4E4E7;
+  --chart-1: #e76f51;
+  --chart-2: #2a9d8b;
+  --chart-3: #264653;
+  --chart-4: #e9c46a;
+  --chart-5: #f4a261;
+  --chart-6: #94a3b8;
+  --radius-btn: 0.75rem;
+  --radius-card: var(--radius);
+  --radius-input: 0.75rem;
+  --font-heading: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
 }
 
 /* Pilihan font: independen dari tema, ditumpangkan lewat data-font di <html>.
