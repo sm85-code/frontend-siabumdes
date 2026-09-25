@@ -247,6 +247,31 @@
   --border: 0 0% 100% / 10%; --input: 0 0% 100% / 15%;
 }
 
+/* Wallpaper dekoratif ("Wallpaper"): pola latar terinspirasi situs ui.shadcn.com
+   sendiri (dot-grid, radial glow, aurora mesh gradient), ditumpangkan lewat
+   data-wallpaper di <html> pada elemen .app-shell (pembungkus utama Layout).
+   Warnanya sengaja ikut --primary/--ring tema aktif (bukan warna tetap) dan
+   opacity dibuat sangat rendah supaya tabel/angka di halaman kerja tetap
+   gampang dibaca -- kartu (bg-card) tetap solid di atasnya. */
+.app-shell {
+  background-color: var(--bg);
+  background-attachment: fixed;
+  background-position: center;
+}
+:root[data-wallpaper="dots"] .app-shell {
+  background-image: radial-gradient(hsl(var(--foreground) / 0.10) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+:root[data-wallpaper="glow"] .app-shell {
+  background-image: radial-gradient(640px circle at 12% -8%, hsl(var(--primary) / 0.16), transparent 60%),
+    radial-gradient(480px circle at 100% 0%, hsl(var(--ring) / 0.10), transparent 55%);
+}
+:root[data-wallpaper="aurora"] .app-shell {
+  background-image: radial-gradient(520px circle at 8% 0%, hsl(var(--primary) / 0.18), transparent 55%),
+    radial-gradient(520px circle at 92% 12%, hsl(var(--ring) / 0.14), transparent 55%),
+    radial-gradient(620px circle at 50% 100%, hsl(var(--primary) / 0.10), transparent 60%);
+}
+
 /* Pilihan font: independen dari tema, ditumpangkan lewat data-font di <html>.
    Diletakkan setelah blok data-theme supaya menang saat keduanya diset. */
 :root[data-font="jakarta"] { --font-heading: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif; --font-body: 'Inter', system-ui, sans-serif; }

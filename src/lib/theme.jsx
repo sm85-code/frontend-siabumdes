@@ -36,13 +36,27 @@ export const MODES = [
   { id: "dark", label: "Gelap" },
 ];
 
+// Wallpaper dekoratif untuk latar aplikasi -- terinspirasi pola yang dipakai
+// situs ui.shadcn.com sendiri (dot-grid, radial glow, aurora mesh gradient).
+// Sengaja dibuat sangat samar (opacity rendah, warnanya ikut --primary/--ring
+// tema aktif) supaya tidak mengganggu keterbacaan tabel/angka di halaman kerja.
+// Lihat blok [data-wallpaper="..."] .app-shell di index.css.
+export const WALLPAPERS = [
+  { id: "none", label: "Polos" },
+  { id: "dots", label: "Dot Grid" },
+  { id: "glow", label: "Radial Glow" },
+  { id: "aurora", label: "Aurora" },
+];
+
 const FONT_KEY = "bumdes-font";
 const THEME_KEY = "bumdes-theme";
 const BASE_KEY = "bumdes-base";
+const WALLPAPER_KEY = "bumdes-wallpaper";
 const MODE_KEY = "bumdes-mode";
 const VALID_FONTS = FONTS.map((f) => f.id);
 const VALID_THEMES = THEMES.map((t) => t.id);
 const VALID_BASE_COLORS = BASE_COLORS.map((b) => b.id);
+const VALID_WALLPAPERS = WALLPAPERS.map((w) => w.id);
 const VALID_MODES = MODES.map((m) => m.id);
 
 function readStored(key, validIds, fallback) {
@@ -59,6 +73,7 @@ const ThemeContext = createContext({
   font: "jakarta", setFont: () => {},
   colorTheme: "blue", setColorTheme: () => {},
   baseColor: "zinc", setBaseColor: () => {},
+  wallpaper: "none", setWallpaper: () => {},
   mode: "light", setMode: () => {},
 });
 
@@ -75,6 +90,7 @@ export function ThemeProvider({ children }) {
   const [font, setFont] = useState(() => readStored(FONT_KEY, VALID_FONTS, "jakarta"));
   const [colorTheme, setColorTheme] = useState(() => readStored(THEME_KEY, VALID_THEMES, "blue"));
   const [baseColor, setBaseColor] = useState(() => readStored(BASE_KEY, VALID_BASE_COLORS, "zinc"));
+  const [wallpaper, setWallpaper] = useState(() => readStored(WALLPAPER_KEY, VALID_WALLPAPERS, "none"));
   const [mode, setMode] = useState(() => readStored(MODE_KEY, VALID_MODES, "light"));
 
   useEffect(() => {
@@ -105,6 +121,15 @@ export function ThemeProvider({ children }) {
   }, [baseColor]);
 
   useEffect(() => {
+    document.documentElement.setAttribute("data-wallpaper", wallpaper);
+    try {
+      localStorage.setItem(WALLPAPER_KEY, wallpaper);
+    } catch {
+      // ignore (private mode / storage blocked)
+    }
+  }, [wallpaper]);
+
+  useEffect(() => {
     document.documentElement.classList.toggle("dark", mode === "dark");
     try {
       localStorage.setItem(MODE_KEY, mode);
@@ -115,7 +140,14 @@ export function ThemeProvider({ children }) {
 
   return (
     <ThemeContext.Provider
-      value={{ theme: "modern", font, setFont, colorTheme, setColorTheme, baseColor, setBaseColor, mode, setMode }}
+      value={{
+        theme: "modern",
+        font, setFont,
+        colorTheme, setColorTheme,
+        baseColor, setBaseColor,
+        wallpaper, setWallpaper,
+        mode, setMode,
+      }}
     >
       {children}
     </ThemeContext.Provider>
