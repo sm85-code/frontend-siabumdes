@@ -598,9 +598,9 @@ if (!(await confirm({
       {/* Unified group and period filters */}
       <Card data-testid="tx-filters">
         <CardContent className="p-4">
-          <div className="flex flex-wrap gap-3 items-end">
-            <div className="space-y-1.5">
-              <Label htmlFor="tx-group-select">Kelompok</Label>
+          <div className="flex flex-wrap gap-4 items-start">
+            <div>
+              <label className="label" htmlFor="tx-group-select">Kelompok</label>
               <Select value={activeGroup} onValueChange={setActiveGroup} disabled={isPengelola}>
                 <SelectTrigger id="tx-group-select" data-testid="tx-group-select">
                   <SelectValue />
@@ -610,16 +610,16 @@ if (!(await confirm({
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-1.5">
-              <Label>Periode</Label>
+            <div>
+              <label className="label">Periode</label>
               <PeriodFilter value={period} onChange={setPeriod} defaultMode="monthly" data-testid="tx-period-filter" />
             </div>
-            <div className="text-xs px-3 py-2 rounded-lg bg-primary/10 text-primary font-semibold">
+            <div className="text-xs px-3 py-2 rounded-lg bg-primary/10 text-primary font-semibold self-center">
               Tampilkan: {periodLabel} · {activeGroup}
             </div>
             {canBulkDelete && selected.size > 0 && (
               <Button data-testid="btn-bulk-delete" onClick={bulkDelete}
-                      variant="destructive" size="sm" className="sm:col-span-4 justify-self-start">
+                      variant="destructive" size="sm" className="self-center">
                 <Trash size={14} /> Hapus {selected.size} Terpilih
               </Button>
             )}

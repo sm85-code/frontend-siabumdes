@@ -183,25 +183,13 @@ export default function Reports() {
         <>
           <Card>
           <CardContent className="pt-6">
-            <label className="label" htmlFor="report-group-select">Kelompok</label>
-            <Select value={groupKey} disabled={isPengelola} onValueChange={(v) => { setGroupKey(v); setData(null); }}>
-              <SelectTrigger id="report-group-select" data-testid="report-group-select"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {groupOptions.map(o => <SelectItem key={o.code} value={o.code}>{o.code === "BUMDES" ? "BUMDES - Pusat" : `${o.code} - ${o.name}`}</SelectItem>)}
-              </SelectContent>
-            </Select>
-          </CardContent>
-          </Card>
-
-          <Card>
-          <CardContent className="pt-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-start">
               <div>
-                <label className="label" htmlFor="report-type-select">Jenis Laporan Keuangan</label>
-                <Select value={active} onValueChange={(v) => { setActive(v); setData(null); }}>
-                  <SelectTrigger id="report-type-select" data-testid="report-type-select"><SelectValue /></SelectTrigger>
+                <label className="label" htmlFor="report-group-select">Kelompok</label>
+                <Select value={groupKey} disabled={isPengelola} onValueChange={(v) => { setGroupKey(v); setData(null); }}>
+                  <SelectTrigger id="report-group-select" data-testid="report-group-select"><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    {visibleReports.map(r => <SelectItem key={r.key} value={r.key}>{r.label}</SelectItem>)}
+                    {groupOptions.map(o => <SelectItem key={o.code} value={o.code}>{o.code === "BUMDES" ? "BUMDES - Pusat" : `${o.code} - ${o.name}`}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
@@ -214,6 +202,15 @@ export default function Reports() {
                   data-testid="report-period-filter"
                   className="w-full"
                 />
+              </div>
+              <div>
+                <label className="label" htmlFor="report-type-select">Jenis Laporan Keuangan</label>
+                <Select value={active} onValueChange={(v) => { setActive(v); setData(null); }}>
+                  <SelectTrigger id="report-type-select" data-testid="report-type-select"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {visibleReports.map(r => <SelectItem key={r.key} value={r.key}>{r.label}</SelectItem>)}
+                  </SelectContent>
+                </Select>
               </div>
               <Button data-testid="btn-load-report" onClick={load}>
                 {loading ? <Spinner size={18} label="Memuat..." /> : "Tampilkan Laporan"}
