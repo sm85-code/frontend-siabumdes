@@ -40,6 +40,13 @@ export function AuthProvider({ children }) {
     return r.data;
   }, []);
 
+  const refreshUser = useCallback(async () => {
+    const r = await api.get("/auth/me");
+    setUser(r.data);
+    try { localStorage.setItem(USER_KEY, JSON.stringify(r.data)); } catch {}
+    return r.data;
+  }, []);
+
   const logout = useCallback(async () => {
     try { await api.post("/auth/logout"); } catch {}
     try { localStorage.removeItem(USER_KEY); } catch {}
@@ -47,7 +54,10 @@ export function AuthProvider({ children }) {
     window.location.href = "/login";
   }, []);
 
-  const value = useMemo(() => ({ user, login, changePassword, logout, loading }), [user, login, changePassword, logout, loading]);
+  const value = useMemo(
+    () => ({ user, login, changePassword, refreshUser, logout, loading }),
+    [user, login, changePassword, refreshUser, logout, loading]
+  );
 
   return <AuthCtx.Provider value={value}>{children}</AuthCtx.Provider>;
 }
