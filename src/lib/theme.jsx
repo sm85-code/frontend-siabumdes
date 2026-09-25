@@ -36,15 +36,15 @@ export const MODES = [
   { id: "dark", label: "Gelap" },
 ];
 
-// Wallpaper dekoratif untuk latar aplikasi -- terinspirasi pola yang dipakai
-// situs ui.shadcn.com sendiri (dot-grid, radial glow, aurora mesh gradient).
-// Sengaja dibuat sangat samar (opacity rendah, warnanya ikut --primary/--ring
-// tema aktif) supaya tidak mengganggu keterbacaan tabel/angka di halaman kerja.
-// Lihat blok [data-wallpaper="..."] .app-shell di index.css.
+// Wallpaper dekoratif untuk latar aplikasi -- komponen ala Magic UI
+// (magicui.design, registry shadcn-compatible): Dot Grid, Ripple (animasi
+// lingkaran konsentris), Aurora (blob gradient melayang). Dirender oleh
+// <WallpaperLayer> sebagai layer tetap di belakang sidebar & konten, warnanya
+// ikut --primary/--ring/--foreground tema aktif.
 export const WALLPAPERS = [
   { id: "none", label: "Polos" },
   { id: "dots", label: "Dot Grid" },
-  { id: "glow", label: "Radial Glow" },
+  { id: "glow", label: "Ripple" },
   { id: "aurora", label: "Aurora" },
 ];
 
