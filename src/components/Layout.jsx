@@ -135,10 +135,14 @@ export default function Layout({ children }) {
               </Select>
             </div>
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-9 h-9 rounded-full flex items-center justify-center font-heading font-semibold text-sm"
-                   style={{ background: "hsl(var(--primary))", color: "#fff" }}>
-                {user.name?.[0]?.toUpperCase()}
-              </div>
+              {user.photo_url ? (
+                <img src={user.photo_url} alt={user.name} className="w-9 h-9 rounded-full object-cover flex-shrink-0" />
+              ) : (
+                <div className="w-9 h-9 rounded-full flex items-center justify-center font-heading font-semibold text-sm flex-shrink-0"
+                     style={{ background: "hsl(var(--primary))", color: "#fff" }}>
+                  {user.name?.[0]?.toUpperCase()}
+                </div>
+              )}
               <div className="min-w-0">
                 <div className="text-sm font-semibold truncate">{user.name}</div>
                 <div className="text-xs" style={{ color: "var(--text-muted)" }}>{ROLE_LABELS[user.role]}</div>

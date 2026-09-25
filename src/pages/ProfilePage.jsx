@@ -7,11 +7,27 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 
 export default function ProfilePage() {
-  const { user, changePassword } = useAuth();
+  const { user, changePassword, refreshUser } = useAuth();
   const [profile, setProfile] = useState({ name: user?.name || "", username: user?.username || "", email: user?.email || "" });
   const [passwords, setPasswords] = useState({ current: "", next: "", confirm: "" });
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [uploading, setUploading] = useState(false);
+
+  const uploadPhoto = (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) { setError("Ukuran foto maksimal 2 MB"); return; }
+    const fd = new FormData();
+    fd.append("file", file);
+    setUploading(true);
+    setMessage(""); setError("");
+    api.post("/auth/profile/photo", fd)
+      .then(() => { refreshUser(); setMessage("Foto profil berhasil diupload"); })
+      .catch((er) => setError(er.response?.data?.detail || "Gagal upload foto"))
+      .finally(() => setUploading(false));
+  };
 
   const saveProfile = async (event) => {
     event.preventDefault();
@@ -47,6 +63,32 @@ export default function ProfilePage() {
       </div>
       {message && <div className="alert alert-success">{message}</div>}
       {error && <div className="alert alert-error">{error}</div>}
+      <Card>
+        <CardHeader>
+          <CardTitle className="font-heading text-lg">Foto Profil</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center gap-4 flex-wrap">
+            <div className="w-20 h-20 rounded-full flex items-center justify-center overflow-hidden shrink-0 bg-muted border border-border">
+              {user?.photo_url ? (
+                <img src={user.photo_url} alt={user.name} className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-xs text-center px-1 text-muted-foreground">Belum ada foto</span>
+              )}
+            </div>
+            <div>
+              <Label className="inline-flex">
+                <Button asChild variant="outline" size="sm" className="cursor-pointer">
+                  <span>{uploading ? "Mengupload..." : "Upload Foto"}</span>
+                </Button>
+                <input type="file" accept="image/png,image/jpeg,image/webp" hidden
+                       onChange={uploadPhoto} disabled={uploading} data-testid="profile-photo-input" />
+              </Label>
+              <p className="text-xs mt-1 text-muted-foreground">PNG/JPG/WebP, maksimal 2 MB.</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
       <Card>
         <CardHeader>
           <CardTitle className="font-heading text-lg">Informasi Profil</CardTitle>
