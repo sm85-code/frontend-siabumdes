@@ -20,6 +20,17 @@ export const THEMES = [
   { id: "rose", label: "Rose" },
 ];
 
+// Base Color resmi shadcn/ui (ui.shadcn.com/docs/theming) -- skala netral untuk
+// background/border/card/muted, independen dari preset "Tema" di atas (yang
+// cuma mengatur --primary/--ring). Lihat blok :root[data-base="..."] di index.css.
+export const BASE_COLORS = [
+  { id: "zinc", label: "Zinc" },
+  { id: "slate", label: "Slate" },
+  { id: "gray", label: "Gray" },
+  { id: "neutral", label: "Neutral" },
+  { id: "stone", label: "Stone" },
+];
+
 export const MODES = [
   { id: "light", label: "Terang" },
   { id: "dark", label: "Gelap" },
@@ -27,9 +38,11 @@ export const MODES = [
 
 const FONT_KEY = "bumdes-font";
 const THEME_KEY = "bumdes-theme";
+const BASE_KEY = "bumdes-base";
 const MODE_KEY = "bumdes-mode";
 const VALID_FONTS = FONTS.map((f) => f.id);
 const VALID_THEMES = THEMES.map((t) => t.id);
+const VALID_BASE_COLORS = BASE_COLORS.map((b) => b.id);
 const VALID_MODES = MODES.map((m) => m.id);
 
 function readStored(key, validIds, fallback) {
@@ -45,6 +58,7 @@ const ThemeContext = createContext({
   theme: "modern",
   font: "jakarta", setFont: () => {},
   colorTheme: "blue", setColorTheme: () => {},
+  baseColor: "zinc", setBaseColor: () => {},
   mode: "light", setMode: () => {},
 });
 
@@ -54,11 +68,13 @@ const ThemeContext = createContext({
  * user-facing pickers are:
  * - font: typeface (data-font attribute)
  * - colorTheme: shadcn/ui color preset (data-theme attribute, --primary/--ring)
+ * - baseColor: shadcn/ui base color (data-base attribute, neutral scale --background/--border/etc.)
  * - mode: light/dark (.dark class on <html>, per Tailwind's darkMode:"class")
  */
 export function ThemeProvider({ children }) {
   const [font, setFont] = useState(() => readStored(FONT_KEY, VALID_FONTS, "jakarta"));
   const [colorTheme, setColorTheme] = useState(() => readStored(THEME_KEY, VALID_THEMES, "blue"));
+  const [baseColor, setBaseColor] = useState(() => readStored(BASE_KEY, VALID_BASE_COLORS, "zinc"));
   const [mode, setMode] = useState(() => readStored(MODE_KEY, VALID_MODES, "light"));
 
   useEffect(() => {
@@ -80,6 +96,15 @@ export function ThemeProvider({ children }) {
   }, [colorTheme]);
 
   useEffect(() => {
+    document.documentElement.setAttribute("data-base", baseColor);
+    try {
+      localStorage.setItem(BASE_KEY, baseColor);
+    } catch {
+      // ignore (private mode / storage blocked)
+    }
+  }, [baseColor]);
+
+  useEffect(() => {
     document.documentElement.classList.toggle("dark", mode === "dark");
     try {
       localStorage.setItem(MODE_KEY, mode);
@@ -89,7 +114,9 @@ export function ThemeProvider({ children }) {
   }, [mode]);
 
   return (
-    <ThemeContext.Provider value={{ theme: "modern", font, setFont, colorTheme, setColorTheme, mode, setMode }}>
+    <ThemeContext.Provider
+      value={{ theme: "modern", font, setFont, colorTheme, setColorTheme, baseColor, setBaseColor, mode, setMode }}
+    >
       {children}
     </ThemeContext.Provider>
   );

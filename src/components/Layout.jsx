@@ -2,7 +2,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuth, can } from "@/lib/auth";
 import api, { ROLE_LABELS } from "@/lib/api";
-import { useTheme, FONTS, THEMES, MODES } from "@/lib/theme";
+import { useTheme, FONTS, THEMES, BASE_COLORS, MODES } from "@/lib/theme";
 import {
   House, Receipt, ChartLine, Storefront, UsersThree,
   BookOpenText, SignOut, List, X, Books, UserCircle, Package, Buildings,
@@ -27,7 +27,7 @@ const NAV = [
 
 export default function Layout({ children }) {
   const { user, logout } = useAuth();
-  const { font, setFont, colorTheme, setColorTheme, mode, setMode } = useTheme();
+  const { font, setFont, colorTheme, setColorTheme, baseColor, setBaseColor, mode, setMode } = useTheme();
   const location = useLocation();
   const [open, setOpen] = useState(false);
   const [uu05Id, setUu05Id] = useState(null);
@@ -103,6 +103,19 @@ export default function Layout({ children }) {
                   <SelectContent>
                     {THEMES.map((t) => (
                       <SelectItem key={t.id} value={t.id}>{t.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="label" htmlFor="base-color-switcher">Base Warna</label>
+                <Select value={baseColor} onValueChange={(v) => setBaseColor(v)}>
+                  <SelectTrigger id="base-color-switcher" data-testid="base-color-switcher" className="text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {BASE_COLORS.map((b) => (
+                      <SelectItem key={b.id} value={b.id}>{b.label}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
