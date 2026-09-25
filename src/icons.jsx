@@ -55,6 +55,7 @@ import {
   FileType2 as LuFileType2,
   ChevronsUpDown as LuChevronsUpDown,
   Check as LuCheck,
+  Palette as LuPalette,
 } from "lucide-react";
 
 /**
@@ -86,6 +87,7 @@ export const Books = wrap(LuLibrary);
 export const Calculator = wrap(LuCalculator);
 export const UserCircle = wrap(LuUserCircle);
 export const Package = wrap(LuPackage);
+export const PaintBrush = wrap(LuPalette);
 export const Eye = wrap(LuEye);
 export const EyeSlash = wrap(LuEyeOff);
 export const SignIn = wrap(LuLogIn);
