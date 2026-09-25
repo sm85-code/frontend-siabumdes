@@ -457,12 +457,15 @@ function ReportBody({ active, data }) {
         </TypographyLead>
         <section>
           <TypographyH4>1. Informasi Umum</TypographyH4>
-          <div className="mt-3">
+          <div className="mt-3 max-w-3xl">
           <TableShell minWidth={320}>
             <Table>
               <TableBody>
                 {Object.entries(data.informasi_umum).map(([k, v]) => (
-                  <TableRow key={k}><TableCell style={{ width: "45%" }}>{INFO_LABELS[k] || titleCase(k)}</TableCell><TableCell>{fmtInfoValue(k, v)}</TableCell></TableRow>
+                  <TableRow key={k}>
+                    <TableCell style={{ width: "45%", color: "var(--text-secondary)" }}>{INFO_LABELS[k] || titleCase(k)}</TableCell>
+                    <TableCell className="font-semibold" style={{ color: "var(--text-primary)" }}>{fmtInfoValue(k, v)}</TableCell>
+                  </TableRow>
                 ))}
               </TableBody>
             </Table>
@@ -471,12 +474,15 @@ function ReportBody({ active, data }) {
         </section>
         <section>
           <TypographyH4>2. Ringkasan Kinerja</TypographyH4>
-          <div className="mt-3">
+          <div className="mt-3 max-w-3xl">
           <TableShell minWidth={320}>
             <Table>
               <TableBody>
                 {Object.entries(data.ringkasan_kinerja).map(([k, v]) => (
-                  <TableRow key={k}><TableCell>{RINGKASAN_LABELS[k] || titleCase(k)}</TableCell><TableCell className="num">{fmtRp(v)}</TableCell></TableRow>
+                  <TableRow key={k}>
+                    <TableCell style={{ color: "var(--text-secondary)" }}>{RINGKASAN_LABELS[k] || titleCase(k)}</TableCell>
+                    <TableCell className="num font-semibold" style={{ color: "var(--text-primary)" }}>{fmtRp(v)}</TableCell>
+                  </TableRow>
                 ))}
               </TableBody>
             </Table>
