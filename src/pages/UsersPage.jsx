@@ -3,7 +3,7 @@ import api, { ROLE_LABELS } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { notify, notifySuccess, notifyError } from "@/lib/feedback";
 import { useConfirm } from "@/components/ConfirmProvider";
-import { Plus, Trash, Key, Lock } from "@phosphor-icons/react";
+import { Plus, Trash, Key, Lock, PencilSimple } from "@phosphor-icons/react";
 import TableShell from "@/components/TableShell";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -39,6 +39,8 @@ export default function UsersPage() {
   const [show, setShow] = useState(false);
   const [showResetFor, setShowResetFor] = useState(null); // user id
   const [showLockFor, setShowLockFor] = useState(null); // user id
+  const [editingUser, setEditingUser] = useState(null); // user object
+  const [editForm, setEditForm] = useState({ name: "", username: "", email: "", role: "", unit_usaha_id: "" });
   const [lockPeriods, setLockPeriods] = useState(new Set()); // Set of "YYYY-MM"
   const [newPw, setNewPw] = useState("");
   const [form, setForm] = useState({
@@ -62,6 +64,24 @@ export default function UsersPage() {
       load();
       notifySuccess("Pengguna berhasil ditambahkan.");
     } catch (er) { notifyError(er.response?.data?.detail || "Gagal"); }
+  };
+
+  const openEdit = (u) => {
+    setEditingUser(u);
+    setEditForm({ name: u.name, username: u.username, email: u.email, role: u.role, unit_usaha_id: u.unit_usaha_id || "" });
+  };
+
+  const saveEdit = async (e) => {
+    e.preventDefault();
+    try {
+      await api.put(`/users/${editingUser.id}`, {
+        ...editForm,
+        unit_usaha_id: editForm.role === "pengelola" ? editForm.unit_usaha_id : null,
+      });
+      setEditingUser(null);
+      load();
+      notifySuccess("Pengguna berhasil diperbarui.");
+    } catch (er) { notifyError(er.response?.data?.detail || "Gagal memperbarui pengguna"); }
   };
 
   const del = async (id) => {
@@ -126,6 +146,16 @@ export default function UsersPage() {
 
   const actionButtons = (u) => (
     <div className="flex gap-1">
+      <Button
+        data-testid={`btn-edit-${u.id}`}
+        onClick={() => openEdit(u)}
+        variant="ghost"
+        size="icon"
+        className="h-8 w-8 text-primary hover:bg-primary/10 hover:text-primary"
+        title="Edit Pengguna"
+      >
+        <PencilSimple size={16} />
+      </Button>
       {u.role !== "admin" && (
         <Button
           data-testid={`btn-lock-${u.id}`}
@@ -237,6 +267,63 @@ export default function UsersPage() {
             <CardFooter className="sm:col-span-2 justify-end gap-2">
               <Button type="button" onClick={() => setShow(false)} variant="outline">Batal</Button>
               <Button type="submit" data-testid="btn-save-user">Simpan</Button>
+            </CardFooter>
+          </form>
+        </Card>
+      )}
+
+      {editingUser && (
+        <Card className="fade-in" data-testid="edit-user-form">
+          <CardHeader>
+            <CardTitle className="font-heading text-lg">Edit Pengguna: {editingUser.name}</CardTitle>
+          </CardHeader>
+          <form onSubmit={saveEdit}>
+            <CardContent className="pt-0 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label>Nama Lengkap</Label>
+                <Input required value={editForm.name}
+                       onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Username</Label>
+                <Input required value={editForm.username}
+                       onChange={(e) => setEditForm({ ...editForm, username: e.target.value })} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Email</Label>
+                <Input type="email" required value={editForm.email}
+                       onChange={(e) => setEditForm({ ...editForm, email: e.target.value })} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Role</Label>
+                <Select required value={editForm.role}
+                        onValueChange={(v) => setEditForm({ ...editForm, role: v })}>
+                  <SelectTrigger data-testid="edit-select-role">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ROLE_OPTIONS.map(r => <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              {editForm.role === "pengelola" && (
+                <div className="space-y-1.5">
+                  <Label>Unit Usaha</Label>
+                  <Select required value={editForm.unit_usaha_id}
+                          onValueChange={(v) => setEditForm({ ...editForm, unit_usaha_id: v })}>
+                    <SelectTrigger data-testid="edit-select-unit-usaha">
+                      <SelectValue placeholder="— pilih unit —" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {units.map(u => <SelectItem key={u.id} value={u.id}>{u.code} - {u.name}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+            </CardContent>
+            <CardFooter className="justify-end gap-2">
+              <Button type="button" onClick={() => setEditingUser(null)} variant="outline">Batal</Button>
+              <Button type="submit" data-testid="btn-save-edit">Simpan Perubahan</Button>
             </CardFooter>
           </form>
         </Card>
