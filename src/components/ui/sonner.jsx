@@ -1,9 +1,11 @@
 import { Toaster as Sonner, toast } from "sonner"
+import { useTheme } from "@/lib/theme"
 
 const Toaster = ({ ...props }) => {
+  const { mode } = useTheme();
   return (
     <Sonner
-      theme="light"
+      theme={mode}
       className="toaster group"
       style={{
         "--success-bg": "color-mix(in srgb, var(--status-success) 12%, white)",
@@ -23,7 +25,7 @@ const Toaster = ({ ...props }) => {
         classNames: {
           toast: "group toast bg-[var(--surface)] text-[var(--text-primary)] border-[var(--legacy-border)] shadow-lg rounded-xl",
           description: "text-[var(--text-secondary)]",
-          actionButton: "bg-[var(--legacy-primary)] text-white",
+          actionButton: "bg-[var(--legacy-primary)] text-[color:hsl(var(--primary-foreground))]",
           cancelButton: "bg-[var(--bg)] text-[var(--legacy-primary)]",
         },
       }}
