@@ -14,7 +14,24 @@ const EMPTY = {
   signatory_mid_title: "", signatory_mid_name: "",
   signatory_right_title: "", signatory_right_name: "",
   primary_color: "1F4E79",
+  share_pengurus: 35, share_penasihat: 7, share_pengawas: 5, share_dana_sosial: 5,
+  share_pades: 30, share_modal_bumdes: 18,
+  share_unit_pengelola: 30, share_unit_bumdes: 70,
 };
+
+const SHARE_FIELDS_BUMDES = [
+  ["share_pengurus", "Pengurus"],
+  ["share_penasihat", "Penasihat"],
+  ["share_pengawas", "Pengawas"],
+  ["share_dana_sosial", "Dana Sosial"],
+  ["share_pades", "PADes (ke Desa)"],
+  ["share_modal_bumdes", "Penguatan Modal BUMDES"],
+];
+const SHARE_FIELDS_UNIT = [
+  ["share_unit_pengelola", "Pengelola Unit"],
+  ["share_unit_bumdes", "BUMDES (Pusat)"],
+];
+const TOTAL_TOLERANCE = 0.01;
 
 export default function OrgProfilePage() {
   const [form, setForm] = useState(EMPTY);
@@ -36,9 +53,20 @@ export default function OrgProfilePage() {
   useEffect(() => { load(); }, []);
 
   const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }));
+  const setNum = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value === "" ? "" : Number(e.target.value) }));
+
+  const sumFields = (fields) => fields.reduce((acc, [key]) => acc + (Number(form[key]) || 0), 0);
+  const bumdesTotal = sumFields(SHARE_FIELDS_BUMDES);
+  const unitTotal = sumFields(SHARE_FIELDS_UNIT);
+  const bumdesValid = Math.abs(bumdesTotal - 100) < TOTAL_TOLERANCE;
+  const unitValid = Math.abs(unitTotal - 100) < TOTAL_TOLERANCE;
 
   const save = async (e) => {
     e.preventDefault();
+    if (!bumdesValid || !unitValid) {
+      notify("Total proporsi bagi hasil tiap grup harus tepat 100%");
+      return;
+    }
     setSaving(true);
     try {
       const { logo_url: _logoUrl, updated_at: _updatedAt, ...payload } = form;
@@ -135,6 +163,69 @@ export default function OrgProfilePage() {
 
         <Card>
           <CardHeader>
+            <CardTitle className="font-heading text-lg">Bagi Hasil</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <p className="text-xs text-muted-foreground">
+              Proporsi ini dipakai saat Tutup Buku bulanan (jurnal alokasi laba) dan di Laporan Perubahan Ekuitas /
+              ringkasan per-unit. Ubah di sini berlaku untuk penutupan bulan berikutnya -- periode yang sudah
+              ditutup tidak berubah.
+            </p>
+
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-semibold">BUMDES (Pusat)</span>
+                <span className={`text-xs font-mono px-2 py-0.5 rounded-full ${bumdesValid ? "" : "font-bold"}`}
+                      style={{
+                        background: bumdesValid ? "var(--primary-light)" : "var(--status-error-bg)",
+                        color: bumdesValid ? "var(--primary-dark)" : "var(--status-error)",
+                      }}
+                      data-testid="bumdes-share-total">
+                  Total: {bumdesTotal}% {bumdesValid ? "" : "(harus 100%)"}
+                </span>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-3">
+                {SHARE_FIELDS_BUMDES.map(([key, label]) => (
+                  <Label key={key} className="label">{label}
+                    <div className="relative mt-1">
+                      <Input type="number" min="0" max="100" step="0.01" className="pr-7"
+                             value={form[key]} onChange={setNum(key)} data-testid={`org-${key}`} />
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">%</span>
+                    </div>
+                  </Label>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-semibold">Unit Usaha</span>
+                <span className="text-xs font-mono px-2 py-0.5 rounded-full"
+                      style={{
+                        background: unitValid ? "var(--primary-light)" : "var(--status-error-bg)",
+                        color: unitValid ? "var(--primary-dark)" : "var(--status-error)",
+                      }}
+                      data-testid="unit-share-total">
+                  Total: {unitTotal}% {unitValid ? "" : "(harus 100%)"}
+                </span>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {SHARE_FIELDS_UNIT.map(([key, label]) => (
+                  <Label key={key} className="label">{label}
+                    <div className="relative mt-1">
+                      <Input type="number" min="0" max="100" step="0.01" className="pr-7"
+                             value={form[key]} onChange={setNum(key)} data-testid={`org-${key}`} />
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">%</span>
+                    </div>
+                  </Label>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
             <CardTitle className="font-heading text-lg">Kolom Tanda Tangan</CardTitle>
           </CardHeader>
           <CardContent>
@@ -152,7 +243,7 @@ export default function OrgProfilePage() {
           </CardContent>
         </Card>
 
-        <Button type="submit" disabled={saving} data-testid="save-org-profile">
+        <Button type="submit" disabled={saving || !bumdesValid || !unitValid} data-testid="save-org-profile">
           {saving ? "Menyimpan..." : "Simpan Profil BUMDES"}
         </Button>
       </form>
