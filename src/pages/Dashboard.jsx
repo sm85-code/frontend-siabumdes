@@ -7,7 +7,10 @@ import {
   XAxis, YAxis,
   PieChart, Pie, Cell, CartesianGrid,
 } from "recharts";
-import { TrendUp, TrendDown, Coin, Storefront, ReceiptX, CalendarBlank, Lock } from "@phosphor-icons/react";
+import {
+  TrendUp, TrendDown, Coin, Storefront, ReceiptX, CalendarBlank, Lock,
+  Buildings, Scales, Wallet, ChartLineUp, ChartPie, Coins,
+} from "@phosphor-icons/react";
 import TableShell from "@/components/TableShell";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
@@ -56,6 +59,23 @@ export default function Dashboard() {
     { key: "laba", label: "Laba Bersih", value: data.laba_bersih, icon: Coin },
     { key: "tx", label: "Jumlah Transaksi", value: data.total_transactions, icon: ReceiptX, isCount: true },
   ] : [], [data]);
+
+  // KPI rasio keuangan ala dashboard keuangan profesional -- dihitung dari
+  // posisi Neraca (total_aset/total_kewajiban/total_ekuitas/kas_bank) yang
+  // dikirim backend per akhir periode terpilih, dipadukan dengan Laba Rugi
+  // periode yang sama (data.total_pendapatan/total_beban/laba_bersih).
+  const posisiKpis = useMemo(() => {
+    if (!data) return [];
+    const pct = (num, denom) => (denom ? (num / denom) * 100 : 0);
+    return [
+      { key: "total-aset", label: "Total Aset", value: data.total_aset, icon: Buildings },
+      { key: "total-kewajiban", label: "Total Kewajiban", value: data.total_kewajiban, icon: Scales },
+      { key: "total-ekuitas", label: "Total Ekuitas", value: data.total_ekuitas, icon: Wallet },
+      { key: "margin-laba", label: "Margin Laba Bersih", value: pct(data.laba_bersih, data.total_pendapatan), icon: ChartLineUp, isPct: true },
+      { key: "rasio-kas", label: "Rasio Kas", value: pct(data.kas_bank, data.total_kewajiban), icon: Coins, isPct: true },
+      { key: "rasio-solvabilitas", label: "Rasio Solvabilitas", value: pct(data.total_kewajiban, data.total_ekuitas), icon: ChartPie, isPct: true },
+    ];
+  }, [data]);
 
   const chartData = useMemo(() => {
     if (!data?.monthly) return [];
@@ -136,6 +156,30 @@ export default function Dashboard() {
         })}
       </div>
 
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: "var(--text-muted)" }}>
+          Rasio & Posisi Keuangan
+        </p>
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+          {posisiKpis.map((k) => {
+            const Icon = k.icon;
+            return (
+              <Card key={k.key} data-testid={`kpi-${k.key}`}>
+                <CardContent className="p-4">
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center mb-3" style={icoBox}>
+                    <Icon size={18} color={INK} />
+                  </div>
+                  <p className="text-xs uppercase tracking-wider font-semibold" style={{ color: "var(--text-secondary)" }}>{k.label}</p>
+                  <p className="font-heading text-xl sm:text-2xl font-bold mt-1 tabular-nums">
+                    {k.isPct ? `${k.value.toFixed(1)}%` : fmtRp(k.value)}
+                  </p>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card className="lg:col-span-2">
         <CardContent className="pt-6">
@@ -145,8 +189,8 @@ export default function Dashboard() {
               {useBar ? (
                 <BarChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE} vertical={false} />
-                  <XAxis dataKey="month" tick={{ fontSize: 11 }} />
-                  <YAxis tick={{ fontSize: 11 }} tickFormatter={yTickFormatter} />
+                  <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+                  <YAxis tick={{ fontSize: 12 }} tickFormatter={yTickFormatter} />
                   <ChartTooltip content={<ChartTooltipContent formatter={(v) => fmtRp(v)} />} />
                   <ChartLegend content={<ChartLegendContent />} />
                   <Bar dataKey="pendapatan" name="Pendapatan" fill="var(--color-pendapatan)" radius={[3,3,0,0]} />
@@ -155,8 +199,8 @@ export default function Dashboard() {
               ) : (
                 <LineChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE} vertical={false} />
-                  <XAxis dataKey="month" tick={{ fontSize: 11 }} />
-                  <YAxis tick={{ fontSize: 11 }} tickFormatter={yTickFormatter} />
+                  <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+                  <YAxis tick={{ fontSize: 12 }} tickFormatter={yTickFormatter} />
                   <ChartTooltip content={<ChartTooltipContent formatter={(v) => fmtRp(v)} />} />
                   <ChartLegend content={<ChartLegendContent />} />
                   <Line type="monotone" dataKey="pendapatan" name="Pendapatan" stroke="var(--color-pendapatan)" strokeWidth={2} dot={false} />
@@ -172,7 +216,7 @@ export default function Dashboard() {
         <Card>
         <CardContent className="pt-6">
           <h3 className="font-heading text-lg font-semibold mb-4">Kontribusi Per Unit</h3>
-          <p className="text-[11px] -mt-3 mb-3" style={{ color: "var(--text-muted)" }}>Berdasarkan laba bersih per unit (unit dengan laba positif).</p>
+          <p className="text-xs -mt-3 mb-3" style={{ color: "var(--text-muted)" }}>Berdasarkan laba bersih per unit (unit dengan laba positif).</p>
           {data.unit_summaries?.some(u => (u.laba || 0) > 0) ? (
             <ChartContainer config={{}} className="w-full aspect-auto" style={{ height: 240 }}>
               <PieChart>

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import WallpaperLayer from "@/components/WallpaperLayer";
+import AppearancePopover from "@/components/AppearancePopover";
 
 export default function Login() {
   const { login } = useAuth();
@@ -36,6 +37,9 @@ export default function Login() {
           <ArrowLeft size={14} /> Kembali
         </Link>
       </Button>
+      <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
+        <AppearancePopover triggerClassName="text-xs sm:text-sm gap-2" align="end" />
+      </div>
       <div className="w-full max-w-md fade-in">
         <div className="text-center mb-6">
           <img src="/logo-transparent.png" alt="Logo BUMDES Karya Raharja" data-testid="bumdes-logo"

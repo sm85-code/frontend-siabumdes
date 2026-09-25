@@ -1,11 +1,18 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
-// Disamakan dengan pilihan font resmi shadcn/ui: Geist (default ui.shadcn.com),
-// Inter (alternatif resmi), dan Geist Mono (angka rata lebar, cocok untuk
-// tabel akuntansi) -- lihat blok :root[data-font="..."] di index.css.
+// Geist & Geist Mono adalah font resmi bawaan ui.shadcn.com, Inter adalah
+// alternatif resmi shadcn di versi-versi sebelumnya -- sisanya (Manrope,
+// Plus Jakarta Sans, Outfit, Space Grotesk, Sora) typeface UI modern populer
+// yang juga sering dipakai di ekosistem shadcn/Tailwind, ditambahkan supaya
+// pilihan gaya lebih beragam. Lihat blok :root[data-font="..."] di index.css.
 export const FONTS = [
   { id: "geist", label: "Geist" },
   { id: "inter", label: "Inter" },
+  { id: "manrope", label: "Manrope" },
+  { id: "jakarta", label: "Plus Jakarta Sans" },
+  { id: "outfit", label: "Outfit" },
+  { id: "grotesk", label: "Space Grotesk" },
+  { id: "sora", label: "Sora" },
   { id: "mono", label: "Geist Mono" },
 ];
 

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Geist:ital,wght@0,100..900;1,100..900&family=Geist+Mono:ital,wght@0,100..900;1,100..900&family=Inter:ital,opsz,wght@0,14..32,400..800;1,14..32,400..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Geist:ital,wght@0,100..900;1,100..900&family=Geist+Mono:ital,wght@0,100..900;1,100..900&family=Inter:ital,opsz,wght@0,14..32,400..800;1,14..32,400..800&family=Manrope:wght@400..800&family=Plus+Jakarta+Sans:ital,wght@0,400..800;1,400..800&family=Outfit:wght@400..800&family=Space+Grotesk:wght@400..700&family=Sora:wght@400..800&display=swap');
 @import './theme-extras.css';
 
 @tailwind base;
@@ -184,20 +184,26 @@
   --accent-foreground: 0 0% 98%;
   --destructive: 0 62.8% 30.6%;
   --destructive-foreground: 0 0% 98%;
-  --border: 240 3.7% 15.9%;
-  --input: 240 3.7% 15.9%;
+  /* Border/input pakai putih transparan (bukan abu solid) -- ini pola resmi
+     shadcn/ui v4 untuk dark mode (lihat blok data-base="neutral"/"stone" di
+     atas yang sudah pakai pola sama): border jadi lebih halus/tidak "tebal"
+     dan otomatis membaur dengan warna latar apa pun di baliknya (termasuk
+     wallpaper), dibanding abu-abu solid yang kontrasnya tetap sama terlepas
+     dari latar di belakangnya. */
+  --border: 0 0% 100% / 10%;
+  --input: 0 0% 100% / 15%;
 
   --bg: #09090B;
   --surface: #18181B;
   --surface-alt: #1F1F23;
-  --legacy-border: #27272A;
+  --legacy-border: rgba(255, 255, 255, 0.08);
   --text-primary: #FAFAFA;
   --text-secondary: #A1A1AA;
   --text-muted: #71717A;
   --status-error-bg: #450A0A;
   --status-error-border: #7F1D1D;
   --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.3);
-  --shadow-inset: inset 0 0 0 1px #27272A;
+  --shadow-inset: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
 
   /* --primary-dark dipakai sebagai warna TEKS (heading, ikon aktif) -- di mode
      terang dicampur ke hitam supaya gelap di atas latar putih; di mode gelap
@@ -266,9 +272,14 @@
   overflow: hidden;
   pointer-events: none;
 }
-/* Sidebar & konten harus di atas wallpaper-layer (z-0) -- aside sudah z-50
-   lewat class Tailwind yang ada, main perlu z-index eksplisit. */
-.app-shell > main { position: relative; z-index: 1; }
+/* Sidebar & konten otomatis tampil di atas wallpaper-layer tanpa perlu
+   position/z-index tambahan di sini -- keduanya sama-sama z-index:auto,
+   dan wallpaper-layer dirender lebih dulu (elemen pertama), jadi urutan DOM
+   saja sudah cukup membuatnya tercat di bawah elemen sesudahnya. Memaksa
+   position:relative di sini pernah tanpa sengaja menimpa position:absolute
+   elemen lain (mis. tombol "Kembali" di Login.jsx) karena spesifisitas
+   selector `.app-shell > main`/`.auth-bg > *` lebih tinggi dari utility
+   class Tailwind seperti .absolute. */
 
 /* Ripple: lingkaran konsentris memudar dari tengah, animasi CSS murni
    (bukan framer-motion) supaya tidak menambah dependency baru. */
@@ -311,6 +322,11 @@
    untuk aplikasi akuntansi ini karena angka tabular jadi rata lebar. */
 :root[data-font="geist"] { --font-heading: 'Geist', 'Inter', system-ui, sans-serif; --font-body: 'Geist', 'Inter', system-ui, sans-serif; }
 :root[data-font="inter"] { --font-heading: 'Inter', system-ui, sans-serif; --font-body: 'Inter', system-ui, sans-serif; }
+:root[data-font="manrope"] { --font-heading: 'Manrope', 'Inter', system-ui, sans-serif; --font-body: 'Manrope', 'Inter', system-ui, sans-serif; }
+:root[data-font="jakarta"] { --font-heading: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif; --font-body: 'Inter', system-ui, sans-serif; }
+:root[data-font="outfit"] { --font-heading: 'Outfit', 'Inter', system-ui, sans-serif; --font-body: 'Outfit', 'Inter', system-ui, sans-serif; }
+:root[data-font="grotesk"] { --font-heading: 'Space Grotesk', 'Inter', system-ui, sans-serif; --font-body: 'Inter', system-ui, sans-serif; }
+:root[data-font="sora"] { --font-heading: 'Sora', 'Inter', system-ui, sans-serif; --font-body: 'Sora', 'Inter', system-ui, sans-serif; }
 :root[data-font="mono"] { --font-heading: 'Geist Mono', ui-monospace, monospace; --font-body: 'Geist Mono', ui-monospace, monospace; }
 
 body {
@@ -368,14 +384,14 @@ select.select {
   background-repeat: no-repeat; background-position: right 0.85rem center; background-size: 13px;
 }
 .input:focus, .select:focus { border-color: var(--legacy-primary); box-shadow: 0 0 0 3px var(--focus-ring); }
-.label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.3rem; display: block; }
+.label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.09em; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.35rem; display: block; }
 
 input[type="date"], input[type="month"] { appearance: none; color-scheme: light; min-height: 44px; }
 
 .tbl { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.875rem; }
 .tbl thead th {
-  text-align: left; padding: 0.8rem 1rem; font-size: 0.68rem; text-transform: uppercase;
-  font-weight: 700; letter-spacing: 0.09em; color: var(--text-secondary);
+  text-align: left; padding: 0.8rem 1rem; font-size: 0.75rem; text-transform: uppercase;
+  font-weight: 700; letter-spacing: 0.07em; color: var(--text-secondary);
   border-bottom: 1.5px solid var(--legacy-border); background: var(--surface-alt); white-space: nowrap;
 }
 .tbl tbody td {
@@ -391,7 +407,7 @@ input[type="date"], input[type="month"] { appearance: none; color-scheme: light;
   border-top: 1.5px solid var(--legacy-border); border-bottom: 0; font-weight: 700;
 }
 
-.badge { display: inline-flex; align-items: center; padding: 0.15rem 0.55rem; border-radius: 999px; font-size: 0.7rem; font-weight: 600; background: var(--primary-light); color: var(--primary-dark); }
+.badge { display: inline-flex; align-items: center; padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; background: var(--primary-light); color: var(--primary-dark); }
 .badge-blue, .badge-purple, .badge-warn { background: var(--primary-light); color: var(--primary-dark); }
 
 .side-link {
@@ -403,7 +419,6 @@ input[type="date"], input[type="month"] { appearance: none; color-scheme: light;
 .side-link.active { background: var(--legacy-primary); color: hsl(var(--primary-foreground)); font-weight: 600; }
 
 .auth-bg { min-height: 100vh; background: var(--bg); position: relative; }
-.auth-bg > *:not(.wallpaper-layer) { position: relative; z-index: 1; }
 
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-thumb { background: #d4d4d8; border-radius: 8px; }
@@ -417,8 +432,8 @@ input[type="date"], input[type="month"] { appearance: none; color-scheme: light;
 .h-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
 @media (max-width: 640px) {
-  .tbl-compact-mobile { font-size: 0.78rem; }
-  .tbl-compact-mobile thead th { padding: 0.6rem 0.6rem; font-size: 0.62rem; white-space: nowrap; }
+  .tbl-compact-mobile { font-size: 0.8rem; }
+  .tbl-compact-mobile thead th { padding: 0.6rem 0.6rem; font-size: 0.7rem; white-space: nowrap; }
   .tbl-compact-mobile tbody td { padding: 0.55rem 0.6rem; white-space: nowrap; }
   .tbl-compact-mobile tbody td.max-w-xs { white-space: normal; }
 }
