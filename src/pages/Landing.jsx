@@ -58,7 +58,7 @@ export default function Landing() {
           Papan Kinerja · BUMDes · Tahun {year}
         </p>
         <h1 className="modern-brand-title text-3xl sm:text-5xl">
-          SIA BUMDes <span style={{ color: "var(--chart-1)" }}>Karya Raharja</span>
+          SIA BUMDes <span style={{ color: "var(--chart-3)" }}>Karya Raharja</span>
         </h1>
         <p className="mt-4 text-sm sm:text-base" style={{ color: "var(--text-secondary)" }}>
           Sistem Informasi Akuntansi & Transparansi Keuangan Terintegrasi.<br />
