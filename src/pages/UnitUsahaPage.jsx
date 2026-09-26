@@ -34,7 +34,7 @@ export default function UnitUsahaPage() {
   const load = async () => {
     setLoading(true);
     try {
-      const r = await api.get("/unit-usaha");
+      const r = await api.get("/unit-usaha", { params: { include_inactive: true } });
       setList(r.data || []);
     } catch (er) {
       notify(er.response?.data?.detail || "Gagal memuat daftar unit usaha");
