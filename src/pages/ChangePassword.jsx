@@ -52,17 +52,17 @@ export default function ChangePassword() {
         <form onSubmit={submit} className="space-y-4">
           <div>
             <label className="label" htmlFor="current-password">Password sementara</label>
-            <Input id="current-password" type="password" required
+            <Input id="current-password" type="password" required maxLength={72}
               value={currentPassword} onChange={(event) => setCurrentPassword(event.target.value)} />
           </div>
           <div>
             <label className="label" htmlFor="new-password">Password baru</label>
-            <Input id="new-password" type="password" minLength={8} required
+            <Input id="new-password" type="password" minLength={8} maxLength={72} required
               value={newPassword} onChange={(event) => setNewPassword(event.target.value)} />
           </div>
           <div>
             <label className="label" htmlFor="confirm-password">Konfirmasi password baru</label>
-            <Input id="confirm-password" type="password" minLength={8} required
+            <Input id="confirm-password" type="password" minLength={8} maxLength={72} required
               value={confirmation} onChange={(event) => setConfirmation(event.target.value)} />
           </div>
           {error && <div className="text-sm p-3 rounded-lg" style={{ background: "var(--status-error-bg)", color: "var(--status-error)" }}>{error}</div>}

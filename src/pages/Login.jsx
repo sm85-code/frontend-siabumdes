@@ -60,7 +60,7 @@ export default function Login() {
             <div>
               <label className="label">Password</label>
               <div className="relative">
-                <Input data-testid="login-password" className="pr-10" type={showPw ? "text" : "password"}
+                <Input data-testid="login-password" className="pr-10" type={showPw ? "text" : "password"} maxLength={72}
                   value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required />
                 <button type="button" data-testid="toggle-password" onClick={() => setShowPw(!showPw)}
                         aria-label={showPw ? "Sembunyikan password" : "Tampilkan password"}
