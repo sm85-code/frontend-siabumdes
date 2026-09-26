@@ -12,6 +12,7 @@ import {
   PENYESUAIAN_NILAI_PERSEDIAAN_ACCOUNT_CODE, BEBAN_KERUGIAN_BARANG_ACCOUNT_CODE,
 } from "@/lib/uu05InventoryCoa";
 import InventorySummary from "@/pages/InventorySummary";
+import PeriodFilter from "@/components/PeriodFilter";
 import TableShell from "@/components/TableShell";
 import Spinner from "@/components/Spinner";
 import { Button } from "@/components/ui/button";
@@ -106,7 +107,7 @@ export default function Inventory() {
   const [adjust, setAdjust] = useState(emptyAdjustForm());
   const [vendorForm, setVendorForm] = useState(emptyPartnerForm());
   const [customerForm, setCustomerForm] = useState(emptyPartnerForm());
-  const [reportRange, setReportRange] = useState({ date_from: "", date_to: "" });
+  const [period, setPeriod] = useState({ mode: "monthly", startDate: "", endDate: "" });
 
   const canAccessRole = can(user, "admin", "direktur", "bendahara", "pengelola");
   const canWrite = can(user, "admin", "direktur", "bendahara", "pengelola");
@@ -165,8 +166,8 @@ export default function Inventory() {
         api.get(`${BASE}/reports/valuation`),
         api.get(`${BASE}/reports/movements`, {
           params: {
-            date_from: reportRange.date_from || undefined,
-            date_to: reportRange.date_to || undefined,
+            date_from: period.startDate || undefined,
+            date_to: period.endDate || undefined,
           },
         }),
       ]);
@@ -175,7 +176,7 @@ export default function Inventory() {
     } catch (e) {
       setError(formatApiError(e, "Gagal memuat laporan"));
     }
-  }, [reportRange]);
+  }, [period]);
 
   useEffect(() => { loadCore(); }, [loadCore]);
   useEffect(() => {
@@ -1090,8 +1091,15 @@ export default function Inventory() {
       {tab === "laporan" && (
         <div className="space-y-4">
           <Card className="p-4 flex flex-wrap gap-4 items-end">
-            <div><label className="label">Dari</label><Input type="date" value={reportRange.date_from} onChange={(e) => setReportRange({ ...reportRange, date_from: e.target.value })} /></div>
-            <div><label className="label">Sampai</label><Input type="date" value={reportRange.date_to} onChange={(e) => setReportRange({ ...reportRange, date_to: e.target.value })} /></div>
+            <div>
+              <label className="label">Periode</label>
+              <PeriodFilter
+                value={period}
+                onChange={setPeriod}
+                defaultMode="monthly"
+                data-testid="inventory-period-filter"
+              />
+            </div>
             <Button type="button" variant="outline" onClick={loadReports}>Muat ulang</Button>
           </Card>
 
