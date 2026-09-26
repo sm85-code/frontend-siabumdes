@@ -83,7 +83,7 @@ export default function UnitUsahaPage() {
     }
   };
 
-  if (loading) return <Spinner column size={48} label="Memuat unit usaha..." />;
+  if (loading) return <div className="flex items-center justify-center min-h-[60vh]"><Spinner column size={48} label="Memuat unit usaha..." /></div>;
 
   return (
     <div className="space-y-6" data-testid="unit-page">
