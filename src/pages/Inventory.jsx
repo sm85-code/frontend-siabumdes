@@ -1040,7 +1040,14 @@ export default function Inventory() {
                     <TableCell className="num">{fmtRp(Number(p.paid_amount))}</TableCell>
                     <TableCell className="num">{fmtRp(Number(p.outstanding))}</TableCell>
                     <TableCell>{p.due_date ? fmtDate(p.due_date) : "-"}</TableCell>
-                    <TableCell><Badge variant={p.status === "paid" ? "default" : "outline"}>{p.status}</Badge></TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={p.status === "paid" ? "default" : "outline"}>{p.status}</Badge>
+                        {canWrite && (
+                          <Button type="button" variant="ghost" size="sm" onClick={() => cancelMovement(p.stock_card_id)}>Batalkan</Button>
+                        )}
+                      </div>
+                    </TableCell>
                     {canWrite && (
                       <TableCell>
                         {p.status !== "paid" && (
@@ -1073,7 +1080,14 @@ export default function Inventory() {
                     <TableCell className="num">{fmtRp(Number(s.paid_amount))}</TableCell>
                     <TableCell className="num">{fmtRp(Number(s.outstanding))}</TableCell>
                     <TableCell>{s.due_date ? fmtDate(s.due_date) : "-"}</TableCell>
-                    <TableCell><Badge variant={s.status === "paid" ? "default" : "outline"}>{s.status}</Badge></TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={s.status === "paid" ? "default" : "outline"}>{s.status}</Badge>
+                        {canWrite && (
+                          <Button type="button" variant="ghost" size="sm" onClick={() => cancelMovement(s.stock_card_id)}>Batalkan</Button>
+                        )}
+                      </div>
+                    </TableCell>
                     {canWrite && (
                       <TableCell>
                         {s.status !== "paid" && (
