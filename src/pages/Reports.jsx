@@ -365,6 +365,14 @@ function ReportBody({ active, data }) {
             <TableRow><TableCell colSpan={3} className="font-semibold" style={{ background: "var(--primary-light)" }}>PENDAPATAN</TableCell></TableRow>
             {data.pendapatan.map((it) => (<TableRow key={it.code}><TableCell>{it.code}</TableCell><TableCell>{it.name}</TableCell><TableCell className="num">{fmtRp(it.amount)}</TableCell></TableRow>))}
             <TableRow><TableCell></TableCell><TableCell className="font-semibold">Total Pendapatan</TableCell><TableCell className="num font-semibold">{fmtRp(data.total_pendapatan)}</TableCell></TableRow>
+            {data.has_hpp && (
+              <>
+                <TableRow><TableCell colSpan={3} className="font-semibold" style={{ background: "var(--primary-light)" }}>HARGA POKOK PENJUALAN</TableCell></TableRow>
+                {data.hpp.map((it) => (<TableRow key={it.code}><TableCell>{it.code}</TableCell><TableCell>{it.name}</TableCell><TableCell className="num">{fmtRp(it.amount)}</TableCell></TableRow>))}
+                <TableRow><TableCell></TableCell><TableCell className="font-semibold">Total HPP</TableCell><TableCell className="num font-semibold">{fmtRp(data.total_hpp)}</TableCell></TableRow>
+                <TableRow style={{ background: "var(--total-row-bg)" }}><TableCell></TableCell><TableCell className="font-bold">LABA KOTOR</TableCell><TableCell className="num font-bold">{fmtRp(data.laba_kotor)}</TableCell></TableRow>
+              </>
+            )}
             <TableRow><TableCell colSpan={3} className="font-semibold" style={{ background: "var(--primary-light)" }}>BEBAN</TableCell></TableRow>
             {data.beban.map((it) => (<TableRow key={it.code}><TableCell>{it.code}</TableCell><TableCell>{it.name}</TableCell><TableCell className="num">{fmtRp(it.amount)}</TableCell></TableRow>))}
             <TableRow><TableCell></TableCell><TableCell className="font-semibold">Total Beban</TableCell><TableCell className="num font-semibold">{fmtRp(data.total_beban)}</TableCell></TableRow>
