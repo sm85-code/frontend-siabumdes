@@ -108,9 +108,9 @@ export default function ProfilePage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={savePassword} className="grid gap-4">
-            <Label className="label">Password Saat Ini<Input className="mt-1" type="password" value={passwords.current} onChange={(e) => setPasswords({ ...passwords, current: e.target.value })} required /></Label>
-            <Label className="label">Password Baru<Input className="mt-1" type="password" minLength={8} value={passwords.next} onChange={(e) => setPasswords({ ...passwords, next: e.target.value })} required /></Label>
-            <Label className="label">Konfirmasi Password Baru<Input className="mt-1" type="password" minLength={8} value={passwords.confirm} onChange={(e) => setPasswords({ ...passwords, confirm: e.target.value })} required /></Label>
+            <Label className="label">Password Saat Ini<Input className="mt-1" type="password" maxLength={72} value={passwords.current} onChange={(e) => setPasswords({ ...passwords, current: e.target.value })} required /></Label>
+            <Label className="label">Password Baru<Input className="mt-1" type="password" minLength={8} maxLength={72} value={passwords.next} onChange={(e) => setPasswords({ ...passwords, next: e.target.value })} required /></Label>
+            <Label className="label">Konfirmasi Password Baru<Input className="mt-1" type="password" minLength={8} maxLength={72} value={passwords.confirm} onChange={(e) => setPasswords({ ...passwords, confirm: e.target.value })} required /></Label>
             <div><Button type="submit">Ganti Password</Button></div>
           </form>
         </CardContent>

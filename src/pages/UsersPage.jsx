@@ -340,7 +340,7 @@ export default function UsersPage() {
             <CardContent className="pt-0 grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="sm:col-span-2 space-y-1.5">
                 <Label>Password Sementara</Label>
-                <Input data-testid="reset-pw-input" type="password" required minLength={8}
+                <Input data-testid="reset-pw-input" type="password" required minLength={8} maxLength={72}
                        value={newPw} onChange={(e) => setNewPw(e.target.value)} placeholder="min. 8 karakter" />
                 <p className="text-xs mt-2 text-muted-foreground">
                   Pengguna wajib mengganti password ini setelah login berikutnya.
