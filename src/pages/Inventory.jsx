@@ -10,6 +10,7 @@ import {
   CoaSelect, KAS_ACCOUNT_CODE, PERSEDIAAN_ACCOUNT_CODE, PIUTANG_ACCOUNT_CODE,
   UTANG_ACCOUNT_CODE, PENDAPATAN_ACCOUNT_CODE, HPP_ACCOUNT_CODE,
   PENYESUAIAN_NILAI_PERSEDIAAN_ACCOUNT_CODE, BEBAN_KERUGIAN_BARANG_ACCOUNT_CODE,
+  BEBAN_PENJUALAN_BARANG_ACCOUNT_CODE,
 } from "@/lib/uu05InventoryCoa";
 import InventorySummary from "@/pages/InventorySummary";
 import PeriodFilter from "@/components/PeriodFilter";
@@ -717,7 +718,7 @@ export default function Inventory() {
                       setStockOut({
                         ...stockOut,
                         isInternal,
-                        debit_account_code: isInternal ? "" : HPP_ACCOUNT_CODE,
+                        debit_account_code: isInternal ? BEBAN_PENJUALAN_BARANG_ACCOUNT_CODE : HPP_ACCOUNT_CODE,
                       });
                     }}
                   />

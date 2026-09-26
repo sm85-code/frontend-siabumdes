@@ -9,6 +9,7 @@ export const UU05_INVENTORY_COA = [
   { code: "2.1.01.15", name: "Utang Usaha" },
   { code: "4.1.01.15", name: "Pendapatan Usaha" },
   { code: "5.1.01.15", name: "Harga Pokok Penjualan Barang Dagangan" },
+  { code: "6.2.01.52", name: "Beban Penjualan Barang" },
   { code: "6.2.99.52", name: "Beban Kerugian Barang" },
 ];
 
@@ -19,6 +20,7 @@ export const PIUTANG_ACCOUNT_CODE = "1.1.03.15";
 export const UTANG_ACCOUNT_CODE = "2.1.01.15";
 export const PENDAPATAN_ACCOUNT_CODE = "4.1.01.15";
 export const HPP_ACCOUNT_CODE = "5.1.01.15";
+export const BEBAN_PENJUALAN_BARANG_ACCOUNT_CODE = "6.2.01.52";
 export const BEBAN_KERUGIAN_BARANG_ACCOUNT_CODE = "6.2.99.52";
 
 export function CoaSelect({ value, onChange, required = true, id, disabled = false }) {
