@@ -60,10 +60,12 @@ const emptyStockIn = () => ({
 });
 
 const emptyStockOut = () => ({
+  isInternal: false,
   product_id: "", quantity: 1, movement_date: today(),
   debit_account_code: HPP_ACCOUNT_CODE, credit_account_code: PERSEDIAAN_ACCOUNT_CODE,
   customer_id: "", sell_price: 0, invoice_number: "", payment_method: "cash", due_date: "",
   revenue_debit_account_code: KAS_ACCOUNT_CODE, revenue_credit_account_code: PENDAPATAN_ACCOUNT_CODE,
+  note: "",
 });
 
 const emptyPartnerForm = () => ({ id: null, name: "", contact: "", address: "" });
@@ -300,13 +302,25 @@ export default function Inventory() {
     }
     setSubmitting(true);
     try {
-      await api.post(`${BASE}/stock-out`, {
-        ...stockOut,
-        quantity: Number(stockOut.quantity),
-        sell_price: Number(stockOut.sell_price),
-        due_date: stockOut.payment_method === "piutang" ? stockOut.due_date : null,
-        unit_usaha_id: meta?.unit_usaha_id,
-      });
+      if (stockOut.isInternal) {
+        await api.post(`${BASE}/stock-out-internal`, {
+          product_id: stockOut.product_id,
+          quantity: Number(stockOut.quantity),
+          movement_date: stockOut.movement_date,
+          debit_account_code: stockOut.debit_account_code,
+          credit_account_code: stockOut.credit_account_code,
+          note: stockOut.note,
+          unit_usaha_id: meta?.unit_usaha_id,
+        });
+      } else {
+        await api.post(`${BASE}/stock-out`, {
+          ...stockOut,
+          quantity: Number(stockOut.quantity),
+          sell_price: Number(stockOut.sell_price),
+          due_date: stockOut.payment_method === "piutang" ? stockOut.due_date : null,
+          unit_usaha_id: meta?.unit_usaha_id,
+        });
+      }
       setStockOut(emptyStockOut());
       await Promise.all([loadCore(), loadOps(), loadTrade()]);
     } catch (err) {
@@ -686,9 +700,28 @@ export default function Inventory() {
           <Card>
           <CardContent className="pt-6">
             <p className="label mb-2">Pengeluaran barang (Stock Out / Penjualan)</p>
-            <p className="text-sm mb-4" style={{ color: "var(--text-muted)" }}>Stock out menghasilkan transaksi stok keluar + jurnal HPP, sekaligus transaksi Penjualan (jurnal pendapatan) tunai atau piutang.</p>
+            <p className="text-sm mb-4" style={{ color: "var(--text-muted)" }}>
+              {stockOut.isInternal
+                ? "Pemakaian/transfer internal: stok berkurang dan tercatat sebagai beban, tanpa jurnal penjualan/pendapatan."
+                : "Stock out menghasilkan transaksi stok keluar + jurnal HPP, sekaligus transaksi Penjualan (jurnal pendapatan) tunai atau piutang."}
+            </p>
             {canWrite ? (
               <form onSubmit={submitStockOut} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <label className="sm:col-span-2 flex items-center gap-2 text-sm cursor-pointer" data-testid="stock-out-internal-toggle">
+                  <input
+                    type="checkbox"
+                    checked={stockOut.isInternal}
+                    onChange={(e) => {
+                      const isInternal = e.target.checked;
+                      setStockOut({
+                        ...stockOut,
+                        isInternal,
+                        debit_account_code: isInternal ? "" : HPP_ACCOUNT_CODE,
+                      });
+                    }}
+                  />
+                  Pemakaian / transfer internal (bukan penjualan ke pihak luar)
+                </label>
                 <div>
                   <label className="label">Produk</label>
                   <Select required value={stockOut.product_id || "__none__"} onValueChange={(v) => {
@@ -703,60 +736,77 @@ export default function Inventory() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div>
-                  <label className="label">Customer</label>
-                  <Select required value={stockOut.customer_id || "__none__"} onValueChange={(v) => setStockOut({ ...stockOut, customer_id: v === "__none__" ? "" : v })}>
-                    <SelectTrigger><SelectValue placeholder="— pilih customer —" /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="__none__">— pilih customer —</SelectItem>
-                      {activeCustomers.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                  {activeCustomers.length === 0 && (
-                    <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>Belum ada customer — tambahkan di tab Customer.</p>
-                  )}
-                </div>
+                {!stockOut.isInternal && (
+                  <div>
+                    <label className="label">Customer</label>
+                    <Select required value={stockOut.customer_id || "__none__"} onValueChange={(v) => setStockOut({ ...stockOut, customer_id: v === "__none__" ? "" : v })}>
+                      <SelectTrigger><SelectValue placeholder="— pilih customer —" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="__none__">— pilih customer —</SelectItem>
+                        {activeCustomers.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                    {activeCustomers.length === 0 && (
+                      <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>Belum ada customer — tambahkan di tab Customer.</p>
+                    )}
+                  </div>
+                )}
                 <div><label className="label">Tanggal</label><Input type="date" required value={stockOut.movement_date} onChange={(e) => setStockOut({ ...stockOut, movement_date: e.target.value })} /></div>
-                <div><label className="label">No. Invoice</label><Input value={stockOut.invoice_number} onChange={(e) => setStockOut({ ...stockOut, invoice_number: e.target.value })} /></div>
                 <div><label className="label">Qty keluar</label><Input type="number" min="1" required value={stockOut.quantity} onChange={(e) => setStockOut({ ...stockOut, quantity: e.target.value })} /></div>
-                <div><label className="label">Harga jual / unit (Rp)</label><Input type="number" min="0" required value={stockOut.sell_price} onChange={(e) => setStockOut({ ...stockOut, sell_price: e.target.value })} /></div>
-                <div>
-                  <label className="label">Metode bayar</label>
-                  <Select value={stockOut.payment_method} onValueChange={(method) => {
-                    setStockOut({
-                      ...stockOut, payment_method: method,
-                      revenue_debit_account_code: method === "piutang" ? PIUTANG_ACCOUNT_CODE : KAS_ACCOUNT_CODE,
-                    });
-                  }}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="cash">Tunai</SelectItem>
-                      <SelectItem value="piutang">Piutang</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                {stockOut.payment_method === "piutang" && (
-                  <div><label className="label">Jatuh tempo</label><Input type="date" required value={stockOut.due_date} onChange={(e) => setStockOut({ ...stockOut, due_date: e.target.value })} /></div>
+                {stockOut.isInternal ? (
+                  <div className="sm:col-span-2">
+                    <label className="label">Catatan (opsional)</label>
+                    <Input value={stockOut.note} onChange={(e) => setStockOut({ ...stockOut, note: e.target.value })} placeholder="mis. dipakai untuk operasional kantor" />
+                  </div>
+                ) : (
+                  <>
+                    <div><label className="label">No. Invoice</label><Input value={stockOut.invoice_number} onChange={(e) => setStockOut({ ...stockOut, invoice_number: e.target.value })} /></div>
+                    <div><label className="label">Harga jual / unit (Rp)</label><Input type="number" min="0" required value={stockOut.sell_price} onChange={(e) => setStockOut({ ...stockOut, sell_price: e.target.value })} /></div>
+                    <div>
+                      <label className="label">Metode bayar</label>
+                      <Select value={stockOut.payment_method} onValueChange={(method) => {
+                        setStockOut({
+                          ...stockOut, payment_method: method,
+                          revenue_debit_account_code: method === "piutang" ? PIUTANG_ACCOUNT_CODE : KAS_ACCOUNT_CODE,
+                        });
+                      }}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="cash">Tunai</SelectItem>
+                          <SelectItem value="piutang">Piutang</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    {stockOut.payment_method === "piutang" && (
+                      <div><label className="label">Jatuh tempo</label><Input type="date" required value={stockOut.due_date} onChange={(e) => setStockOut({ ...stockOut, due_date: e.target.value })} /></div>
+                    )}
+                  </>
                 )}
                 <div>
-                  <label className="label">Akun debit (HPP)</label>
+                  <label className="label">{stockOut.isInternal ? "Akun debit (Beban)" : "Akun debit (HPP)"}</label>
                   <CoaSelect value={stockOut.debit_account_code} onChange={(e) => setStockOut({ ...stockOut, debit_account_code: e.target.value })} />
                 </div>
                 <div>
                   <label className="label">Akun kredit (Persediaan)</label>
                   <CoaSelect value={stockOut.credit_account_code} onChange={(e) => setStockOut({ ...stockOut, credit_account_code: e.target.value })} />
                 </div>
-                <div>
-                  <label className="label">Akun debit penjualan ({stockOut.payment_method === "piutang" ? "Piutang" : "Kas/Bank"})</label>
-                  <CoaSelect value={stockOut.revenue_debit_account_code} onChange={(e) => setStockOut({ ...stockOut, revenue_debit_account_code: e.target.value })} />
-                </div>
-                <div>
-                  <label className="label">Akun kredit (Pendapatan)</label>
-                  <CoaSelect value={stockOut.revenue_credit_account_code} onChange={(e) => setStockOut({ ...stockOut, revenue_credit_account_code: e.target.value })} />
-                </div>
+                {!stockOut.isInternal && (
+                  <>
+                    <div>
+                      <label className="label">Akun debit penjualan ({stockOut.payment_method === "piutang" ? "Piutang" : "Kas/Bank"})</label>
+                      <CoaSelect value={stockOut.revenue_debit_account_code} onChange={(e) => setStockOut({ ...stockOut, revenue_debit_account_code: e.target.value })} />
+                    </div>
+                    <div>
+                      <label className="label">Akun kredit (Pendapatan)</label>
+                      <CoaSelect value={stockOut.revenue_credit_account_code} onChange={(e) => setStockOut({ ...stockOut, revenue_credit_account_code: e.target.value })} />
+                    </div>
+                  </>
+                )}
                 <Card className="sm:col-span-2 p-3 text-sm" style={{ background: "var(--surface-alt)" }}>
-                  <p>Preview jurnal HPP: <strong>{fmtRp(Number(stockOut.quantity || 0) * Number(products.find((p) => p.id === stockOut.product_id)?.cost_price || 0))}</strong></p>
-                  <p>Preview jurnal Penjualan: <strong>{fmtRp(Number(stockOut.quantity || 0) * Number(stockOut.sell_price || 0))}</strong></p>
+                  <p>Preview jurnal {stockOut.isInternal ? "Beban" : "HPP"}: <strong>{fmtRp(Number(stockOut.quantity || 0) * Number(products.find((p) => p.id === stockOut.product_id)?.cost_price || 0))}</strong></p>
+                  {!stockOut.isInternal && (
+                    <p>Preview jurnal Penjualan: <strong>{fmtRp(Number(stockOut.quantity || 0) * Number(stockOut.sell_price || 0))}</strong></p>
+                  )}
                 </Card>
                 <div className="sm:col-span-2 flex justify-end"><Button type="submit" disabled={submitting}>{submitting ? "Menyimpan…" : "Catat stock out"}</Button></div>
               </form>
@@ -1123,7 +1173,10 @@ function MovementTable({ rows, onCancel }) {
               <TableCell>{m.product_name}</TableCell>
               <TableCell className="num">{m.quantity}</TableCell>
               <TableCell className="num">{fmtRp(Number(m.total_value))}</TableCell>
-              <TableCell><Badge variant="secondary">{m.finance_status}</Badge></TableCell>
+              <TableCell>
+                <Badge variant="secondary">{m.finance_status}</Badge>
+                {m.movement_kind === "internal_use" && <Badge variant="outline" className="ml-1">Internal</Badge>}
+              </TableCell>
               <TableCell className="text-xs">
                 {m.reference ? (
                   <Link
