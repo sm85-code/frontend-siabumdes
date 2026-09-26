@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import { notify } from "@/lib/feedback";
 import Spinner from "@/components/Spinner";
-import { Card, CardContent } from "@/components/ui/card";
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -135,26 +135,35 @@ export default function UnitUsahaPage() {
         </Dialog>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        {list.map((u) => (
-          <Card key={u.id} data-testid={`unit-card-${u.code}`} className={u.active === false ? "opacity-60" : ""}>
-            <CardContent className="pt-6">
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <Badge variant="secondary">{u.code}</Badge>
-                  <Badge variant="outline">{BUSINESS_TYPE_LABEL[u.business_type] || u.business_type}</Badge>
-                  {u.active === false && <Badge variant="outline">Nonaktif</Badge>}
-                </div>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Kode</TableHead>
+            <TableHead>Nama Unit</TableHead>
+            <TableHead>Jenis Usaha</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead className="text-right">Aksi</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {list.map((u) => (
+            <TableRow key={u.id} data-testid={`unit-row-${u.code}`} className={u.active === false ? "opacity-60" : ""}>
+              <TableCell><Badge variant="secondary">{u.code}</Badge></TableCell>
+              <TableCell className="font-medium">{u.name}</TableCell>
+              <TableCell>{BUSINESS_TYPE_LABEL[u.business_type] || u.business_type}</TableCell>
+              <TableCell>
+                {u.active === false ? <Badge variant="outline">Nonaktif</Badge> : <Badge variant="outline">Aktif</Badge>}
+              </TableCell>
+              <TableCell className="text-right">
                 <Button variant="ghost" size="icon" data-testid={`unit-edit-${u.code}`}
                   onClick={() => setEditing({ ...u })}>
                   <PencilSimple size={16} />
                 </Button>
-              </div>
-              <h3 className="font-heading text-lg font-bold mb-2">{u.name}</h3>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
 
       <Dialog open={!!editing} onOpenChange={(o) => { if (!o) setEditing(null); }}>
         <DialogContent>
