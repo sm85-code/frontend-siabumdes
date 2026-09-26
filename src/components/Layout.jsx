@@ -21,8 +21,8 @@ const NAV = [
   { to: "/ledger", label: "Buku Besar", icon: BookOpenText, roles: READ_MOST },
   { to: "/inventory", label: "Inventory", icon: Package, roles: ["admin", "direktur", "bendahara", "pengelola"], inventoryUnitOnly: true },
   { to: "/unit-usaha", label: "Profil Unit Usaha", icon: Buildings, roles: ["admin"] },
-  { to: "/users", label: "Kelola Pengguna", icon: UsersThree, roles: ["admin"] },
   { to: "/profil-bumdes", label: "Profil BUMDES", icon: Buildings, roles: ["admin"] },
+  { to: "/users", label: "Kelola Pengguna", icon: UsersThree, roles: ["admin"] },
   { to: "/profile", label: "Profil Saya", icon: UserCircle, roles: READ_MOST },
 ];
 
