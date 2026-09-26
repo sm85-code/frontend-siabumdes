@@ -42,6 +42,7 @@ const ROLES_LEDGER = ["admin", "direktur", "bendahara", "pengelola", "pengawas",
 const ROLES_COA = ["admin"];
 const ROLES_USERS = ["admin"];
 const ROLES_ORG_PROFILE = ["admin"];
+const ROLES_UNIT_USAHA = ["admin"];
 const ROLES_INVENTORY = ["admin", "direktur", "bendahara", "pengelola"];
 
 function Protected({ children, roles }) {
@@ -72,7 +73,7 @@ function App() {
               <Route path="/reports" element={<Protected roles={ROLES_REPORTS}><LazyPage><Reports /></LazyPage></Protected>} />
               <Route path="/reports/per-unit" element={<Protected><LazyPage><ReportsPerUnit /></LazyPage></Protected>} />
               <Route path="/ledger" element={<Protected roles={ROLES_LEDGER}><LazyPage><BukuBesar /></LazyPage></Protected>} />
-              <Route path="/unit-usaha" element={<Protected><LazyPage><UnitUsahaPage /></LazyPage></Protected>} />
+              <Route path="/unit-usaha" element={<Protected roles={ROLES_UNIT_USAHA}><LazyPage><UnitUsahaPage /></LazyPage></Protected>} />
               <Route path="/mitra" element={<Protected><LazyPage><MitraPage /></LazyPage></Protected>} />
               <Route path="/accounts" element={<Protected roles={ROLES_COA}><LazyPage><COAPage /></LazyPage></Protected>} />
               <Route path="/inventory" element={<Protected roles={ROLES_INVENTORY}><LazyPage><Inventory /></LazyPage></Protected>} />
