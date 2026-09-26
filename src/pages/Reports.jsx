@@ -87,7 +87,13 @@ export default function Reports() {
   };
 
   useEffect(() => {
-    api.get("/unit-usaha").then(r => {
+    // include_inactive: true -- laporan historis dan tutup buku (cuma admin/HQ
+    // yang bisa akses halaman ini) tetap harus bisa pilih unit yang sudah
+    // dinonaktifkan, misalnya untuk menutup periode yang masih tertinggal
+    // atau menarik laporan lama. Dropdown transaksi harian di halaman lain
+    // tetap default (aktif saja) supaya tidak ada pencatatan baru ke unit
+    // yang sudah dinonaktifkan.
+    api.get("/unit-usaha", { params: { include_inactive: true } }).then(r => {
       setUnits(r.data);
       if (isPengelola && user?.unit_usaha_id) {
         const own = r.data.find(u => u.id === user.unit_usaha_id);
