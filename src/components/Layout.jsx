@@ -19,7 +19,7 @@ const NAV = [
   { to: "/transactions", label: "Transaksi", icon: Receipt, roles: READ_MOST },
   { to: "/reports", label: "Laporan Keuangan", icon: ChartLine, roles: READ_MOST },
   { to: "/ledger", label: "Buku Besar", icon: BookOpenText, roles: READ_MOST },
-  { to: "/inventory", label: "Inventory", icon: Package, roles: ["admin", "direktur", "bendahara", "pengelola"], uu05Only: true },
+  { to: "/inventory", label: "Inventory", icon: Package, roles: ["admin", "direktur", "bendahara", "pengelola"], inventoryUnitOnly: true },
   { to: "/unit-usaha", label: "Profil Unit Usaha", icon: Buildings, roles: ["admin"] },
   { to: "/users", label: "Kelola Pengguna", icon: UsersThree, roles: ["admin"] },
   { to: "/profil-bumdes", label: "Profil BUMDES", icon: Buildings, roles: ["admin"] },
@@ -30,14 +30,16 @@ export default function Layout({ children }) {
   const { user, logout } = useAuth();
   const location = useLocation();
   const [open, setOpen] = useState(false);
-  const [uu05Id, setUu05Id] = useState(null);
+  const [inventoryUnitIds, setInventoryUnitIds] = useState(null);
 
   useEffect(() => {
     let alive = true;
     api.get("/unit-usaha").then((r) => {
       if (!alive) return;
-      const u = (r.data || []).find((x) => x.code === "UU05");
-      setUu05Id(u?.id || null);
+      const ids = (r.data || [])
+        .filter((x) => ["perdagangan", "manufaktur"].includes(x.business_type))
+        .map((x) => x.id);
+      setInventoryUnitIds(ids);
     }).catch(() => {});
     return () => { alive = false; };
   }, []);
@@ -45,8 +47,8 @@ export default function Layout({ children }) {
   if (!user) return null;
   const visible = NAV.filter((n) => {
     if (!can(user, ...n.roles)) return false;
-    if (n.uu05Only && user.role === "pengelola") {
-      return Boolean(uu05Id) && user.unit_usaha_id === uu05Id;
+    if (n.inventoryUnitOnly && user.role === "pengelola") {
+      return Boolean(inventoryUnitIds) && inventoryUnitIds.includes(user.unit_usaha_id);
     }
     return true;
   });
