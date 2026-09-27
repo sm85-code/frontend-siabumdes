@@ -13,6 +13,7 @@ const Dashboard = lazy(() => import("@/pages/Dashboard"));
 const UnitUsahaPage = lazy(() => import("@/pages/UnitUsahaPage"));
 const MitraPage = lazy(() => import("@/pages/MitraPage"));
 const UsersPage = lazy(() => import("@/pages/UsersPage"));
+const AuditLogPage = lazy(() => import("@/pages/AuditLogPage"));
 const Reports = lazy(() => import("@/pages/Reports"));
 const ReportsPerUnit = lazy(() => import("@/pages/ReportsPerUnit"));
 const Transactions = lazy(() => import("@/pages/Transactions"));
@@ -41,6 +42,7 @@ const ROLES_REPORTS = ["admin", "direktur", "bendahara", "pengelola", "pengawas"
 const ROLES_LEDGER = ["admin", "direktur", "bendahara", "pengelola", "pengawas", "penasihat"];
 const ROLES_COA = ["admin"];
 const ROLES_USERS = ["admin"];
+const ROLES_AUDIT_LOG = ["admin"];
 const ROLES_ORG_PROFILE = ["admin"];
 const ROLES_UNIT_USAHA = ["admin"];
 const ROLES_INVENTORY = ["admin", "direktur", "bendahara", "pengelola"];
@@ -77,6 +79,7 @@ function App() {
               <Route path="/mitra" element={<Protected><LazyPage><MitraPage /></LazyPage></Protected>} />
               <Route path="/accounts" element={<Protected roles={ROLES_COA}><LazyPage><COAPage /></LazyPage></Protected>} />
               <Route path="/inventory" element={<Protected roles={ROLES_INVENTORY}><LazyPage><Inventory /></LazyPage></Protected>} />
+              <Route path="/audit-log" element={<Protected roles={ROLES_AUDIT_LOG}><LazyPage><AuditLogPage /></LazyPage></Protected>} />
               <Route path="/users" element={<Protected roles={ROLES_USERS}><LazyPage><UsersPage /></LazyPage></Protected>} />
               <Route path="/profil-bumdes" element={<Protected roles={ROLES_ORG_PROFILE}><LazyPage><OrgProfilePage /></LazyPage></Protected>} />
               <Route path="*" element={<Navigate to="/" replace />} />

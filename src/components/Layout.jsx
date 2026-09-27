@@ -4,7 +4,7 @@ import { useAuth, can } from "@/lib/auth";
 import api, { ROLE_LABELS } from "@/lib/api";
 import {
   House, Receipt, ChartLine, Storefront, UsersThree,
-  BookOpenText, SignOut, List, X, Books, UserCircle, Package, Buildings,
+  BookOpenText, SignOut, List, X, Books, UserCircle, Package, Buildings, ClipboardText,
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import WallpaperLayer from "@/components/WallpaperLayer";
@@ -22,6 +22,7 @@ const NAV = [
   { to: "/inventory", label: "Inventory", icon: Package, roles: ["admin", "direktur", "bendahara", "pengelola"], inventoryUnitOnly: true },
   { to: "/unit-usaha", label: "Profil Unit Usaha", icon: Buildings, roles: ["admin"] },
   { to: "/profil-bumdes", label: "Profil BUMDES", icon: Buildings, roles: ["admin"] },
+  { to: "/audit-log", label: "Audit Log", icon: ClipboardText, roles: ["admin"] },
   { to: "/users", label: "Kelola Pengguna", icon: UsersThree, roles: ["admin"] },
   { to: "/profile", label: "Profil Saya", icon: UserCircle, roles: READ_MOST },
 ];

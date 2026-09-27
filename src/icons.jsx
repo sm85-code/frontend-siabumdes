@@ -56,6 +56,7 @@ import {
   ChevronsUpDown as LuChevronsUpDown,
   Check as LuCheck,
   Palette as LuPalette,
+  ClipboardList as LuClipboardList,
 } from "lucide-react";
 
 /**
@@ -135,3 +136,4 @@ export const Wallet = wrap(LuWallet);
 export const HandCoins = wrap(LuHandCoins);
 export const CaretUpDown = wrap(LuChevronsUpDown);
 export const Check = wrap(LuCheck);
+export const ClipboardText = wrap(LuClipboardList);
