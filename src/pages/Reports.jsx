@@ -245,7 +245,7 @@ export default function Reports() {
                 <FileXls size={16} weight="duotone" color="var(--primary-dark)" /> Export Excel
               </Button>
               <Button variant="outline" data-testid="btn-export-word" onClick={() => download("word")}>
-                <FileDoc size={16} weight="duotone" color="#2b579a" /> Export Word
+                <FileDoc size={16} weight="duotone" color="var(--primary-dark)" /> Export Word
               </Button>
             </div>
           </div>

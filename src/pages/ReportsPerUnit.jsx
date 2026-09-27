@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
-import api, { fmtRp, API } from "@/lib/api";
+import api, { fmtRp, API, getApiError } from "@/lib/api";
+import { notifyError } from "@/lib/feedback";
 import { FilePdf, FileXls } from "@phosphor-icons/react";
+import Spinner from "@/components/Spinner";
 import TableShell from "@/components/TableShell";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
@@ -22,10 +24,18 @@ export default function ReportsPerUnit() {
   const start = period.startDate;
   const end = period.endDate;
   const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
-    const r = await api.get("/reports/per-unit", { params: { start_date: start, end_date: end } });
-    setData(r.data);
+    setLoading(true);
+    try {
+      const r = await api.get("/reports/per-unit", { params: { start_date: start, end_date: end } });
+      setData(r.data);
+    } catch (er) {
+      notifyError(getApiError(er, "Gagal memuat laporan per unit"));
+    } finally {
+      setLoading(false);
+    }
   }, [start, end]);
 
   useEffect(() => { load(); }, [load]);
@@ -60,7 +70,12 @@ export default function ReportsPerUnit() {
         </div>
       </CardContent>
       </Card>
-      {data && (
+      {loading && (
+        <Card className="py-10 flex justify-center">
+          <Spinner label="Memuat laporan..." />
+        </Card>
+      )}
+      {!loading && data && (
         <Card className="p-0 overflow-hidden">
           <TableShell minWidth={720}>
             <Table data-testid="per-unit-table">

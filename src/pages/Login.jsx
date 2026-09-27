@@ -70,7 +70,13 @@ export default function Login() {
               </div>
             </div>
             {err && (
-              <div data-testid="login-error" className="text-sm p-3 rounded-xl" style={{ color: "#C45C5C" }}>{err}</div>
+              <div
+                data-testid="login-error"
+                className="text-sm p-3 rounded-xl"
+                style={{ color: "var(--status-error)", background: "var(--status-error-bg)", border: "1px solid var(--status-error-border)" }}
+              >
+                {err}
+              </div>
             )}
             <Button data-testid="login-submit" disabled={loading} className="w-full">
               {loading ? <Spinner size={18} label="Memproses..." /> : <><SignIn size={18} />Masuk</>}
