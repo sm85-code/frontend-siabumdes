@@ -13,6 +13,8 @@ import {
 // Label ramah-baca untuk kode aksi mentah dari backend (lihat
 // modules/siabumdes/identity/application/services.py: record_audit).
 const ACTION_LABELS = {
+  login_success: "Login berhasil",
+  login_failed: "Login gagal",
   create_user: "Buat akun",
   update_user: "Ubah akun",
   delete_user: "Hapus akun",
@@ -38,7 +40,7 @@ const ACTION_LABELS = {
 };
 
 const DESTRUCTIVE_ACTIONS = new Set([
-  "delete_user", "delete_account", "reset_accounts", "delete_transaction_type",
+  "login_failed", "delete_user", "delete_account", "reset_accounts", "delete_transaction_type",
   "delete_mitra", "reopen_period", "system_lock",
 ]);
 
