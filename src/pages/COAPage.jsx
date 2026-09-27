@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import api, { API } from "@/lib/api";
+import api, { API, getApiError } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { notify } from "@/lib/feedback";
+import Spinner from "@/components/Spinner";
 import { useConfirm } from "@/components/ConfirmProvider";
 import { useSort } from "@/lib/useSort";
 import { Plus, Pencil, Trash, DownloadSimple, UploadSimple, Warning } from "@phosphor-icons/react";
@@ -138,11 +139,20 @@ export default function COAPage() {
     }
   };
 
+  const [loading, setLoading] = useState(true);
+
   const load = useCallback(async () => {
-    const [a, t, u] = await Promise.all([
-      api.get("/accounts"), api.get("/transaction-types"), api.get("/unit-usaha"),
-    ]);
-    setList(a.data); setTypes(t.data); setUnits(u.data);
+    setLoading(true);
+    try {
+      const [a, t, u] = await Promise.all([
+        api.get("/accounts"), api.get("/transaction-types"), api.get("/unit-usaha"),
+      ]);
+      setList(a.data); setTypes(t.data); setUnits(u.data);
+    } catch (er) {
+      notify(getApiError(er, "Gagal memuat kode akun/jenis transaksi"));
+    } finally {
+      setLoading(false);
+    }
   }, []);
   useEffect(() => { load(); }, [load]);
 
@@ -296,7 +306,13 @@ export default function COAPage() {
         </div>
       )}
 
-      {activeSection === "accounts" && <>
+      {loading && (
+        <Card className="py-10 flex justify-center">
+          <Spinner label="Memuat kode akun & jenis transaksi..." />
+        </Card>
+      )}
+
+      {!loading && activeSection === "accounts" && <>
       {/* ============ KODE AKUN ============ */}
       <Card className="p-4 flex flex-wrap items-center gap-2" data-testid="account-toolbar">
         <Button variant="outline" data-testid="btn-download-account-template" onClick={() => downloadTemplate("accounts")}><DownloadSimple size={16} /> Download Template</Button>
@@ -488,7 +504,7 @@ export default function COAPage() {
 
       </>}
 
-      {activeSection === "transaction-types" && <>
+      {!loading && activeSection === "transaction-types" && <>
       {/* ============ JENIS TRANSAKSI ============ */}
       <Card className="p-4 flex flex-wrap items-center gap-2" data-testid="transaction-toolbar">
         <Button variant="outline" data-testid="btn-download-transaction-template" onClick={() => downloadTemplate("transaction-types")}><DownloadSimple size={16} /> Download Template</Button>

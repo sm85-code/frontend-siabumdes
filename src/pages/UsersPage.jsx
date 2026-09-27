@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
-import api, { ROLE_LABELS } from "@/lib/api";
+import api, { ROLE_LABELS, getApiError } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { notify, notifySuccess, notifyError } from "@/lib/feedback";
 import { useConfirm } from "@/components/ConfirmProvider";
+import { useSort } from "@/lib/useSort";
 import { Plus, Trash, Key, Lock, PencilSimple } from "@phosphor-icons/react";
+import Spinner from "@/components/Spinner";
 import TableShell from "@/components/TableShell";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -47,9 +49,18 @@ export default function UsersPage() {
     username: "", email: "", name: "", password: "", role: "pengelola", unit_usaha_id: "",
   });
 
+  const [loading, setLoading] = useState(true);
+
   const load = useCallback(async () => {
-    const [u, un] = await Promise.all([api.get("/users"), api.get("/unit-usaha")]);
-    setUsers(u.data); setUnits(un.data);
+    setLoading(true);
+    try {
+      const [u, un] = await Promise.all([api.get("/users"), api.get("/unit-usaha")]);
+      setUsers(u.data); setUnits(un.data);
+    } catch (er) {
+      notifyError(getApiError(er, "Gagal memuat data pengguna"));
+    } finally {
+      setLoading(false);
+    }
   }, []);
   useEffect(() => { load(); }, [load]);
 
@@ -128,6 +139,7 @@ export default function UsersPage() {
   };
 
   const isAdmin = user.role === "admin";
+  const userSort = useSort(users, "name", "asc");
 
   if (!isAdmin) {
     return (
@@ -427,45 +439,54 @@ export default function UsersPage() {
       })()}
 
       <Card className="p-0 overflow-hidden">
-        <TableShell
-          minWidth={720}
-          data-testid="users-table"
-        >
-          <Table data-testid="users-table">
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nama</TableHead><TableHead>Username</TableHead><TableHead>Email</TableHead>
-                <TableHead>Role</TableHead><TableHead>Unit</TableHead>
-                <TableHead>Periode Terkunci</TableHead>
-                <TableHead></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {users.map(u => {
-                const blockedCnt = (u.blocked_periods || []).length;
-                return (
-                  <TableRow key={u.id}>
-                    <TableCell className="font-medium">{u.name}</TableCell>
-                    <TableCell>{u.username}</TableCell>
-                    <TableCell className="text-xs">{u.email}</TableCell>
-                    <TableCell>
-                      <Badge variant={ROLE_BADGE_VARIANT[u.role] || "outline"}>{ROLE_LABELS[u.role] || u.role}</Badge>
-                    </TableCell>
-                    <TableCell className="text-xs">{units.find(x => x.id === u.unit_usaha_id)?.code || "-"}</TableCell>
-                    <TableCell className="text-xs" data-testid={`blocked-count-${u.id}`}>
-                      {blockedCnt > 0
-                        ? <Badge variant="secondary">{blockedCnt} bulan</Badge>
-                        : <span className="text-muted-foreground">—</span>}
-                    </TableCell>
-                    <TableCell>
-                      {actionButtons(u)}
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </TableShell>
+        {loading ? (
+          <div className="py-10 flex justify-center">
+            <Spinner label="Memuat pengguna..." />
+          </div>
+        ) : (
+          <TableShell
+            minWidth={720}
+            data-testid="users-table"
+          >
+            <Table data-testid="users-table">
+              <TableHeader>
+                <TableRow>
+                  <TableHead {...userSort.headerProps("name")}>Nama{userSort.sortIndicator("name")}</TableHead>
+                  <TableHead {...userSort.headerProps("username")}>Username{userSort.sortIndicator("username")}</TableHead>
+                  <TableHead {...userSort.headerProps("email")}>Email{userSort.sortIndicator("email")}</TableHead>
+                  <TableHead {...userSort.headerProps("role")}>Role{userSort.sortIndicator("role")}</TableHead>
+                  <TableHead>Unit</TableHead>
+                  <TableHead>Periode Terkunci</TableHead>
+                  <TableHead></TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {userSort.sorted.map(u => {
+                  const blockedCnt = (u.blocked_periods || []).length;
+                  return (
+                    <TableRow key={u.id}>
+                      <TableCell className="font-medium">{u.name}</TableCell>
+                      <TableCell>{u.username}</TableCell>
+                      <TableCell className="text-xs">{u.email}</TableCell>
+                      <TableCell>
+                        <Badge variant={ROLE_BADGE_VARIANT[u.role] || "outline"}>{ROLE_LABELS[u.role] || u.role}</Badge>
+                      </TableCell>
+                      <TableCell className="text-xs">{units.find(x => x.id === u.unit_usaha_id)?.code || "-"}</TableCell>
+                      <TableCell className="text-xs" data-testid={`blocked-count-${u.id}`}>
+                        {blockedCnt > 0
+                          ? <Badge variant="secondary">{blockedCnt} bulan</Badge>
+                          : <span className="text-muted-foreground">—</span>}
+                      </TableCell>
+                      <TableCell>
+                        {actionButtons(u)}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableShell>
+        )}
       </Card>
     </div>
   );

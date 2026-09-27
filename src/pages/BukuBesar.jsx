@@ -194,7 +194,7 @@ export default function BukuBesar() {
                       <FileXls size={16} weight="duotone" color="var(--primary-dark)" /> Export Excel
                     </Button>
                     <Button variant="outline" data-testid="btn-ledger-word" onClick={downloadWord}>
-                      <FileDoc size={16} weight="duotone" color="#2b579a" /> Export Word
+                      <FileDoc size={16} weight="duotone" color="var(--primary-dark)" /> Export Word
                     </Button>
                   </div>
                 </div>
