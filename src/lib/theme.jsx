@@ -78,10 +78,10 @@ function readStored(key, validIds, fallback) {
 
 const ThemeContext = createContext({
   theme: "modern",
-  font: "geist", setFont: () => {},
+  font: "jakarta", setFont: () => {},
   colorTheme: "blue", setColorTheme: () => {},
   baseColor: "zinc", setBaseColor: () => {},
-  wallpaper: "none", setWallpaper: () => {},
+  wallpaper: "glow", setWallpaper: () => {},
   mode: "light", setMode: () => {},
 });
 
@@ -95,10 +95,10 @@ const ThemeContext = createContext({
  * - mode: light/dark (.dark class on <html>, per Tailwind's darkMode:"class")
  */
 export function ThemeProvider({ children }) {
-  const [font, setFont] = useState(() => readStored(FONT_KEY, VALID_FONTS, "geist"));
+  const [font, setFont] = useState(() => readStored(FONT_KEY, VALID_FONTS, "jakarta"));
   const [colorTheme, setColorTheme] = useState(() => readStored(THEME_KEY, VALID_THEMES, "blue"));
   const [baseColor, setBaseColor] = useState(() => readStored(BASE_KEY, VALID_BASE_COLORS, "zinc"));
-  const [wallpaper, setWallpaper] = useState(() => readStored(WALLPAPER_KEY, VALID_WALLPAPERS, "none"));
+  const [wallpaper, setWallpaper] = useState(() => readStored(WALLPAPER_KEY, VALID_WALLPAPERS, "glow"));
   const [mode, setMode] = useState(() => readStored(MODE_KEY, VALID_MODES, "light"));
 
   useEffect(() => {
