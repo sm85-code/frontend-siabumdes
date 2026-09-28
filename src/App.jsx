@@ -43,8 +43,8 @@ const ROLES_LEDGER = ["admin", "direktur", "bendahara", "pengelola", "pengawas",
 const ROLES_COA = ["admin"];
 const ROLES_USERS = ["admin"];
 const ROLES_AUDIT_LOG = ["admin"];
-const ROLES_ORG_PROFILE = ["admin"];
-const ROLES_UNIT_USAHA = ["admin"];
+const ROLES_ORG_PROFILE = ["admin", "direktur", "pengawas", "penasihat"];
+const ROLES_UNIT_USAHA = ["admin", "direktur", "pengawas", "penasihat"];
 const ROLES_INVENTORY = ["admin", "direktur", "bendahara", "pengelola"];
 
 function Protected({ children, roles }) {

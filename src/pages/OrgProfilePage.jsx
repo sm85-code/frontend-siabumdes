@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
+import { useAuth, can } from "@/lib/auth";
 import { notify } from "@/lib/feedback";
 import Spinner from "@/components/Spinner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,6 +35,9 @@ const SHARE_FIELDS_UNIT = [
 const TOTAL_TOLERANCE = 0.01;
 
 export default function OrgProfilePage() {
+  const { user } = useAuth();
+  // Admin & Direktur can edit; Penasihat & Pengawas are view-only.
+  const canWrite = can(user, "admin", "direktur");
   const [form, setForm] = useState(EMPTY);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -63,6 +67,7 @@ export default function OrgProfilePage() {
 
   const save = async (e) => {
     e.preventDefault();
+    if (!canWrite) return;
     if (!bumdesValid || !unitValid) {
       notify("Total proporsi bagi hasil tiap grup harus tepat 100%");
       return;
@@ -83,7 +88,7 @@ export default function OrgProfilePage() {
   const uploadLogo = (e) => {
     const file = e.target.files?.[0];
     e.target.value = "";
-    if (!file) return;
+    if (!canWrite || !file) return;
     if (file.size > 2 * 1024 * 1024) { notify("Ukuran logo maksimal 2 MB"); return; }
     const fd = new FormData();
     fd.append("file", file);
@@ -121,20 +126,32 @@ export default function OrgProfilePage() {
               )}
             </div>
             <div>
-              <Label className="inline-flex">
-                <Button asChild variant="outline" size="sm" className="cursor-pointer">
-                  <span>{uploading ? "Mengupload..." : "Upload Logo"}</span>
-                </Button>
-                <input type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden
-                       onChange={uploadLogo} disabled={uploading} data-testid="org-logo-input" />
-              </Label>
-              <p className="text-xs mt-1 text-muted-foreground">PNG/JPG/WebP/SVG, maksimal 2 MB. Tampil di tengah kop surat.</p>
+              {canWrite ? (
+                <>
+                  <Label className="inline-flex">
+                    <Button asChild variant="outline" size="sm" className="cursor-pointer">
+                      <span>{uploading ? "Mengupload..." : "Upload Logo"}</span>
+                    </Button>
+                    <input type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden
+                           onChange={uploadLogo} disabled={uploading} data-testid="org-logo-input" />
+                  </Label>
+                  <p className="text-xs mt-1 text-muted-foreground">PNG/JPG/WebP/SVG, maksimal 2 MB. Tampil di tengah kop surat.</p>
+                </>
+              ) : (
+                <p className="text-xs text-muted-foreground">Mode lihat saja — Anda tidak dapat mengubah logo.</p>
+              )}
             </div>
           </div>
         </CardContent>
       </Card>
 
       <form onSubmit={save} className="space-y-6">
+        {!canWrite && (
+          <p className="text-sm text-muted-foreground" data-testid="org-profile-readonly-banner">
+            Mode lihat saja — role Anda tidak dapat mengubah Profil BUMDES.
+          </p>
+        )}
+        <fieldset disabled={!canWrite} className="space-y-6 border-0 p-0 m-0 min-w-0">
         <Card>
           <CardHeader>
             <CardTitle className="font-heading text-lg">Identitas Organisasi</CardTitle>
@@ -243,9 +260,12 @@ export default function OrgProfilePage() {
           </CardContent>
         </Card>
 
-        <Button type="submit" disabled={saving || !bumdesValid || !unitValid} data-testid="save-org-profile">
-          {saving ? "Menyimpan..." : "Simpan Profil BUMDES"}
-        </Button>
+        {canWrite && (
+          <Button type="submit" disabled={saving || !bumdesValid || !unitValid} data-testid="save-org-profile">
+            {saving ? "Menyimpan..." : "Simpan Profil BUMDES"}
+          </Button>
+        )}
+        </fieldset>
       </form>
     </div>
   );

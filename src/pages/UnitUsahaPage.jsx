@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
+import { useAuth, can } from "@/lib/auth";
 import { notify } from "@/lib/feedback";
 import Spinner from "@/components/Spinner";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
@@ -24,6 +25,9 @@ const BUSINESS_TYPE_LABEL = Object.fromEntries(BUSINESS_TYPES.map((t) => [t.valu
 const EMPTY_NEW = { code: "", name: "", business_type: "jasa" };
 
 export default function UnitUsahaPage() {
+  const { user } = useAuth();
+  // Admin & Direktur can edit; Penasihat & Pengawas are view-only.
+  const canWrite = can(user, "admin", "direktur");
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -46,6 +50,7 @@ export default function UnitUsahaPage() {
 
   const submitNew = async (e) => {
     e.preventDefault();
+    if (!canWrite) return;
     if (!newUnit.code.trim() || !newUnit.name.trim()) {
       notify("Kode dan nama unit wajib diisi");
       return;
@@ -66,6 +71,7 @@ export default function UnitUsahaPage() {
 
   const submitEdit = async (e) => {
     e.preventDefault();
+    if (!canWrite) return;
     setSaving(true);
     try {
       await api.patch(`/unit-usaha/${editing.id}`, {
@@ -94,6 +100,7 @@ export default function UnitUsahaPage() {
             {list.length} Unit Usaha BUMDES
           </h1>
         </div>
+        {canWrite && (
         <Dialog open={addOpen} onOpenChange={(o) => { setAddOpen(o); if (!o) setNewUnit(EMPTY_NEW); }}>
           <DialogTrigger asChild>
             <Button data-testid="unit-add-btn"><Plus className="mr-1" size={16} /> Tambah Unit</Button>
@@ -133,6 +140,12 @@ export default function UnitUsahaPage() {
             </form>
           </DialogContent>
         </Dialog>
+        )}
+        {!canWrite && (
+          <p className="text-sm text-muted-foreground" data-testid="unit-usaha-readonly-banner">
+            Mode lihat saja — role Anda tidak dapat mengubah Profil Unit Usaha.
+          </p>
+        )}
       </div>
 
       <Table>
@@ -142,7 +155,7 @@ export default function UnitUsahaPage() {
             <TableHead>Nama Unit</TableHead>
             <TableHead>Jenis Usaha</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead className="text-right">Aksi</TableHead>
+            {canWrite && <TableHead className="text-right">Aksi</TableHead>}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -154,18 +167,20 @@ export default function UnitUsahaPage() {
               <TableCell>
                 {u.active === false ? <Badge variant="outline">Nonaktif</Badge> : <Badge variant="outline">Aktif</Badge>}
               </TableCell>
+              {canWrite && (
               <TableCell className="text-right">
                 <Button variant="ghost" size="icon" data-testid={`unit-edit-${u.code}`}
                   onClick={() => setEditing({ ...u })}>
                   <PencilSimple size={16} />
                 </Button>
               </TableCell>
+              )}
             </TableRow>
           ))}
         </TableBody>
       </Table>
 
-      <Dialog open={!!editing} onOpenChange={(o) => { if (!o) setEditing(null); }}>
+      <Dialog open={canWrite && !!editing} onOpenChange={(o) => { if (!o) setEditing(null); }}>
         <DialogContent>
           <DialogHeader><DialogTitle>Edit Unit Usaha {editing?.code}</DialogTitle></DialogHeader>
           {editing && (
