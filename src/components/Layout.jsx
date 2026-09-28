@@ -1,23 +1,27 @@
 import { NavLink, useLocation } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAuth, can } from "@/lib/auth";
 import api, { ROLE_LABELS } from "@/lib/api";
 import {
-  House, Receipt, ChartLine, Storefront, UsersThree,
-  BookOpenText, SignOut, List, X, Books, UserCircle, Package, Buildings, ClipboardText,
+  House, Receipt, ChartLine, UsersThree,
+  BookOpenText, SignOut, Books, UserCircle, Package, Buildings, ClipboardText,
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import WallpaperLayer from "@/components/WallpaperLayer";
 import AppearancePopover from "@/components/AppearancePopover";
+import BottomNav from "@/components/BottomNav";
 
 const READ_MOST = ["admin", "direktur", "bendahara", "pengelola", "pengawas", "penasihat"];
 const INK = "var(--primary-dark)";
+
+/** Fixed mobile bottom-nav slot order (left→right). Lainnya is appended in BottomNav. */
+const BOTTOM_NAV_PATHS = ["/dashboard", "/ledger", "/reports", "/transactions"];
 
 const NAV = [
   { to: "/dashboard", label: "Dashboard", icon: House, roles: READ_MOST },
   { to: "/accounts", label: "Kode Akun (COA)", icon: Books, roles: ["admin"] },
   { to: "/transactions", label: "Transaksi", icon: Receipt, roles: READ_MOST },
-  { to: "/reports", label: "Laporan Keuangan", icon: ChartLine, roles: READ_MOST },
+  { to: "/reports", label: "Laporan Keuangan", shortLabel: "Laporan", icon: ChartLine, roles: READ_MOST },
   { to: "/ledger", label: "Buku Besar", icon: BookOpenText, roles: READ_MOST },
   { to: "/inventory", label: "Inventory", icon: Package, roles: ["admin", "direktur", "bendahara", "pengelola"], inventoryUnitOnly: true },
   { to: "/unit-usaha", label: "Profil Unit Usaha", icon: Buildings, roles: ["admin"] },
@@ -26,6 +30,16 @@ const NAV = [
   { to: "/users", label: "Kelola Pengguna", icon: UsersThree, roles: ["admin"] },
   { to: "/profile", label: "Profil Saya", icon: UserCircle, roles: READ_MOST },
 ];
+
+/** Prefer longest matching nav path so `/reports/per-unit` activates Laporan. */
+function isNavActive(pathname, to, allPaths) {
+  const matches = allPaths.filter(
+    (p) => pathname === p || pathname.startsWith(`${p}/`),
+  );
+  if (matches.length === 0) return false;
+  const best = matches.reduce((a, b) => (a.length >= b.length ? a : b));
+  return best === to;
+}
 
 export default function Layout({ children }) {
   const { user, logout } = useAuth();
@@ -45,29 +59,50 @@ export default function Layout({ children }) {
     return () => { alive = false; };
   }, []);
 
+  // Close mobile sheet on route change (Lainnya → pick item).
+  useEffect(() => {
+    setOpen(false);
+  }, [location.pathname]);
+
+  const visible = useMemo(() => {
+    if (!user) return [];
+    return NAV.filter((n) => {
+      if (!can(user, ...n.roles)) return false;
+      if (n.inventoryUnitOnly && user.role === "pengelola") {
+        return Boolean(inventoryUnitIds) && inventoryUnitIds.includes(user.unit_usaha_id);
+      }
+      return true;
+    });
+  }, [user, inventoryUnitIds]);
+
+  const allPaths = useMemo(() => visible.map((n) => n.to), [visible]);
+
+  const bottomItems = useMemo(() => {
+    const byPath = new Map(visible.map((n) => [n.to, n]));
+    return BOTTOM_NAV_PATHS.map((p) => byPath.get(p)).filter(Boolean);
+  }, [visible]);
+
+  const moreActive = useMemo(() => {
+    if (!visible.length) return false;
+    const onPrimary = BOTTOM_NAV_PATHS.some((p) => isNavActive(location.pathname, p, BOTTOM_NAV_PATHS));
+    if (onPrimary) return false;
+    return visible.some(
+      (n) => !BOTTOM_NAV_PATHS.includes(n.to) && isNavActive(location.pathname, n.to, allPaths),
+    );
+  }, [visible, location.pathname, allPaths]);
+
   if (!user) return null;
-  const visible = NAV.filter((n) => {
-    if (!can(user, ...n.roles)) return false;
-    if (n.inventoryUnitOnly && user.role === "pengelola") {
-      return Boolean(inventoryUnitIds) && inventoryUnitIds.includes(user.unit_usaha_id);
-    }
-    return true;
-  });
 
   return (
     <div className="app-shell min-h-screen flex">
       <WallpaperLayer />
-      <div className="lg:hidden fixed top-3 inset-x-3 z-40 flex items-center justify-between px-4 h-14 rounded-2xl"
+      {/* Mobile top brand bar — hamburger removed; primary nav is bottom bar + Lainnya sheet */}
+      <div className="lg:hidden fixed top-3 inset-x-3 z-40 flex items-center px-4 h-14 rounded-2xl"
            style={{ background: "var(--surface)", border: "1px solid var(--legacy-border)", boxShadow: "var(--shadow-soft)" }}>
-        <div className="flex items-center gap-2">
-          <img src="/logo-bumdes.webp" alt="Logo" className="w-8 h-8 rounded-full object-cover" />
-          <span className="font-heading font-semibold text-sm">BUMDES Karya Raharja</span>
+        <div className="flex items-center gap-2 min-w-0">
+          <img src="/logo-bumdes.webp" alt="Logo" className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
+          <span className="font-heading font-semibold text-sm truncate">BUMDES Karya Raharja</span>
         </div>
-        <button data-testid="mobile-menu-btn" onClick={() => setOpen(!open)} className="p-2 rounded-xl"
-                aria-label={open ? "Tutup menu" : "Buka menu"}
-                style={{ color: INK }}>
-          {open ? <X size={22} /> : <List size={22} />}
-        </button>
       </div>
 
       <aside data-testid="sidebar"
@@ -84,7 +119,7 @@ export default function Layout({ children }) {
           <nav className="flex-1 min-h-0 p-3 space-y-1 overflow-y-auto">
             {visible.map((n) => {
               const Icon = n.icon;
-              const active = location.pathname === n.to;
+              const active = isNavActive(location.pathname, n.to, allPaths);
               return (
                 <NavLink key={n.to} to={n.to} data-testid={`nav-${n.to.replace(/\//g, "-")}`}
                   onClick={() => setOpen(false)} className={`side-link ${active ? "active" : ""}`}>
@@ -120,9 +155,15 @@ export default function Layout({ children }) {
       </aside>
 
       {open && <div className="lg:hidden fixed inset-0 z-40 bg-black/20" onClick={() => setOpen(false)} />}
-      <main className="flex-1 min-w-0 pt-20 lg:pt-0">
+      <main className="flex-1 min-w-0 pt-20 lg:pt-0 pb-24 lg:pb-0">
         <div className="p-4 sm:p-6 lg:p-8 max-w-[1400px] mx-auto fade-in">{children}</div>
       </main>
+
+      <BottomNav
+        items={bottomItems}
+        onOpenMore={() => setOpen(true)}
+        moreActive={moreActive}
+      />
     </div>
   );
 }
